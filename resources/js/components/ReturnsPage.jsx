@@ -5,13 +5,13 @@ function ReturnsPage() {
     return (
         <>
             <Helmet>
-                <title>بازگردانی و مرجوعی | جمه - سیاست بازگشت کالا</title>
-                <meta name="description" content="شرایط و قوانین بازگردانی کالا در فروشگاه جمه. اطلاعات کامل درباره مراحل مرجوعی، شرایط بازگشت و استرداد وجه." />
-                <meta name="keywords" content="بازگردانی, مرجوعی, استرداد وجه, بازگشت کالا, جمه" />
+                <title>بازگردانی و مرجوعی | iliyw - سیاست بازگشت کالا</title>
+                <meta name="description" content="شرایط و قوانین بازگردانی تابلو در فروشگاه iliyw. اطلاعات کامل درباره مراحل مرجوعی، شرایط بازگشت و استرداد وجه." />
+                <meta name="keywords" content="بازگردانی تابلو, مرجوعی, استرداد وجه, بازگشت کالا, iliyw" />
                 <link rel="canonical" href={`${window.location.origin}/returns`} />
             </Helmet>
 
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+            <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
                 {/* Header */}
                 <div className="sticky top-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10">
                     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -82,35 +82,35 @@ function ReturnsPage() {
                             <h2 className="text-xl font-bold text-white mb-4">مراحل بازگشت</h2>
                             <div className="space-y-4">
                                 <div className="flex items-start gap-4">
-                                    <div className="bg-cherry-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
+                                    <div className="bg-amber-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">1</div>
                                     <div>
                                         <h3 className="text-white font-semibold">تماس با پشتیبانی</h3>
                                         <p className="text-gray-300 text-sm">از طریق اینستاگرام یا تلگرام با ما تماس بگیرید</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
-                                    <div className="bg-cherry-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
+                                    <div className="bg-amber-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">2</div>
                                     <div>
                                         <h3 className="text-white font-semibold">ارسال مدارک</h3>
                                         <p className="text-gray-300 text-sm">عکس کالا و فاکتور خرید را ارسال کنید</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
-                                    <div className="bg-cherry-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
+                                    <div className="bg-amber-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">3</div>
                                     <div>
                                         <h3 className="text-white font-semibold">تایید بازگشت</h3>
                                         <p className="text-gray-300 text-sm">پس از بررسی، تاییدیه بازگشت برای شما ارسال می‌شود</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
-                                    <div className="bg-cherry-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
+                                    <div className="bg-amber-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">4</div>
                                     <div>
                                         <h3 className="text-white font-semibold">ارسال کالا</h3>
                                         <p className="text-gray-300 text-sm">کالا را به آدرس مشخص شده ارسال کنید</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
-                                    <div className="bg-cherry-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">5</div>
+                                    <div className="bg-amber-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold flex-shrink-0">5</div>
                                     <div>
                                         <h3 className="text-white font-semibold">استرداد وجه</h3>
                                         <p className="text-gray-300 text-sm">پس از دریافت کالا، وجه شما بازگردانده می‌شود</p>
@@ -128,14 +128,14 @@ function ReturnsPage() {
                                     <p className="text-gray-300 text-sm mb-3">
                                         امکان بازگشت تا 7 روز پس از دریافت کالا
                                     </p>
-                                    <div className="text-cherry-400 font-medium">7 روز کاری</div>
+                                    <div className="text-amber-400 font-medium">7 روز کاری</div>
                                 </div>
                                 <div className="bg-white/5 rounded-xl p-4">
                                     <h3 className="text-lg font-semibold text-white mb-2">کالاهای معیوب</h3>
                                     <p className="text-gray-300 text-sm mb-3">
                                         امکان بازگشت تا 14 روز پس از دریافت کالا
                                     </p>
-                                    <div className="text-cherry-400 font-medium">14 روز کاری</div>
+                                    <div className="text-amber-400 font-medium">14 روز کاری</div>
                                 </div>
                             </div>
                         </section>
@@ -160,16 +160,16 @@ function ReturnsPage() {
                         </section>
 
                         {/* Contact Info */}
-                        <section className="bg-gradient-to-r from-cherry-600/20 to-pink-600/20 backdrop-blur-sm rounded-2xl p-6 border border-cherry-500/30">
+                        <section className="bg-gradient-to-r from-amber-600/20 to-indigo-600/20 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/30">
                             <h2 className="text-xl font-bold text-white mb-4">نیاز به کمک دارید؟</h2>
                             <p className="text-gray-300 mb-4">
                                 تیم پشتیبانی ما آماده پاسخگویی به سوالات شما درباره بازگشت کالا است
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <a href="https://instagram.com/jemehshopp" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://instagram.com/iliywstore" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     اینستاگرام
                                 </a>
-                                <a href="https://t.me/jemeh_shop" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://instagram.com/iliywstore" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     تلگرام
                                 </a>
                             </div>

@@ -113,13 +113,13 @@ function FileUpload({
                     className={`relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:bg-white/5 transition-all duration-200 group ${
                         error 
                             ? 'border-red-500/50 hover:border-red-500/70' 
-                            : 'border-white/20 hover:border-cherry-500/50'
+                            : 'border-white/20 hover:border-amber-500/50'
                     }`}
                 >
                     <div className="flex flex-col items-center space-y-3">
                         {/* Upload Icon */}
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cherry-500/20 to-cherry-600/20 flex items-center justify-center group-hover:from-cherry-500/30 group-hover:to-cherry-600/30 transition-all duration-200">
-                            <svg className="w-6 h-6 text-cherry-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/20 flex items-center justify-center group-hover:from-amber-500/30 group-hover:to-amber-600/30 transition-all duration-200">
+                            <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                             </svg>
                         </div>
@@ -139,7 +139,7 @@ function FileUpload({
             {value && (
                 <div className="relative">
                     {previewUrl && (
-                        <div className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+                        <div className="bg-gradient-to-br from-gray-800/50 to-slate-950/50 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
                             {/* Image Preview */}
                             <div className="relative">
                                 <img 
@@ -181,8 +181,8 @@ function FileUpload({
                             <div className="p-4">
                                 <div className="flex items-center space-x-3 space-x-reverse">
                                     {/* File Icon */}
-                                    <div className="w-12 h-12 bg-gradient-to-br from-cherry-500/20 to-cherry-600/20 rounded-xl flex items-center justify-center">
-                                        <svg className="w-6 h-6 text-cherry-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-amber-500/20 to-amber-600/20 rounded-xl flex items-center justify-center">
+                                        <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>

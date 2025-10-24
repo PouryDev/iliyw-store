@@ -1,5 +1,5 @@
-// Service Worker for Jemeh Shop PWA
-const CACHE_NAME = 'jemeh-shop-v1';
+// Service Worker for iliyw Store PWA
+const CACHE_NAME = 'iliyw-store-v1';
 const urlsToCache = [
     '/',
     '/css/app.css',

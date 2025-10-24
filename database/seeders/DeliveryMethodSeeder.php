@@ -15,25 +15,25 @@ class DeliveryMethodSeeder extends Seeder
     {
         $methods = [
             [
-                'title' => 'پست پیشتاز',
-                'fee' => 25000,
+                'title' => 'پست پیشتاز (بسته‌بندی ویژه)',
+                'fee' => 35000,
                 'is_active' => true,
                 'sort_order' => 1,
             ],
             [
-                'title' => 'پست سفارشی',
-                'fee' => 35000,
+                'title' => 'پست سفارشی (بیمه شده)',
+                'fee' => 50000,
                 'is_active' => true,
                 'sort_order' => 2,
             ],
             [
-                'title' => 'پیک موتوری (تهران)',
-                'fee' => 45000,
+                'title' => 'پیک موتوری تهران (حرفه‌ای)',
+                'fee' => 65000,
                 'is_active' => true,
                 'sort_order' => 3,
             ],
             [
-                'title' => 'ارسال رایگان (خرید بالای 500 هزار تومان)',
+                'title' => 'ارسال رایگان (خرید بالای 2 میلیون تومان)',
                 'fee' => 0,
                 'is_active' => true,
                 'sort_order' => 0,

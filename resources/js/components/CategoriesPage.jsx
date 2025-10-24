@@ -29,7 +29,7 @@ function CategoriesPage(){
     }, [categories, query]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white anim-page">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white anim-page">
             {/* Hero / Sticky search */}
             <div className="sticky top-0 z-30 bg-black/40 backdrop-blur border-b border-white/10">
                 <div className="max-w-7xl mx-auto px-4 py-3">
@@ -43,7 +43,7 @@ function CategoriesPage(){
                                 value={query}
                                 onChange={(e)=>setQuery(e.target.value)}
                                 placeholder="جستجوی دسته‌بندی..."
-                                className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-3 pl-10 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-600 text-white"
+                                className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-3 pl-10 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-600 text-white"
                             />
                             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -70,9 +70,9 @@ function CategoriesPage(){
                                 <button
                                     key={cat.id}
                                     onClick={() => navigate(`/category/${cat.id}`)}
-                                    className="group rounded-xl glass-card soft-shadow border border-white/10 p-3 text-right hover:border-cherry-500/40 hover:bg-white/10 transition flex items-center gap-3"
+                                    className="group rounded-xl glass-card soft-shadow border border-white/10 p-3 text-right hover:border-amber-500/40 hover:bg-white/10 transition flex items-center gap-3"
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cherry-600/25 to-pink-600/15 flex items-center justify-center text-white text-sm ring-1 ring-white/10">
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600/25 to-indigo-600/15 flex items-center justify-center text-white text-sm ring-1 ring-white/10">
                                         {(cat.name || '?').charAt(0)}
                                     </div>
                                     <div className="min-w-0 flex-1">
@@ -81,7 +81,7 @@ function CategoriesPage(){
                                             <div className="text-[11px] text-gray-400 mt-0.5 line-clamp-2">{cat.description}</div>
                                         )}
                                     </div>
-                                    <svg className="w-4 h-4 text-gray-400 group-hover:text-cherry-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+                                    <svg className="w-4 h-4 text-gray-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
                                 </button>
                             ))}
                         </div>

@@ -89,7 +89,7 @@ function AccountOrders() {
                     <p className="text-gray-400 mb-6">اولین سفارش خود را ثبت کنید</p>
                     <button
                         onClick={() => window.location.href = '/'}
-                        className="bg-gradient-to-r from-cherry-500 to-cherry-600 hover:from-cherry-600 hover:to-cherry-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
+                        className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
                     >
                         شروع خرید
                     </button>
@@ -103,8 +103,8 @@ function AccountOrders() {
                         >
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center space-x-4 space-x-reverse">
-                                    <div className="w-12 h-12 bg-cherry-500/20 rounded-xl flex items-center justify-center">
-                                        <svg className="w-6 h-6 text-cherry-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                                        <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                         </svg>
                                     </div>
@@ -172,7 +172,7 @@ function AccountOrders() {
             {selectedOrder && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="fixed inset-0 bg-black/50" onClick={() => setSelectedOrder(null)}></div>
-                    <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-white/10 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="relative bg-gradient-to-br from-gray-800 to-slate-950 rounded-2xl border border-white/10 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="p-6">
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-white">جزئیات سفارش</h2>

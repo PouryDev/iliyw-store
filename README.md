@@ -1,22 +1,23 @@
-# JemehShop
+# iliyw Store
 
-A minimal, modern e‑commerce (Laravel 12 + Tailwind) showcasing products, cart, checkout, and a lightweight admin panel. Persian (fa) localization is enabled by default.
+A modern art gallery e‑commerce platform (Laravel 12 + React + Tailwind) showcasing paintings and musical artworks with cart, checkout, and admin panel. Persian (fa) localization is enabled by default.
 
 ## Features
 
--   Modern UI with RTL layout, Persian validation messages
--   Product catalog, product images, slug routing
--   Cart (session-based), checkout with receipt upload
+-   Modern React SPA with RTL layout, Persian localization
+-   Art gallery catalog with paintings and musical artworks
+-   Music player integration for musical paintings
+-   Product variants for frame types and dimensions
+-   Cart (session-based), checkout with multiple payment methods
 -   Orders, invoices, transactions data model
--   User account area (orders, settings, password)
--   Admin panel: products CRUD, orders management, status updates, payment verification
--   Reusable Blade UI components: inputs, textarea, checkbox, select, file (with preview), button
--   Mobile-first responsive tables and layouts
+-   User account area (orders, addresses, profile)
+-   Admin panel: products CRUD, music tracks management, orders management, campaigns, discount codes
+-   Mobile-first responsive design with smooth animations
 
 ## Tech Stack
 
--   Backend: Laravel 12 (PHP 8.3)
--   Frontend: Blade, Tailwind (via Vite; CDN fallback on prod)
+-   Backend: Laravel 12 (PHP 8.3) + RESTful API
+-   Frontend: React 18 + React Router + Tailwind CSS (via Vite)
 -   Database: MariaDB 11
 -   Web: Nginx + PHP-FPM
 -   Docker: Multi-service setup (php, nginx, db, backup)

@@ -60,13 +60,13 @@ class OrderSeeder extends Seeder
                 'updated_at' => $orderDate,
             ]);
 
-            // Add 1-4 items to order
-            $itemCount = rand(1, 4);
+            // Add 1-3 items to order (art pieces typically have fewer items per order)
+            $itemCount = rand(1, 3);
             $selectedProducts = $products->random($itemCount);
             $totalAmount = 0;
 
             foreach ($selectedProducts as $product) {
-                $quantity = rand(1, 3);
+                $quantity = rand(1, 2); // Usually 1 or 2 paintings per order
                 $originalPrice = $product->price;
 
                 // Check if product has campaign discount
@@ -114,7 +114,7 @@ class OrderSeeder extends Seeder
             $discountAmount = 0;
             $discountCode = null;
 
-            if (rand(0, 3) === 0 && $discountCodes->isNotEmpty() && $totalAmount > 50000) {
+            if (rand(0, 3) === 0 && $discountCodes->isNotEmpty() && $totalAmount > 200000) {
                 // Find a discount code that this user hasn't used yet
                 $usedDiscountCodeIds = DiscountCodeUsage::where('user_id', $user->id)
                     ->pluck('discount_code_id')

@@ -22,6 +22,10 @@ class Product extends Model
         'has_colors',
         'has_sizes',
         'is_active',
+        'is_musical',
+        'artist',
+        'technique',
+        'year',
     ];
 
     public function category(): BelongsTo
@@ -42,6 +46,11 @@ class Product extends Model
     public function activeVariants(): HasMany
     {
         return $this->hasMany(ProductVariant::class)->where('is_active', true);
+    }
+
+    public function musicTracks(): HasMany
+    {
+        return $this->hasMany(ProductMusicTrack::class)->orderBy('sort_order');
     }
 
     public function getTotalStockAttribute(): int

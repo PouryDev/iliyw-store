@@ -102,9 +102,9 @@ function AccountLayout() {
     }, [sidebarOpen]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
             {/* Mobile Header */}
-            <div className="lg:hidden bg-gradient-to-r from-cherry-600 to-cherry-700 px-4 py-4 sticky top-0 z-50">
+            <div className="lg:hidden bg-gradient-to-r from-amber-600 to-amber-700 px-4 py-4 sticky top-0 z-50">
                 <div className="flex items-center justify-between">
                     <button
                         onClick={openSidebar}
@@ -165,7 +165,7 @@ function AccountLayout() {
                                             navigate('/admin');
                                             setUserMenuOpen(false);
                                         }}
-                                        className="w-full text-right px-3 py-2 rounded hover:bg-white/5 text-sm text-cherry-400"
+                                        className="w-full text-right px-3 py-2 rounded hover:bg-white/5 text-sm text-amber-400"
                                     >
                                         پنل ادمین
                                     </button>
@@ -196,7 +196,7 @@ function AccountLayout() {
                         onClick={closeSidebar}
                     ></div>
                     <div 
-                        className="fixed right-0 top-0 h-full w-80 bg-gradient-to-b from-gray-800 to-gray-900 shadow-2xl transition-transform duration-300 ease-out"
+                        className="fixed right-0 top-0 h-full w-80 bg-gradient-to-b from-gray-800 to-slate-950 shadow-2xl transition-transform duration-300 ease-out"
                         style={{
                             transform: sidebarAnimating ? 'translateX(0)' : 'translateX(100%)'
                         }}
@@ -216,7 +216,7 @@ function AccountLayout() {
 
                             {/* User Info */}
                             <div className="text-center mb-8">
-                                <div className="w-20 h-20 bg-gradient-to-br from-cherry-500 to-cherry-600 rounded-full flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform duration-200">
+                                <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform duration-200">
                                     <span className="text-white text-2xl font-bold">
                                         {user?.name?.charAt(0) || 'U'}
                                     </span>
@@ -236,7 +236,7 @@ function AccountLayout() {
                                         }}
                                         className={`w-full flex items-center space-x-3 space-x-reverse p-4 rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
                                             location.pathname === item.path
-                                                ? 'bg-cherry-500/20 text-cherry-400 border border-cherry-500/30 shadow-cherry-500/20'
+                                                ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 shadow-amber-500/20'
                                                 : 'text-gray-300 hover:bg-white/5 hover:text-white hover:shadow-white/10'
                                         }`}
                                     >
@@ -263,11 +263,11 @@ function AccountLayout() {
 
             <div className="flex">
                 {/* Desktop Sidebar */}
-                <div className="hidden lg:block w-80 bg-gradient-to-b from-gray-800 to-gray-900 min-h-screen sticky top-0">
+                <div className="hidden lg:block w-80 bg-gradient-to-b from-gray-800 to-slate-950 min-h-screen sticky top-0">
                     <div className="p-8">
                         {/* User Info */}
                         <div className="text-center mb-8">
-                            <div className="w-24 h-24 bg-gradient-to-br from-cherry-500 to-cherry-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="w-24 h-24 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <span className="text-white text-3xl font-bold">
                                     {user?.name?.charAt(0) || 'U'}
                                 </span>
@@ -284,7 +284,7 @@ function AccountLayout() {
                                     onClick={() => navigate(item.path)}
                                     className={`w-full flex items-center space-x-4 space-x-reverse p-4 rounded-xl transition-all duration-200 ${
                                         location.pathname === item.path
-                                            ? 'bg-cherry-500/20 text-cherry-400 border border-cherry-500/30'
+                                            ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                                             : 'text-gray-300 hover:bg-white/5 hover:text-white'
                                     }`}
                                 >

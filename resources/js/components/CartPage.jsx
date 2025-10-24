@@ -136,7 +136,7 @@ function CartPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
             {/* Header */}
             <div className="sticky top-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10">
                 <div className="max-w-md mx-auto px-4 py-4">
@@ -148,7 +148,7 @@ function CartPage() {
             <div className="max-w-md mx-auto px-4 py-6">
                 {loading ? (
                     <div className="flex items-center justify-center py-12">
-                        <div className="w-8 h-8 border-2 border-cherry-500 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : error ? (
                     <div className="text-center py-12">
@@ -159,7 +159,7 @@ function CartPage() {
                     <div className="text-center py-16">
                         <div className="text-6xl mb-4">🛒</div>
                         <div className="text-gray-400 text-lg">سبد خرید خالی است</div>
-                        <Link to="/" className="inline-block mt-4 bg-cherry-600 hover:bg-cherry-500 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">
+                        <Link to="/" className="inline-block mt-4 bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors">
                             شروع خرید
                         </Link>
                     </div>
@@ -169,7 +169,7 @@ function CartPage() {
                             <div key={item.key} className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
                                 <div className="flex items-center gap-3">
                                     {/* Product Image */}
-                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-cherry-500/20 to-pink-500/20 flex items-center justify-center text-2xl flex-shrink-0">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-500/20 to-indigo-500/20 flex items-center justify-center text-2xl flex-shrink-0">
                                         🛍️
                                     </div>
 
@@ -186,7 +186,7 @@ function CartPage() {
                                             {item.original_price && item.original_price !== item.price && (
                                                 <span className="text-xs text-gray-500 line-through">{formatPrice(item.original_price)}</span>
                                             )}
-                                            <span className="text-xs text-cherry-400">{formatPrice(item.price)} تومان</span>
+                                            <span className="text-xs text-amber-400">{formatPrice(item.price)} تومان</span>
                                         </div>
                                     </div>
 
@@ -216,7 +216,7 @@ function CartPage() {
                                         <button
                                             onClick={() => incrementItem(item)}
                                             disabled={removingKey === item.key}
-                                            className="w-8 h-8 rounded-full bg-cherry-600 hover:bg-cherry-500 text-white text-sm disabled:opacity-50 flex items-center justify-center"
+                                            className="w-8 h-8 rounded-full bg-amber-600 hover:bg-amber-500 text-white text-sm disabled:opacity-50 flex items-center justify-center"
                                         >
                                             +
                                         </button>
@@ -268,7 +268,7 @@ function CartPage() {
                                 </div>
                                 <Link
                                     to="/checkout"
-                                    className="bg-cherry-600 hover:bg-cherry-500 text-white rounded-2xl py-3 px-8 font-semibold transition-colors shadow-lg"
+                                    className="bg-amber-600 hover:bg-amber-500 text-white rounded-2xl py-3 px-8 font-semibold transition-colors shadow-lg"
                                 >
                                     ادامه خرید
                                 </Link>

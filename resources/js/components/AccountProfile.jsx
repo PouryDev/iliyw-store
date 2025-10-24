@@ -86,7 +86,7 @@ function AccountProfile() {
             {/* Profile Header */}
             <div className="glass-card rounded-2xl p-6 border border-white/10">
                 <div className="flex items-center gap-4 mb-6">
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cherry-600 to-pink-600 flex items-center justify-center text-white text-3xl font-bold">
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-600 to-indigo-600 flex items-center justify-center text-white text-3xl font-bold">
                         {user.name ? user.name.charAt(0).toUpperCase() : 'U'}
                     </div>
                     <div>
@@ -100,7 +100,7 @@ function AccountProfile() {
                     {!editing ? (
                         <button
                             onClick={() => setEditing(true)}
-                            className="px-4 py-2 rounded-lg bg-cherry-600 hover:bg-cherry-700 text-white text-sm font-semibold transition"
+                            className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold transition"
                         >
                             ویرایش اطلاعات
                         </button>
@@ -109,7 +109,7 @@ function AccountProfile() {
                             <button
                                 onClick={handleSave}
                                 disabled={saving}
-                                className="px-4 py-2 rounded-lg bg-cherry-600 hover:bg-cherry-700 disabled:opacity-50 text-white text-sm font-semibold transition"
+                                className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-sm font-semibold transition"
                             >
                                 {saving ? 'در حال ذخیره...' : 'ذخیره'}
                             </button>
@@ -145,7 +145,7 @@ function AccountProfile() {
                                     type="text"
                                     value={form.name}
                                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                    className={`w-full bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-cherry-600`}
+                                    className={`w-full bg-white/5 border ${errors.name ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-600`}
                                 />
                                 {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name[0]}</p>}
                             </>
@@ -161,7 +161,7 @@ function AccountProfile() {
                                     type="text"
                                     value={form.phone}
                                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                                    className={`w-full bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-cherry-600`}
+                                    className={`w-full bg-white/5 border ${errors.phone ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-600`}
                                 />
                                 {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone[0]}</p>}
                             </>
@@ -177,7 +177,7 @@ function AccountProfile() {
                                     type="text"
                                     value={form.instagram_id}
                                     onChange={(e) => setForm({ ...form, instagram_id: e.target.value })}
-                                    className={`w-full bg-white/5 border ${errors.instagram_id ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-cherry-600`}
+                                    className={`w-full bg-white/5 border ${errors.instagram_id ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-600`}
                                     placeholder="@username"
                                 />
                                 {errors.instagram_id && <p className="text-red-400 text-xs mt-1">{errors.instagram_id[0]}</p>}
@@ -194,7 +194,7 @@ function AccountProfile() {
                                     value={form.address}
                                     onChange={(e) => setForm({ ...form, address: e.target.value })}
                                     rows="3"
-                                    className={`w-full bg-white/5 border ${errors.address ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-cherry-600`}
+                                    className={`w-full bg-white/5 border ${errors.address ? 'border-red-500' : 'border-white/10'} rounded-lg py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-600`}
                                     placeholder="آدرس پستی خود را وارد کنید"
                                 />
                                 {errors.address && <p className="text-red-400 text-xs mt-1">{errors.address[0]}</p>}

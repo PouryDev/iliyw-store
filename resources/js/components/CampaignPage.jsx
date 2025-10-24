@@ -70,17 +70,17 @@ function CampaignPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
             {/* Header */}
             <section className="relative py-6 md:py-10 px-4">
                 <div className="max-w-7xl mx-auto">
-                    <button onClick={() => navigate(-1)} className="text-cherry-400 hover:text-cherry-300 text-sm mb-3 flex items-center gap-1">
+                    <button onClick={() => navigate(-1)} className="text-amber-400 hover:text-amber-300 text-sm mb-3 flex items-center gap-1">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
                         بازگشت
                     </button>
                     {campaign ? (
                         <div className="rounded-2xl overflow-hidden glass-card soft-shadow border border-white/10">
-                            <div className="relative h-32 md:h-40 bg-gradient-to-br from-cherry-600/40 via-pink-600/30 to-purple-600/20 overflow-hidden">
+                            <div className="relative h-32 md:h-40 bg-gradient-to-br from-amber-600/40 via-pink-600/30 to-indigo-600/20 overflow-hidden">
                                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjAzIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-30" />
                                 <div className="absolute inset-0 flex items-center justify-center text-center px-4 z-10">
                                     <div>
@@ -137,7 +137,7 @@ function CampaignPage() {
                                     <button
                                         onClick={loadMore}
                                         disabled={loading}
-                                        className="bg-cherry-600 hover:bg-cherry-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                                        className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                                     >
                                         {loading ? (
                                             <span className="flex items-center gap-2">

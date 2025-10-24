@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../utils/sanctumAuth';
 import { useSeo } from '../hooks/useSeo';
+import MusicPlayer from './MusicPlayer';
 
 function ProductPage() {
     const { slug } = useParams();
@@ -17,12 +18,13 @@ function ProductPage() {
     const [adding, setAdding] = React.useState(false);
     const [addStatus, setAddStatus] = React.useState(null);
     const [displayPrice, setDisplayPrice] = React.useState(null);
+    const [musicTracks, setMusicTracks] = React.useState([]);
 
     // SEO
     useSeo({
-        title: product ? `${product.title} - جمه` : 'محصول - جمه',
-        description: product ? `${product.title} - ${product.description?.substring(0, 150)}...` : 'محصول با کیفیت از فروشگاه جمه',
-        keywords: product ? `${product.title}, لباس, جمه, خرید آنلاین` : 'لباس, خرید آنلاین',
+        title: product ? `${product.title} - iliyw` : 'تابلو - iliyw',
+        description: product ? `${product.title} - ${product.description?.substring(0, 150)}...` : 'تابلوهای هنری با کیفیت از فروشگاه iliyw',
+        keywords: product ? `${product.title}, تابلو, هنر, iliyw, خرید آنلاین` : 'تابلو, هنر, خرید آنلاین',
         image: product?.images?.[0]?.path ? resolveImageUrl(product.images[0].path) : '/images/logo.png',
         canonical: window.location.origin + `/products/${slug}`
     });
@@ -63,6 +65,20 @@ function ProductPage() {
                     setSelectedSizeId(firstSize ? firstSize.id : null);
                 }
                 setDisplayPrice(calculateBasePrice(p, null, null));
+                
+                // Load music tracks if product is musical
+                if (p?.is_musical) {
+                    apiRequest(`/api/products/${slug}/music-tracks`)
+                        .then(async (res) => {
+                            if (res.ok) {
+                                const data = await res.json();
+                                if (data?.success) {
+                                    setMusicTracks(data.data || []);
+                                }
+                            }
+                        })
+                        .catch(() => {});
+                }
             })
             .catch(() => setError('خطا در بارگذاری محصول'))
             .finally(() => setLoading(false));
@@ -215,7 +231,7 @@ function ProductPage() {
             <div className="min-h-screen py-12">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="text-red-400">{error || 'محصول یافت نشد'}</div>
-                    <button onClick={() => navigate(-1)} className="mt-4 text-cherry-400 hover:text-cherry-300">بازگشت</button>
+                    <button onClick={() => navigate(-1)} className="mt-4 text-amber-400 hover:text-amber-300">بازگشت</button>
                 </div>
             </div>
         );
@@ -243,7 +259,7 @@ function ProductPage() {
                                         <button
                                             key={idx}
                                             onClick={() => setMainImage(resolveImageUrl(img.path))}
-                                            className={`flex-shrink-0 bg-black/30 rounded border ${mainImage === resolveImageUrl(img.path) ? 'border-cherry-500' : 'border-white/10'} p-1`}
+                                            className={`flex-shrink-0 bg-black/30 rounded border ${mainImage === resolveImageUrl(img.path) ? 'border-amber-500' : 'border-white/10'} p-1`}
                                         >
                                             <img src={resolveImageUrl(img.path)} alt={product.title} className="w-16 h-16 object-cover rounded" onError={(e) => { e.currentTarget.src = '/images/placeholder.jpg'; }} />
                                         </button>
@@ -254,7 +270,7 @@ function ProductPage() {
                                         <button
                                             key={idx}
                                             onClick={() => setMainImage(resolveImageUrl(img.path))}
-                                            className={`bg-black/30 rounded border ${mainImage === resolveImageUrl(img.path) ? 'border-cherry-500' : 'border-white/10'} p-1`}
+                                            className={`bg-black/30 rounded border ${mainImage === resolveImageUrl(img.path) ? 'border-amber-500' : 'border-white/10'} p-1`}
                                         >
                                             <img src={resolveImageUrl(img.path)} alt={product.title} className="w-full h-16 object-cover rounded" onError={(e) => { e.currentTarget.src = '/images/placeholder.jpg'; }} />
                                         </button>
@@ -284,7 +300,7 @@ function ProductPage() {
                                 );
                             })()}
                             {getActiveCampaign(product) && (
-                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-cherry-600/20 to-pink-600/20 text-cherry-200 border border-cherry-500/30 text-xs md:text-sm backdrop-blur">
+                                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gradient-to-r from-amber-600/20 to-indigo-600/20 text-amber-200 border border-amber-500/30 text-xs md:text-sm backdrop-blur">
                                     <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                     <span className="font-medium truncate max-w-[160px] md:max-w-xs">{getActiveCampaign(product).name}</span>
                                 </span>
@@ -295,10 +311,47 @@ function ProductPage() {
                             <p className="text-gray-300 leading-7 mb-6">{product.description}</p>
                         )}
 
+                        {/* Artist and Technical Info */}
+                        {(product.artist || product.technique || product.year) && (
+                            <div className="mb-6 p-4 bg-white/5 border border-white/10 rounded-lg space-y-2 text-sm">
+                                {product.artist && (
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-gray-400">هنرمند:</span>
+                                        <span className="text-white">{product.artist}</span>
+                                    </div>
+                                )}
+                                {product.technique && (
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-gray-400">تکنیک:</span>
+                                        <span className="text-white">{product.technique}</span>
+                                    </div>
+                                )}
+                                {product.year && (
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-gray-400">سال:</span>
+                                        <span className="text-white">{product.year}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Music Player for Musical Paintings */}
+                        {product.is_musical && musicTracks.length > 0 && (
+                            <div className="mb-6">
+                                <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+                                    </svg>
+                                    موسیقی همراه تابلو
+                                </h3>
+                                <MusicPlayer tracks={musicTracks} />
+                            </div>
+                        )}
+
                         <div className="space-y-4">
                             {product.has_colors && (
                                 <div>
-                                    <label className="block text-sm text-gray-300 mb-2">رنگ</label>
+                                    <label className="block text-sm text-gray-300 mb-2">نوع قاب</label>
                                     <div className="flex flex-wrap gap-2">
                                         {colors.length === 0 ? (
                                             <span className="text-xs text-gray-400">ناموجود</span>
@@ -308,7 +361,7 @@ function ProductPage() {
                                                     key={c.id}
                                                     onClick={() => setSelectedColorId(c.id)}
                                                     className={`w-9 h-9 rounded-full border-2 transition ${
-                                                        selectedColorId === c.id ? 'border-white ring-2 ring-cherry-500' : 'border-white/20'
+                                                        selectedColorId === c.id ? 'border-white ring-2 ring-amber-500' : 'border-white/20'
                                                     }`}
                                                     style={{ backgroundColor: c.hex_code || '#777' }}
                                                     aria-label={c.name}
@@ -322,7 +375,7 @@ function ProductPage() {
 
                             {product.has_sizes && (
                                 <div>
-                                    <label className="block text-sm text-gray-300 mb-2">سایز</label>
+                                    <label className="block text-sm text-gray-300 mb-2">ابعاد</label>
                                     <div className="flex flex-wrap gap-2">
                                         {sizes.length === 0 ? (
                                             <span className="text-xs text-gray-400">ناموجود</span>
@@ -359,7 +412,7 @@ function ProductPage() {
                                 <button
                                     onClick={handleAddToCart}
                                     disabled={adding}
-                                    className="bg-cherry-600 hover:bg-cherry-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-white px-6 py-3 rounded-lg"
+                                    className="bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-white px-6 py-3 rounded-lg"
                                 >
                                     {adding ? 'در حال افزودن...' : 'افزودن به سبد خرید'}
                                 </button>
@@ -371,28 +424,28 @@ function ProductPage() {
                         {/* Benefit Cards */}
                         <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                             <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
-                                <span className="text-cherry-400 mt-0.5">🚚</span>
+                                <span className="text-amber-400 mt-0.5">🚚</span>
                                 <div>
                                     <div className="text-white font-semibold">ارسال سریع</div>
                                     <div className="text-gray-400 text-xs">تحویل 2 تا 4 روز کاری</div>
                                 </div>
                             </div>
                             <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
-                                <span className="text-cherry-400 mt-0.5">🔄</span>
+                                <span className="text-amber-400 mt-0.5">🔄</span>
                                 <div>
                                     <div className="text-white font-semibold">مرجوع آسان</div>
                                     <div className="text-gray-400 text-xs">تا 7 روز پس از دریافت</div>
                                 </div>
                             </div>
                             <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
-                                <span className="text-cherry-400 mt-0.5">💳</span>
+                                <span className="text-amber-400 mt-0.5">💳</span>
                                 <div>
                                     <div className="text-white font-semibold">پرداخت امن</div>
                                     <div className="text-gray-400 text-xs">از طریق درگاه شتاب</div>
                                 </div>
                             </div>
                             <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
-                                <span className="text-cherry-400 mt-0.5">🎁</span>
+                                <span className="text-amber-400 mt-0.5">🎁</span>
                                 <div>
                                     <div className="text-white font-semibold">بسته‌بندی شیک</div>
                                     <div className="text-gray-400 text-xs">مناسب هدیه دادن</div>
@@ -414,7 +467,7 @@ function ProductPage() {
                                 return <div className="text-white font-extrabold">{formatPrice(finalPrice)} تومان</div>;
                             })()}
                         </div>
-                        <button onClick={handleAddToCart} disabled={adding} className="flex-1 text-center bg-cherry-600 hover:bg-cherry-500 text-white rounded-lg py-2">
+                        <button onClick={handleAddToCart} disabled={adding} className="flex-1 text-center bg-amber-600 hover:bg-amber-500 text-white rounded-lg py-2">
                             {adding ? 'در حال افزودن...' : 'افزودن به سبد'}
                         </button>
                     </div>

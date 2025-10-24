@@ -24,27 +24,27 @@ function Header() {
 
     return (
         <>
-        <header className="bg-black/50 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <header className="bg-slate-950/80 backdrop-blur-xl border-b border-amber-500/20 sticky top-0 z-50 shadow-lg shadow-amber-500/5">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
-                    <Link to="/" className="flex items-center space-x-2 text-white hover:text-cherry-400 transition-colors">
-                        <img src="/images/logo.png" alt="Logo" className="h-8 w-8" />
-                        <span className="font-bold text-xl">جمه</span>
+                    <Link to="/" className="flex items-center space-x-2 text-white hover:text-amber-400 transition-colors">
+                        <img src="/images/logo.png" alt="iliyw Logo" className="h-8 w-8" />
+                        <span className="font-bold text-xl">ایلی استور</span>
                     </Link>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex space-x-8">
-                        <Link to="/" className="text-white hover:text-cherry-400 transition-colors">
+                        <Link to="/" className="text-white hover:text-amber-400 transition-colors">
                             خانه
                         </Link>
-                        <Link to="/products" className="text-white hover:text-cherry-400 transition-colors">
-                            محصولات
+                        <Link to="/products" className="text-white hover:text-amber-400 transition-colors">
+                            تابلوها
                         </Link>
-                        <Link to="/about" className="text-white hover:text-cherry-400 transition-colors">
+                        <Link to="/about" className="text-white hover:text-amber-400 transition-colors">
                             درباره ما
                         </Link>
-                        <Link to="/contact" className="text-white hover:text-cherry-400 transition-colors">
+                        <Link to="/contact" className="text-white hover:text-amber-400 transition-colors">
                             تماس
                         </Link>
                     </nav>
@@ -67,7 +67,7 @@ function Header() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 10-8 0v4M5 9h14l-1 10a2 2 0 01-2 2H8a2 2 0 01-2-2L5 9z" />
                             </svg>
                             {cartData.count > 0 && (
-                                <span className="absolute -top-1 -right-1 z-20 bg-gradient-to-r from-cherry-600 to-pink-600 text-white text-[10px] rounded-full h-5 min-w-5 px-1 flex items-center justify-center ring-1 ring-white/30 shadow">
+                                <span className="absolute -top-1 -right-1 z-20 bg-gradient-to-r from-amber-600 to-indigo-600 text-white text-[10px] rounded-full h-5 min-w-5 px-1 flex items-center justify-center ring-1 ring-white/30 shadow">
                                     {cartData.count}
                                 </span>
                             )}
@@ -76,7 +76,7 @@ function Header() {
                         {/* User Menu - Only show when not in account area */}
                         {!isInAccountArea && (
                             <div className="relative">
-                                <button onClick={() => setUserMenuOpen(v=>!v)} className="flex items-center space-x-2 text-white hover:text-cherry-400 transition-colors">
+                                <button onClick={() => setUserMenuOpen(v=>!v)} className="flex items-center space-x-2 text-white hover:text-amber-400 transition-colors">
                                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
@@ -118,7 +118,7 @@ function Header() {
                         {/* Mobile menu button */}
                         <button
                             onClick={toggleMenu}
-                            className="md:hidden p-2 text-white hover:text-cherry-400 transition-colors"
+                            className="md:hidden p-2 text-white hover:text-amber-400 transition-colors"
                         >
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 {isMenuOpen ? (
@@ -152,7 +152,7 @@ function Header() {
                                 className="px-4 py-2 text-white/90 hover:text-white hover:bg-white/5 transition-colors"
                                 onClick={() => setIsMenuOpen(false)}
                             >
-                                محصولات
+                                تابلوها
                             </Link>
                             <Link 
                                 to="/about" 

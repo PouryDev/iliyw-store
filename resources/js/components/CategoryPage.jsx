@@ -86,12 +86,12 @@ function CategoryPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white anim-page">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white anim-page">
             {/* Header */}
             <section className="relative py-10 md:py-14 px-4">
                 <div className="max-w-7xl mx-auto">
                     <div className="rounded-2xl glass-card soft-shadow p-5 md:p-7 border border-white/10">
-                        <button onClick={() => navigate(-1)} className="text-cherry-400 hover:text-cherry-300 text-sm mb-3 flex items-center gap-1">
+                        <button onClick={() => navigate(-1)} className="text-amber-400 hover:text-amber-300 text-sm mb-3 flex items-center gap-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
                             بازگشت
                         </button>
@@ -133,7 +133,7 @@ function CategoryPage() {
                                     <button
                                         onClick={loadMore}
                                         disabled={loading}
-                                        className="bg-cherry-600 hover:bg-cherry-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                                        className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                                     >
                                         {loading ? (
                                             <span className="flex items-center gap-2">

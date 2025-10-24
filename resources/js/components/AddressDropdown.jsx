@@ -23,12 +23,12 @@ function AddressDropdown({ addresses, selectedAddress, onSelect, onAddNew, loadi
                     setIsOpen(!isOpen);
                 }}
                 disabled={loading}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-right text-white hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 disabled:opacity-50"
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-right text-white hover:bg-white/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:opacity-50"
             >
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cherry-500/20 to-pink-500/20 flex items-center justify-center">
-                            <svg className="w-4 h-4 text-cherry-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500/20 to-indigo-500/20 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
@@ -86,12 +86,12 @@ function AddressDropdown({ addresses, selectedAddress, onSelect, onAddNew, loadi
                                         handleSelect(address);
                                     }}
                                     className={`w-full text-right p-4 hover:bg-white/10 transition-colors border-b border-white/10 last:border-b-0 ${
-                                        selectedAddress?.id === address.id ? 'bg-cherry-500/20' : ''
+                                        selectedAddress?.id === address.id ? 'bg-amber-500/20' : ''
                                     }`}
                                 >
                                     <div className="flex items-start gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-cherry-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
-                                            <svg className="w-4 h-4 text-cherry-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-500/20 to-indigo-500/20 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                             </svg>
@@ -102,7 +102,7 @@ function AddressDropdown({ addresses, selectedAddress, onSelect, onAddNew, loadi
                                                     {address.title || 'آدرس'}
                                                 </div>
                                                 {address.is_default && (
-                                                    <span className="bg-cherry-600 text-white text-xs px-2 py-1 rounded-full">
+                                                    <span className="bg-amber-600 text-white text-xs px-2 py-1 rounded-full">
                                                         پیش‌فرض
                                                     </span>
                                                 )}
@@ -117,7 +117,7 @@ function AddressDropdown({ addresses, selectedAddress, onSelect, onAddNew, loadi
                                             )}
                                         </div>
                                         {selectedAddress?.id === address.id && (
-                                            <div className="w-5 h-5 rounded-full bg-cherry-600 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-5 h-5 rounded-full bg-amber-600 flex items-center justify-center flex-shrink-0">
                                                 <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                                 </svg>
@@ -137,7 +137,7 @@ function AddressDropdown({ addresses, selectedAddress, onSelect, onAddNew, loadi
                                 e.stopPropagation();
                                 handleAddNew();
                             }}
-                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-cherry-600 to-pink-600 hover:from-cherry-500 hover:to-pink-500 text-white rounded-lg py-2.5 px-4 transition-all duration-200"
+                            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white rounded-lg py-2.5 px-4 transition-all duration-200"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />

@@ -295,7 +295,7 @@ const PersianDatePicker = ({
                     {/* Date Picker */}
                     <div 
                         data-datepicker-dropdown
-                        className={`fixed bg-gradient-to-br from-gray-900/95 to-gray-800/95 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl z-[99999] overflow-hidden ${
+                        className={`fixed bg-gradient-to-br from-slate-950/95 to-gray-800/95 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl z-[99999] overflow-hidden ${
                             isMobile ? 'inset-x-4 top-1/2 -translate-y-1/2' : ''
                         }`}
                         style={isMobile ? {
@@ -368,7 +368,7 @@ const PersianDatePicker = ({
                                 }}
                                 className={`aspect-square flex items-center justify-center text-sm rounded-lg transition-all duration-200 ${
                                     dayInfo.isSelected
-                                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold'
+                                        ? 'bg-gradient-to-r from-amber-500 to-indigo-600 text-white font-bold'
                                         : dayInfo.isToday
                                         ? 'bg-purple-500/20 text-purple-400 font-semibold'
                                         : dayInfo.isCurrentMonth
@@ -416,7 +416,7 @@ const PersianDatePicker = ({
                                     
                                     onChange(gregorianString);
                                 }}
-                                className="flex-1 bg-gradient-to-r from-purple-500/20 to-purple-600/20 hover:from-purple-500/30 hover:to-purple-600/30 text-purple-400 font-medium py-2 px-3 rounded-lg transition-all duration-200 text-sm"
+                                className="flex-1 bg-gradient-to-r from-amber-500/20 to-indigo-600/20 hover:from-amber-500/30 hover:to-indigo-600/30 text-purple-400 font-medium py-2 px-3 rounded-lg transition-all duration-200 text-sm"
                             >
                                 امروز
                             </button>

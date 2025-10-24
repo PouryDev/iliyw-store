@@ -143,7 +143,7 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                         onChange={handleInputChange}
                         onFocus={handleInputFocus}
                         placeholder="جستجوی محصول، مثل: دستبند نقره"
-                        className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-600 text-white"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-600 text-white"
                     />
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                         {loading ? (
@@ -181,7 +181,7 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                                         onClick={() => handleResultClick(category)}
                                         className="w-full text-right px-3 py-2 rounded-lg hover:bg-white/5 text-sm flex items-center gap-3 group"
                                     >
-                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cherry-600/25 to-pink-600/15 flex items-center justify-center text-white text-xs ring-1 ring-white/10">
+                                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-600/25 to-indigo-600/15 flex items-center justify-center text-white text-xs ring-1 ring-white/10">
                                             {category.name.charAt(0)}
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -190,7 +190,7 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                                                 <div className="text-gray-400 text-xs truncate">{category.description}</div>
                                             )}
                                         </div>
-                                        <svg className="w-4 h-4 text-gray-400 group-hover:text-cherry-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4 text-gray-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
                                         </svg>
                                     </button>
@@ -221,9 +221,9 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-white font-medium truncate">{product.title}</div>
-                                            <div className="text-cherry-400 text-xs">{formatPrice(product.price)} تومان</div>
+                                            <div className="text-amber-400 text-xs">{formatPrice(product.price)} تومان</div>
                                         </div>
-                                        <svg className="w-4 h-4 text-gray-400 group-hover:text-cherry-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="w-4 h-4 text-gray-400 group-hover:text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/>
                                         </svg>
                                     </button>
@@ -239,7 +239,7 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                                         navigate(`/products?q=${encodeURIComponent(query)}`);
                                         setShowDropdown(false);
                                     }}
-                                    className="w-full text-center px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-cherry-400 hover:text-cherry-300"
+                                    className="w-full text-center px-3 py-2 rounded-lg hover:bg-white/5 text-sm text-amber-400 hover:text-amber-300"
                                 >
                                     مشاهده همه نتایج برای "{query}"
                                 </button>

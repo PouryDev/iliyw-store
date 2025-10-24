@@ -106,7 +106,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
             />
             
             {/* Modal */}
-            <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-t-3xl md:rounded-2xl w-full md:max-w-md mx-auto shadow-2xl border border-white/10 max-h-[90vh] md:max-h-[80vh] flex flex-col">
+            <div className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-t-3xl md:rounded-2xl w-full md:max-w-md mx-auto shadow-2xl border border-white/10 max-h-[90vh] md:max-h-[80vh] flex flex-col">
                 {/* Header */}
                 <div className="px-4 py-4 border-b border-white/10 flex-shrink-0">
                     <div className="flex items-center justify-between">
@@ -142,7 +142,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                             value={form.title}
                             onChange={handleChange}
                             placeholder="مثل: خانه، محل کار"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 focus:border-transparent text-sm"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
                         />
                     </div>
 
@@ -158,7 +158,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                             rows={3}
                             required
                             placeholder="آدرس کامل خود را وارد کنید..."
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 focus:border-transparent resize-none text-sm"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent resize-none text-sm"
                         />
                     </div>
 
@@ -174,7 +174,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                                 value={form.city}
                                 onChange={handleChange}
                                 placeholder="تهران"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 focus:border-transparent text-sm"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
                             />
                         </div>
                         <div>
@@ -187,7 +187,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                                 value={form.province}
                                 onChange={handleChange}
                                 placeholder="تهران"
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 focus:border-transparent text-sm"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
                             />
                         </div>
                     </div>
@@ -204,7 +204,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                                 value={form.recipient_name}
                                 onChange={handleChange}
                                 placeholder={user?.name ? `نام شما: ${user.name}` : "نام گیرنده"}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 focus:border-transparent text-sm"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
                             />
                         </div>
                         <div>
@@ -217,7 +217,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                                 value={form.recipient_phone}
                                 onChange={handleChange}
                                 placeholder={user?.phone ? `شماره شما: ${user.phone}` : "09123456789"}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 focus:border-transparent text-sm"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
                             />
                         </div>
                     </div>
@@ -233,7 +233,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                             value={form.postal_code}
                             onChange={handleChange}
                             placeholder="1234567890"
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500/50 focus:border-transparent text-sm"
+                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-transparent text-sm"
                         />
                     </div>
 
@@ -252,7 +252,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                                 htmlFor="is_default"
                                 className={`w-6 h-6 rounded-lg border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
                                     form.is_default 
-                                        ? 'bg-gradient-to-r from-cherry-600 to-pink-600 border-cherry-600 shadow-lg shadow-cherry-600/30' 
+                                        ? 'bg-gradient-to-r from-amber-600 to-indigo-600 border-amber-600 shadow-lg shadow-amber-600/30' 
                                         : 'bg-white/10 border-white/20 hover:border-white/40'
                                 }`}
                             >
@@ -275,7 +275,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                 </form>
 
                 {/* Actions - Fixed at bottom */}
-                <div className="px-4 py-4 border-t border-white/10 flex-shrink-0 bg-gradient-to-t from-gray-900/90 to-transparent">
+                <div className="px-4 py-4 border-t border-white/10 flex-shrink-0 bg-gradient-to-t from-slate-950/90 to-transparent">
                     <div className="flex gap-3">
                         <button
                             type="button"
@@ -288,7 +288,7 @@ function AddressModal({ open, onClose, onSave, address = null, loading = false }
                             type="submit"
                             disabled={loading || !form.address.trim()}
                             onClick={handleSubmit}
-                            className="flex-1 py-3 px-4 bg-gradient-to-r from-cherry-600 to-pink-600 hover:from-cherry-500 hover:to-pink-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg"
+                            className="flex-1 py-3 px-4 bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl transition-all duration-200 text-sm font-medium shadow-lg"
                         >
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">

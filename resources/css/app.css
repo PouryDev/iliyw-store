@@ -9,18 +9,44 @@
     --font-sans: 'Vazirmatn', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
     
-    /* Custom Cherry/Burgundy Color - replaces pink */
-    --color-cherry-50: oklch(0.97 0.02 15);
-    --color-cherry-100: oklch(0.95 0.04 15);
-    --color-cherry-200: oklch(0.90 0.08 15);
-    --color-cherry-300: oklch(0.82 0.14 15);
-    --color-cherry-400: oklch(0.71 0.20 15);
-    --color-cherry-500: oklch(0.58 0.24 15);
-    --color-cherry-600: oklch(0.48 0.22 15); /* Main: #bf224a */
-    --color-cherry-700: oklch(0.40 0.20 15);
-    --color-cherry-800: oklch(0.33 0.16 15);
-    --color-cherry-900: oklch(0.27 0.12 15);
-    --color-cherry-950: oklch(0.18 0.08 15);
+    /* Custom Amber/Gold Color - Art Gallery Theme */
+    --color-amber-50: oklch(0.98 0.02 85);
+    --color-amber-100: oklch(0.96 0.04 85);
+    --color-amber-200: oklch(0.92 0.08 85);
+    --color-amber-300: oklch(0.85 0.12 85);
+    --color-amber-400: oklch(0.76 0.16 85);
+    --color-amber-500: oklch(0.68 0.18 85);
+    --color-amber-600: oklch(0.58 0.16 85); /* Main: Golden */
+    --color-amber-700: oklch(0.48 0.14 85);
+    --color-amber-800: oklch(0.38 0.11 85);
+    --color-amber-900: oklch(0.30 0.09 85);
+    --color-amber-950: oklch(0.20 0.06 85);
+    
+    /* Indigo for sophistication */
+    --color-indigo-50: oklch(0.97 0.01 270);
+    --color-indigo-100: oklch(0.94 0.03 270);
+    --color-indigo-200: oklch(0.88 0.06 270);
+    --color-indigo-300: oklch(0.78 0.10 270);
+    --color-indigo-400: oklch(0.66 0.16 270);
+    --color-indigo-500: oklch(0.55 0.20 270);
+    --color-indigo-600: oklch(0.47 0.22 270);
+    --color-indigo-700: oklch(0.40 0.20 270);
+    --color-indigo-800: oklch(0.33 0.16 270);
+    --color-indigo-900: oklch(0.27 0.12 270);
+    --color-indigo-950: oklch(0.18 0.08 270);
+    
+    /* Keep cherry for backwards compatibility but rename to primary */
+    --color-primary-50: oklch(0.98 0.02 85);
+    --color-primary-100: oklch(0.96 0.04 85);
+    --color-primary-200: oklch(0.92 0.08 85);
+    --color-primary-300: oklch(0.85 0.12 85);
+    --color-primary-400: oklch(0.76 0.16 85);
+    --color-primary-500: oklch(0.68 0.18 85);
+    --color-primary-600: oklch(0.58 0.16 85);
+    --color-primary-700: oklch(0.48 0.14 85);
+    --color-primary-800: oklch(0.38 0.11 85);
+    --color-primary-900: oklch(0.30 0.09 85);
+    --color-primary-950: oklch(0.20 0.06 85);
 }
 /* Local Vazirmatn fonts */
 @font-face {
@@ -33,18 +59,24 @@
   unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1;
 }
 
-/* Modern UI helpers (mobile-first) */
+/* Modern UI helpers (mobile-first) - Art Gallery Theme */
 .glass-card {
-  background-color: color-mix(in oklab, rgba(255,255,255,0.06), transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background-color: color-mix(in oklab, rgba(255,255,255,0.04), transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .soft-shadow {
   box-shadow:
-    0 10px 20px -10px rgba(0,0,0,0.5),
-    0 4px 6px -4px rgba(0,0,0,0.4);
+    0 20px 40px -20px rgba(0,0,0,0.6),
+    0 8px 16px -8px rgba(0,0,0,0.5);
+}
+
+.elegant-shadow {
+  box-shadow:
+    0 4px 20px rgba(251, 191, 36, 0.1),
+    0 2px 8px rgba(0,0,0,0.3);
 }
 
 .hover-lift { transition: transform .2s ease, box-shadow .2s ease; }

@@ -94,12 +94,14 @@ class DatabaseSeeder extends Seeder
         $this->command->info('📂 Creating categories...');
 
         $categories = [
-            ['name' => 'تیشرت'],
-            ['name' => 'شلوار'],
-            ['name' => 'کفش'],
-            ['name' => 'اکسسوری'],
-            ['name' => 'لباس زمستانی'],
-            ['name' => 'لباس تابستانی'],
+            ['name' => 'نقاشی انتزاعی'],
+            ['name' => 'منظره طبیعت'],
+            ['name' => 'پرتره و چهره'],
+            ['name' => 'هنر مدرن'],
+            ['name' => 'تابلوهای موزیکال'],
+            ['name' => 'آثار دیجیتال'],
+            ['name' => 'خوشنویسی مدرن'],
+            ['name' => 'مینیمالیستی'],
         ];
 
         $createdCategories = [];
@@ -113,17 +115,18 @@ class DatabaseSeeder extends Seeder
 
     private function createColors()
     {
-        $this->command->info('🎨 Creating colors...');
+        $this->command->info('🖼️ Creating frame types (colors table)...');
 
+        // Colors table is used for frame types
         $colors = [
-            ['name' => 'قرمز', 'hex_code' => '#EF4444'],
-            ['name' => 'آبی', 'hex_code' => '#3B82F6'],
-            ['name' => 'سبز', 'hex_code' => '#10B981'],
-            ['name' => 'مشکی', 'hex_code' => '#1F2937'],
-            ['name' => 'سفید', 'hex_code' => '#F9FAFB'],
-            ['name' => 'خاکستری', 'hex_code' => '#6B7280'],
-            ['name' => 'صورتی', 'hex_code' => '#EC4899'],
-            ['name' => 'بنفش', 'hex_code' => '#8B5CF6'],
+            ['name' => 'قاب چوبی طبیعی', 'hex_code' => '#D2691E'],
+            ['name' => 'قاب چوبی تیره', 'hex_code' => '#654321'],
+            ['name' => 'قاب فلزی طلایی', 'hex_code' => '#FFD700'],
+            ['name' => 'قاب فلزی نقره‌ای', 'hex_code' => '#C0C0C0'],
+            ['name' => 'قاب فلزی مشکی', 'hex_code' => '#1F2937'],
+            ['name' => 'قاب سفید مدرن', 'hex_code' => '#F9FAFB'],
+            ['name' => 'بدون قاب (کشیده روی تخته)', 'hex_code' => '#FFFFFF'],
+            ['name' => 'قاب چوبی شیک', 'hex_code' => '#8B4513'],
         ];
 
         $createdColors = [];
@@ -137,15 +140,18 @@ class DatabaseSeeder extends Seeder
 
     private function createSizes()
     {
-        $this->command->info('📏 Creating sizes...');
+        $this->command->info('📐 Creating dimensions (sizes table)...');
 
+        // Sizes table is used for painting dimensions
         $sizes = [
-            ['name' => 'XS', 'description' => 'Extra Small'],
-            ['name' => 'S', 'description' => 'Small'],
-            ['name' => 'M', 'description' => 'Medium'],
-            ['name' => 'L', 'description' => 'Large'],
-            ['name' => 'XL', 'description' => 'Extra Large'],
-            ['name' => 'XXL', 'description' => 'Double Extra Large'],
+            ['name' => '20×30 سانتی‌متر', 'description' => 'مناسب برای فضاهای کوچک'],
+            ['name' => '30×40 سانتی‌متر', 'description' => 'سایز استاندارد کوچک'],
+            ['name' => '40×60 سانتی‌متر', 'description' => 'سایز متوسط محبوب'],
+            ['name' => '50×70 سانتی‌متر', 'description' => 'سایز متوسط بزرگ'],
+            ['name' => '60×90 سانتی‌متر', 'description' => 'سایز بزرگ'],
+            ['name' => '70×100 سانتی‌متر', 'description' => 'سایز خیلی بزرگ'],
+            ['name' => '80×120 سانتی‌متر', 'description' => 'سایز بزرگ دیواری'],
+            ['name' => '100×150 سانتی‌متر', 'description' => 'سایز پانوراما'],
         ];
 
         $createdSizes = [];
@@ -159,50 +165,77 @@ class DatabaseSeeder extends Seeder
 
     private function createProducts($categories)
     {
-        $this->command->info('🛍️ Creating products...');
+        $this->command->info('🎨 Creating artwork products...');
 
         $productNames = [
-            'تیشرت کتان آبی',
-            'شلوار جین مشکی',
-            'کفش ورزشی سفید',
-            'کاپشن زمستانی',
-            'دستبند نقره',
-            'گردنبند طلا',
-            'ساعت هوشمند',
-            'کلاه بافتنی',
-            'شورت ورزشی',
-            'پیراهن مردانه',
-            'کت شلوار رسمی',
-            'کفش کتانی رنگی',
-            'ساک دستی چرمی',
-            'عینک آفتابی',
-            'کیف پول چرمی',
+            'غروب آرام',
+            'رویای آبی',
+            'شب مهتابی',
+            'باغ بهشت',
+            'نقش و نگار',
+            'افق طلایی',
+            'سکوت سبز',
+            'رقص رنگ‌ها',
+            'نسیم صبح',
+            'ابریشم شب',
+            'موج‌های آرامش',
+            'درخت زندگی',
+            'پرتره مدرن',
+            'انتزاع هندسی',
+            'خیال پردازی',
+        ];
+
+        $artistNames = [
+            'رضا محمدی',
+            'سارا احمدی',
+            'علی کریمی',
+            'مریم نوری',
+            'حسین صادقی',
+            'فاطمه رضایی',
+            'امیر حسینی',
+            'نگار محمودی',
+        ];
+
+        $techniques = [
+            'آکریلیک روی بوم',
+            'رنگ روغن',
+            'آبرنگ',
+            'چاپ دیجیتال با کیفیت موزه‌ای',
+            'تکنیک مدرن',
+            'تکنیک مخلوط',
         ];
 
         $createdProducts = [];
-        for ($i = 0; $i < 30; $i++) {
+        for ($i = 0; $i < 40; $i++) {
             $category = $categories[array_rand($categories)];
             $name = $productNames[array_rand($productNames)] . ' ' . ($i + 1);
+            $isMusical = ($category->name === 'تابلوهای موزیکال') || (rand(0, 4) === 0); // 20% musical
             
             $product = Product::create([
                 'category_id' => $category->id,
                 'title' => $name,
                 'slug' => Str::slug($name) . '-' . ($i + 1),
-                'description' => 'توضیحات کامل محصول ' . $name . '. این محصول با کیفیت بالا و طراحی زیبا تولید شده است.',
-                'price' => rand(50000, 500000),
-                'stock' => rand(0, 100),
+                'description' => 'این اثر هنری با الهام از زیبایی‌های طبیعت و احساسات انسانی خلق شده است. ' . 
+                               'هر تابلو با دقت و ظرافت خاصی ساخته شده و می‌تواند فضای منزل یا محل کار شما را متحول کند. ' .
+                               ($isMusical ? 'این تابلو موزیکال با موسیقی‌های منتخب همراه است که تجربه‌ای منحصر به فرد را خلق می‌کند.' : ''),
+                'price' => rand(150000, 2500000),
+                'stock' => rand(1, 15),
                 'has_variants' => rand(0, 1),
-                'has_colors' => rand(0, 1),
-                'has_sizes' => rand(0, 1),
+                'has_colors' => rand(0, 1), // Frame types
+                'has_sizes' => rand(0, 1), // Dimensions
                 'is_active' => true,
+                'is_musical' => $isMusical,
+                'artist' => $artistNames[array_rand($artistNames)],
+                'technique' => $techniques[array_rand($techniques)],
+                'year' => rand(2020, 2024),
             ]);
 
-            // Add product images
-            $imageCount = rand(1, 3);
+            // Add product images (art images)
+            $imageCount = rand(2, 4);
             for ($j = 0; $j < $imageCount; $j++) {
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'path' => 'https://picsum.photos/seed/' . md5($product->id . '-' . $j) . '/600/600',
+                    'path' => 'https://picsum.photos/seed/' . md5($product->id . '-art-' . $j) . '/800/800',
                     'sort_order' => $j,
                 ]);
             }
@@ -286,41 +319,51 @@ class DatabaseSeeder extends Seeder
 
         $discountCodes = [
             [
-                'code' => 'WELCOME20',
+                'code' => 'ILIYWART20',
                 'type' => 'percentage',
                 'value' => 20,
                 'usage_limit' => 100,
-                'max_discount_amount' => 50000,
-                'min_order_amount' => 100000,
+                'max_discount_amount' => 200000,
+                'min_order_amount' => 500000,
                 'expires_at' => Carbon::now()->addMonths(3),
                 'is_active' => true,
             ],
             [
-                'code' => 'SUMMER50',
+                'code' => 'MUSICAL30',
                 'type' => 'percentage',
-                'value' => 50,
+                'value' => 30,
                 'usage_limit' => 50,
-                'max_discount_amount' => 100000,
-                'min_order_amount' => 200000,
+                'max_discount_amount' => 300000,
+                'min_order_amount' => 800000,
                 'expires_at' => Carbon::now()->addMonths(2),
                 'is_active' => true,
             ],
             [
-                'code' => 'FIXED10K',
+                'code' => 'ART50K',
                 'type' => 'fixed',
-                'value' => 10000,
+                'value' => 50000,
                 'usage_limit' => 200,
-                'min_order_amount' => 50000,
+                'min_order_amount' => 300000,
                 'expires_at' => Carbon::now()->addMonths(1),
+                'is_active' => true,
+            ],
+            [
+                'code' => 'GALLERY15',
+                'type' => 'percentage',
+                'value' => 15,
+                'usage_limit' => null,
+                'max_discount_amount' => 150000,
+                'min_order_amount' => 400000,
+                'expires_at' => Carbon::now()->addDays(15),
                 'is_active' => true,
             ],
             [
                 'code' => DiscountCode::generateCode(),
                 'type' => 'percentage',
-                'value' => 15,
-                'usage_limit' => null,
-                'max_discount_amount' => 25000,
-                'expires_at' => Carbon::now()->addDays(15),
+                'value' => 25,
+                'usage_limit' => 30,
+                'max_discount_amount' => 250000,
+                'expires_at' => Carbon::now()->addWeeks(3),
                 'is_active' => true,
             ],
         ];
@@ -332,98 +375,124 @@ class DatabaseSeeder extends Seeder
 
     private function createCampaigns($products, $categories)
     {
-        $this->command->info('🎯 Creating campaigns...');
+        $this->command->info('🎯 Creating art gallery campaigns...');
 
-        // Campaign 1: Summer Sale
-        $summerCampaign = Campaign::create([
-            'name' => 'فروش فوق‌العاده تابستان',
-            'description' => 'تخفیف ویژه محصولات تابستانی تا 40 درصد',
+        // Campaign 1: Art Gallery Opening
+        $openingCampaign = Campaign::create([
+            'name' => 'افتتاحیه گالری',
+            'description' => 'تخفیف ویژه آثار هنری منتخب تا 35 درصد',
             'type' => 'percentage',
-            'discount_value' => 30,
-            'max_discount_amount' => 75000,
+            'discount_value' => 35,
+            'max_discount_amount' => 400000,
             'starts_at' => Carbon::now()->subDays(5),
             'ends_at' => Carbon::now()->addDays(25),
             'is_active' => true,
             'priority' => 10,
-            'badge_text' => 'فروش تابستان',
+            'badge_text' => 'افتتاحیه',
         ]);
 
-        // Add targets for summer campaign (some products and categories)
-        $summerProducts = array_slice($products, 0, 8);
-        foreach ($summerProducts as $product) {
+        // Add targets for opening campaign
+        $openingProducts = array_slice($products, 0, 10);
+        foreach ($openingProducts as $product) {
             CampaignTarget::create([
-                'campaign_id' => $summerCampaign->id,
+                'campaign_id' => $openingCampaign->id,
                 'targetable_type' => Product::class,
                 'targetable_id' => $product->id,
             ]);
         }
 
-        // Campaign 2: T-shirt Special
-        $tshirtCampaign = Campaign::create([
-            'name' => 'تخفیف ویژه تیشرت‌ها',
-            'description' => 'همه تیشرت‌ها با 25 درصد تخفیف',
+        // Campaign 2: Musical Paintings Special
+        $musicalCampaign = Campaign::create([
+            'name' => 'تخفیف ویژه تابلوهای موزیکال',
+            'description' => 'همه تابلوهای موزیکال با 30 درصد تخفیف',
             'type' => 'percentage',
-            'discount_value' => 25,
-            'max_discount_amount' => 50000,
+            'discount_value' => 30,
+            'max_discount_amount' => 350000,
             'starts_at' => Carbon::now()->subDays(2),
             'ends_at' => Carbon::now()->addDays(15),
             'is_active' => true,
-            'priority' => 5,
-            'badge_text' => 'تیشرت ارزان',
+            'priority' => 8,
+            'badge_text' => 'موزیکال',
         ]);
 
-        // Add t-shirt category as target
-        $tshirtCategory = collect($categories)->first();
-        CampaignTarget::create([
-            'campaign_id' => $tshirtCampaign->id,
-            'targetable_type' => Category::class,
-            'targetable_id' => $tshirtCategory->id,
-        ]);
-
-        // Campaign 3: Fixed Discount
-        $fixedCampaign = Campaign::create([
-            'name' => 'تخفیف 20 هزار تومانی',
-            'description' => 'تخفیف ثابت 20 هزار تومان برای محصولات انتخاب شده',
-            'type' => 'fixed',
-            'discount_value' => 20000,
-            'starts_at' => Carbon::now()->subDays(1),
-            'ends_at' => Carbon::now()->addDays(10),
-            'is_active' => true,
-            'priority' => 3,
-            'badge_text' => '20K تخفیف',
-        ]);
-
-        // Add some products for fixed discount
-        $fixedProducts = array_slice($products, 10, 5);
-        foreach ($fixedProducts as $product) {
+        // Add musical category as target
+        $musicalCategory = collect($categories)->where('name', 'تابلوهای موزیکال')->first();
+        if ($musicalCategory) {
             CampaignTarget::create([
-                'campaign_id' => $fixedCampaign->id,
-                'targetable_type' => Product::class,
-                'targetable_id' => $product->id,
+                'campaign_id' => $musicalCampaign->id,
+                'targetable_type' => Category::class,
+                'targetable_id' => $musicalCategory->id,
             ]);
         }
 
-        // Campaign 4: Upcoming Campaign
-        $upcomingCampaign = Campaign::create([
-            'name' => 'فروش ویژه زمستان',
-            'description' => 'آماده شوید برای تخفیف‌های زمستانی',
+        // Campaign 3: Fixed Discount for Modern Art
+        $modernCampaign = Campaign::create([
+            'name' => 'تخفیف 100 هزار تومانی',
+            'description' => 'تخفیف ثابت 100 هزار تومان برای آثار مدرن منتخب',
+            'type' => 'fixed',
+            'discount_value' => 100000,
+            'starts_at' => Carbon::now()->subDays(1),
+            'ends_at' => Carbon::now()->addDays(10),
+            'is_active' => true,
+            'priority' => 6,
+            'badge_text' => '100K تخفیف',
+        ]);
+
+        // Add modern art category
+        $modernCategory = collect($categories)->where('name', 'هنر مدرن')->first();
+        if ($modernCategory) {
+            CampaignTarget::create([
+                'campaign_id' => $modernCampaign->id,
+                'targetable_type' => Category::class,
+                'targetable_id' => $modernCategory->id,
+            ]);
+        }
+
+        // Campaign 4: Abstract Art Festival
+        $abstractCampaign = Campaign::create([
+            'name' => 'جشنواره هنر انتزاعی',
+            'description' => 'تخفیف ویژه نقاشی‌های انتزاعی - 25 درصد',
+            'type' => 'percentage',
+            'discount_value' => 25,
+            'max_discount_amount' => 300000,
+            'starts_at' => Carbon::now()->subDays(3),
+            'ends_at' => Carbon::now()->addDays(20),
+            'is_active' => true,
+            'priority' => 7,
+            'badge_text' => 'انتزاعی',
+        ]);
+
+        // Add abstract category
+        $abstractCategory = collect($categories)->where('name', 'نقاشی انتزاعی')->first();
+        if ($abstractCategory) {
+            CampaignTarget::create([
+                'campaign_id' => $abstractCampaign->id,
+                'targetable_type' => Category::class,
+                'targetable_id' => $abstractCategory->id,
+            ]);
+        }
+
+        // Campaign 5: Upcoming Winter Collection
+        $winterCampaign = Campaign::create([
+            'name' => 'کلکسیون زمستانی',
+            'description' => 'آماده شوید برای کلکسیون جدید زمستانی با تخفیف‌های ویژه',
             'type' => 'percentage',
             'discount_value' => 40,
-            'max_discount_amount' => 100000,
-            'starts_at' => Carbon::now()->addDays(5),
-            'ends_at' => Carbon::now()->addDays(35),
+            'max_discount_amount' => 500000,
+            'starts_at' => Carbon::now()->addDays(7),
+            'ends_at' => Carbon::now()->addDays(37),
             'is_active' => true,
             'priority' => 15,
             'badge_text' => 'به زودی',
         ]);
 
-        // Add winter category
-        $winterCategory = collect($categories)->where('name', 'لباس زمستانی')->first();
-        if ($winterCategory) {
+        // Add some products for upcoming campaign
+        $winterProducts = array_slice($products, 15, 8);
+        foreach ($winterProducts as $product) {
             CampaignTarget::create([
-                'campaign_id' => $upcomingCampaign->id,
-                'targetable_type' => Category::class,
-                'targetable_id' => $winterCategory->id,
+                'campaign_id' => $winterCampaign->id,
+                'targetable_type' => Product::class,
+                'targetable_id' => $product->id,
             ]);
         }
     }

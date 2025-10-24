@@ -111,7 +111,7 @@ function AccountProfile() {
             <div className="max-w-2xl mx-auto">
                 <div className="flex items-center justify-center min-h-96">
                     <div className="text-center">
-                        <div className="w-12 h-12 border-4 border-cherry-500/30 border-t-cherry-500 rounded-full animate-spin mx-auto mb-4"></div>
+                        <div className="w-12 h-12 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin mx-auto mb-4"></div>
                         <p className="text-gray-400">در حال بارگذاری...</p>
                     </div>
                 </div>
@@ -148,7 +148,7 @@ function AccountProfile() {
             <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6 lg:p-8">
                 {/* User Avatar */}
                 <div className="text-center mb-8">
-                    <div className="w-24 h-24 bg-gradient-to-br from-cherry-500 to-cherry-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-24 h-24 bg-gradient-to-br from-amber-500 to-amber-600 rounded-full flex items-center justify-center mx-auto mb-4">
                         <span className="text-white text-3xl font-bold">
                             {user?.name?.charAt(0) || 'U'}
                         </span>
@@ -167,7 +167,7 @@ function AccountProfile() {
                             name="name"
                             value={form.name}
                             onChange={handleChange}
-                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500 focus:border-transparent transition-all duration-200"
+                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                             placeholder="نام و نام خانوادگی خود را وارد کنید"
                         />
                     </div>
@@ -180,7 +180,7 @@ function AccountProfile() {
                             name="phone"
                             value={form.phone}
                             onChange={handleChange}
-                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500 focus:border-transparent transition-all duration-200"
+                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                             placeholder="شماره تلفن خود را وارد کنید"
                         />
                     </div>
@@ -193,7 +193,7 @@ function AccountProfile() {
                             name="instagram_id"
                             value={form.instagram_id}
                             onChange={handleChange}
-                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cherry-500 focus:border-transparent transition-all duration-200"
+                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
                             placeholder="آیدی اینستاگرام خود را وارد کنید"
                         />
                     </div>
@@ -213,7 +213,7 @@ function AccountProfile() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-gradient-to-r from-cherry-500 to-cherry-600 hover:from-cherry-600 hover:to-cherry-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                         {loading ? (
                             <div className="flex items-center justify-center space-x-2 space-x-reverse">
@@ -261,7 +261,7 @@ function AccountProfile() {
                     <p className="text-gray-400 text-sm">مبلغ کل</p>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-xl rounded-xl border border-purple-500/20 p-6 text-center">
+                <div className="bg-gradient-to-br from-amber-500/10 to-indigo-600/10 backdrop-blur-xl rounded-xl border border-purple-500/20 p-6 text-center">
                     <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
                         <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

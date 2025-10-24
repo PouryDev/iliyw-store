@@ -30,7 +30,7 @@ if [ ! -f ".env" ]; then
   if [ -f ".env.docker" ]; then
     cp .env.docker .env
   else
-    echo "APP_NAME=\"جمه شاپ\"" > .env
+    echo "APP_NAME=\"iliyw Store\"" > .env
     echo "APP_ENV=production" >> .env
     echo "APP_KEY=" >> .env
     echo "APP_DEBUG=false" >> .env
@@ -39,8 +39,8 @@ if [ ! -f ".env" ]; then
     echo "DB_CONNECTION=mysql" >> .env
     echo "DB_HOST=db" >> .env
     echo "DB_PORT=3306" >> .env
-    echo "DB_DATABASE=jemeh_shop_db" >> .env
-    echo "DB_USERNAME=jemeh" >> .env
+    echo "DB_DATABASE=iliw_store_db" >> .env
+    echo "DB_USERNAME=iliw" >> .env
     echo "DB_PASSWORD=secret" >> .env
   fi
 fi

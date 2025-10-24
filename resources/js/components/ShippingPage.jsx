@@ -5,13 +5,13 @@ function ShippingPage() {
     return (
         <>
             <Helmet>
-                <title>ارسال و تحویل | جمه - فروشگاه آنلاین لباس</title>
-                <meta name="description" content="اطلاعات کامل درباره روش‌های ارسال، هزینه ارسال، زمان تحویل و شرایط ارسال در فروشگاه جمه. ارسال سریع و مطمئن به سراسر کشور." />
-                <meta name="keywords" content="ارسال, تحویل, پست, پیک, هزینه ارسال, زمان تحویل, جمه" />
+                <title>ارسال و تحویل | iliyw - فروشگاه آنلاین تابلو</title>
+                <meta name="description" content="اطلاعات کامل درباره روش‌های ارسال، هزینه ارسال، زمان تحویل و شرایط ارسال در فروشگاه iliyw. ارسال سریع و مطمئن به سراسر کشور." />
+                <meta name="keywords" content="ارسال تابلو, تحویل تابلو, پست, پیک, هزینه ارسال, زمان تحویل, iliyw" />
                 <link rel="canonical" href={`${window.location.origin}/shipping`} />
             </Helmet>
 
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+            <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
                 {/* Header */}
                 <div className="sticky top-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10">
                     <div className="max-w-4xl mx-auto px-4 py-6">
@@ -31,14 +31,14 @@ function ShippingPage() {
                                     <p className="text-gray-300 text-sm mb-3">
                                         ارسال از طریق پست پیشتاز با قابلیت ردیابی کامل
                                     </p>
-                                    <div className="text-cherry-400 font-medium">3-5 روز کاری</div>
+                                    <div className="text-amber-400 font-medium">3-5 روز کاری</div>
                                 </div>
                                 <div className="bg-white/5 rounded-xl p-4">
                                     <h3 className="text-lg font-semibold text-white mb-2">پیک موتوری</h3>
                                     <p className="text-gray-300 text-sm mb-3">
                                         ارسال سریع با پیک موتوری در شهر تهران
                                     </p>
-                                    <div className="text-cherry-400 font-medium">2-4 ساعت</div>
+                                    <div className="text-amber-400 font-medium">2-4 ساعت</div>
                                 </div>
                             </div>
                         </section>
@@ -100,35 +100,35 @@ function ShippingPage() {
                             <h2 className="text-xl font-bold text-white mb-4">نکات مهم</h2>
                             <div className="space-y-3 text-gray-300 text-sm">
                                 <div className="flex items-start gap-2">
-                                    <span className="text-cherry-400 mt-1">•</span>
+                                    <span className="text-amber-400 mt-1">•</span>
                                     <span>در صورت عدم حضور در آدرس، بسته به اداره پست محلی ارسال می‌شود</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span className="text-cherry-400 mt-1">•</span>
+                                    <span className="text-amber-400 mt-1">•</span>
                                     <span>لطفاً شماره تماس صحیح وارد کنید تا در صورت نیاز با شما تماس گرفته شود</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span className="text-cherry-400 mt-1">•</span>
+                                    <span className="text-amber-400 mt-1">•</span>
                                     <span>در صورت تغییر آدرس، حتماً قبل از ارسال با ما تماس بگیرید</span>
                                 </div>
                                 <div className="flex items-start gap-2">
-                                    <span className="text-cherry-400 mt-1">•</span>
+                                    <span className="text-amber-400 mt-1">•</span>
                                     <span>هزینه ارسال برای سفارشات بالای 1 میلیون تومان رایگان است</span>
                     </div>
                     </div>
                 </section>
 
                         {/* Contact Info */}
-                        <section className="bg-gradient-to-r from-cherry-600/20 to-pink-600/20 backdrop-blur-sm rounded-2xl p-6 border border-cherry-500/30">
+                        <section className="bg-gradient-to-r from-amber-600/20 to-indigo-600/20 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/30">
                             <h2 className="text-xl font-bold text-white mb-4">سوالی دارید؟</h2>
                             <p className="text-gray-300 mb-4">
                                 برای اطلاعات بیشتر درباره ارسال و تحویل، با ما تماس بگیرید
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <a href="https://instagram.com/jemehshopp" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://instagram.com/iliywstore" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     اینستاگرام
                                 </a>
-                                <a href="https://t.me/jemeh_shop" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://instagram.com/iliywstore" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     تلگرام
                                 </a>
                     </div>

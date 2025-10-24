@@ -148,9 +148,9 @@ function AdminLayout() {
     }, [sidebarOpen]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
             {/* Mobile Header */}
-            <div className="lg:hidden bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-4 sticky top-0 z-50">
+            <div className="lg:hidden bg-gradient-to-r from-amber-600 to-indigo-700 px-4 py-4 sticky top-0 z-50">
                 <div className="flex items-center justify-between">
                     <button
                         onClick={openSidebar}
@@ -222,7 +222,7 @@ function AdminLayout() {
                         onClick={closeSidebar}
                     ></div>
                     <div 
-                        className="fixed right-0 top-0 h-full w-80 bg-gradient-to-b from-gray-800 to-gray-900 shadow-2xl transition-transform duration-300 ease-out"
+                        className="fixed right-0 top-0 h-full w-80 bg-gradient-to-b from-gray-800 to-slate-950 shadow-2xl transition-transform duration-300 ease-out"
                         style={{
                             transform: sidebarAnimating ? 'translateX(0)' : 'translateX(100%)'
                         }}
@@ -242,7 +242,7 @@ function AdminLayout() {
 
                             {/* Admin Info */}
                             <div className="text-center mb-8">
-                                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform duration-200">
+                                <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform duration-200">
                                     <span className="text-white text-2xl font-bold">
                                         {user?.name?.charAt(0) || 'A'}
                                     </span>
@@ -289,11 +289,11 @@ function AdminLayout() {
 
             <div className="flex">
                 {/* Desktop Sidebar */}
-                <div className="hidden lg:block w-80 bg-gradient-to-b from-gray-800 to-gray-900 min-h-screen sticky top-0">
+                <div className="hidden lg:block w-80 bg-gradient-to-b from-gray-800 to-slate-950 min-h-screen sticky top-0">
                     <div className="p-8">
                         {/* Admin Info */}
                         <div className="text-center mb-8">
-                            <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="w-24 h-24 bg-gradient-to-br from-amber-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <span className="text-white text-3xl font-bold">
                                     {user?.name?.charAt(0) || 'A'}
                                 </span>

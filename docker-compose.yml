@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: jemeh-shop-php:prod
+    image: iliw-store-php:prod
     restart: unless-stopped
     env_file:
       - .env.docker
@@ -15,7 +15,7 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-jemeh_shop}
+      DB_DATABASE: ${DB_DATABASE:-iliw_store}
       DB_USERNAME: ${DB_USERNAME:-root}
       DB_PASSWORD: ${DB_PASSWORD:-rootpass}
       LOG_CHANNEL: daily
@@ -33,10 +33,12 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - ./:/var/www/html:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - storage_data:/var/www/html/storage
+      - certs:/etc/letsencrypt:ro
     depends_on:
       - php
 
@@ -44,8 +46,8 @@ services:
     image: mariadb:11.4
     restart: unless-stopped
     environment:
-      MARIADB_DATABASE: ${DB_DATABASE:-jemeh_shop_db}
-      MARIADB_USER: ${DB_USERNAME:-jemeh}
+      MARIADB_DATABASE: ${DB_DATABASE:-iliw_store_db}
+      MARIADB_USER: ${DB_USERNAME:-iliw}
       MARIADB_PASSWORD: ${DB_PASSWORD:-secret}
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
       MARIADB_AUTO_UPGRADE: 1
@@ -70,8 +72,8 @@ services:
       - .env.docker
     environment:
       DB_HOST: db
-      DB_DATABASE: ${DB_DATABASE:-jemeh_shop_db}
-      DB_USERNAME: ${DB_USERNAME:-jemeh}
+      DB_DATABASE: ${DB_DATABASE:-iliw_store_db}
+      DB_USERNAME: ${DB_USERNAME:-iliw}
       DB_PASSWORD: ${DB_PASSWORD:-secret}
     volumes:
       - ./docker/backup/backup.sh:/backup.sh:ro
@@ -85,7 +87,26 @@ services:
     depends_on:
       - db
 
+  # SSL Certificate Service (Run only when needed)
+  lego:
+    image: docker.arvancloud.ir/goacme/lego:latest
+    container_name: iliw-lego-certbot
+    command: >
+      --email="pk74ever@gmail.com"
+      --domains="iliyw.store"
+      --domains="www.iliyw.store"
+      --path="/etc/letsencrypt"
+      --http
+      run
+    volumes:
+      - certs:/etc/letsencrypt
+    ports:
+      - "80:80"
+    profiles:
+      - ssl-setup
+
 volumes:
   db_data:
   storage_data:
   db_backups:
+  certs:

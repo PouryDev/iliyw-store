@@ -30,7 +30,7 @@ function AccountLayout() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
             <div className="max-w-7xl mx-auto px-4 py-6 md:py-10">
                 {/* Mobile Horizontal Tabs */}
                 <div className="md:hidden mb-6">
@@ -44,7 +44,7 @@ function AccountLayout() {
                                     className={({ isActive }) =>
                                         `flex-shrink-0 flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition ${
                                             isActive
-                                                ? 'bg-cherry-600 text-white'
+                                                ? 'bg-amber-600 text-white'
                                                 : 'text-gray-300 hover:bg-white/10'
                                         }`
                                     }
@@ -77,7 +77,7 @@ function AccountLayout() {
                                         className={({ isActive }) =>
                                             `flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                                                 isActive
-                                                    ? 'bg-cherry-600 text-white shadow-lg'
+                                                    ? 'bg-amber-600 text-white shadow-lg'
                                                     : 'text-gray-300 hover:bg-white/10'
                                             }`
                                         }

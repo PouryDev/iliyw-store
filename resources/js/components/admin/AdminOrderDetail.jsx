@@ -75,7 +75,7 @@ function AdminOrderDetail() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+            <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
                 <div className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10 px-4 py-3">
                     <div className="flex items-center justify-between">
                         <button
@@ -100,7 +100,7 @@ function AdminOrderDetail() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+            <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
                 <div className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10 px-4 py-3">
                     <div className="flex items-center justify-between">
                         <button
@@ -133,7 +133,7 @@ function AdminOrderDetail() {
 
     if (!order) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+            <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
                 <div className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10 px-4 py-3">
                     <div className="flex items-center justify-between">
                         <button
@@ -165,7 +165,7 @@ function AdminOrderDetail() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
             {/* Mobile Header */}
             <div className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-md border-b border-white/10 px-4 py-3">
                 <div className="flex items-center justify-between">

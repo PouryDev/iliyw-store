@@ -26,6 +26,10 @@ use App\Http\Controllers\Api\SearchController;
 // Public API routes
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{product}', [ProductController::class, 'show']);
+Route::get('/products/{product}/music-tracks', function ($productSlug) {
+    $product = \App\Models\Product::where('slug', $productSlug)->firstOrFail();
+    return response()->json(['success' => true, 'data' => $product->musicTracks]);
+});
 Route::get('/campaigns/active', [CampaignController::class, 'active']);
 Route::get('/categories', [CategoryController::class, 'index']);
 
@@ -97,6 +101,51 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureUserIsAdmin::class
     // Products
     Route::apiResource('products', \App\Http\Controllers\Api\AdminProductController::class);
     Route::delete('products/{product}/images/{image}', [\App\Http\Controllers\Api\AdminProductController::class, 'destroyImage']);
+    
+    // Music Tracks for Products
+    Route::get('products/{product}/music-tracks', function ($productId) {
+        $product = \App\Models\Product::findOrFail($productId);
+        return response()->json(['success' => true, 'data' => $product->musicTracks]);
+    });
+    
+    Route::post('products/{product}/music-tracks', function (\Illuminate\Http\Request $request, $productId) {
+        $product = \App\Models\Product::findOrFail($productId);
+        
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'artist' => 'nullable|string|max:255',
+            'file' => 'required|file|mimes:mp3,wav,ogg|max:10240', // 10MB max
+            'duration' => 'nullable|integer|min:0',
+            'sort_order' => 'nullable|integer|min:0'
+        ]);
+        
+        // Upload file
+        $file = $request->file('file');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $path = $file->storeAs('music', $filename, 'public');
+        
+        $track = $product->musicTracks()->create([
+            'title' => $validated['title'],
+            'artist' => $validated['artist'] ?? null,
+            'file_path' => $path,
+            'duration' => $validated['duration'] ?? null,
+            'sort_order' => $validated['sort_order'] ?? 0,
+        ]);
+        
+        return response()->json(['success' => true, 'data' => $track]);
+    });
+    
+    Route::delete('products/{product}/music-tracks/{track}', function ($productId, $trackId) {
+        $track = \App\Models\ProductMusicTrack::where('product_id', $productId)
+            ->where('id', $trackId)
+            ->firstOrFail();
+        
+        // Delete file
+        \Illuminate\Support\Facades\Storage::disk('public')->delete($track->file_path);
+        
+        $track->delete();
+        return response()->json(['success' => true, 'message' => 'آهنگ حذف شد']);
+    });
     
     // Categories, Colors, Sizes
     Route::get('/categories', function () {

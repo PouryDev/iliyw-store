@@ -342,7 +342,7 @@ function ProductModal({ product, isOpen, onClose }) {
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
             
             {/* Modal */}
-            <div className="relative w-full max-w-md md:max-w-2xl h-[90vh] md:h-[80vh] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="relative w-full max-w-md md:max-w-2xl h-[90vh] md:h-[80vh] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="sticky top-0 bg-gray-900/80 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center justify-between z-10">
                     <button
@@ -362,7 +362,7 @@ function ProductModal({ product, isOpen, onClose }) {
                     {loading ? (
                         <div className="flex items-center justify-center h-64">
                             <div className="flex flex-col items-center gap-4">
-                                <div className="w-8 h-8 border-2 border-cherry-500 border-t-transparent rounded-full animate-spin" />
+                                <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
                                 <span className="text-gray-400">در حال بارگذاری...</span>
                             </div>
                         </div>
@@ -396,7 +396,7 @@ function ProductModal({ product, isOpen, onClose }) {
                                             onClick={() => setMainImage(resolveImageUrl(img.path))}
                                             className={`flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden border-2 ${
                                                 mainImage === resolveImageUrl(img.path) 
-                                                    ? 'border-cherry-500' 
+                                                    ? 'border-amber-500' 
                                                     : 'border-white/20'
                                             }`}
                                         >
@@ -431,11 +431,11 @@ function ProductModal({ product, isOpen, onClose }) {
                             )}
                             
                             <div className="flex items-center gap-2">
-                                <span className="text-2xl font-bold text-cherry-400">
+                                <span className="text-2xl font-bold text-amber-400">
                                     {formatPrice(displayPrice)} تومان
                                 </span>
                                 {currentProduct.campaigns && currentProduct.campaigns.length > 0 && (
-                                    <span className="bg-cherry-600 text-white px-2 py-1 rounded-full text-sm font-semibold">
+                                    <span className="bg-amber-600 text-white px-2 py-1 rounded-full text-sm font-semibold">
                                         تخفیف ویژه
                                     </span>
                                 )}
@@ -468,7 +468,7 @@ function ProductModal({ product, isOpen, onClose }) {
                                             onClick={() => setSelectedColorId(color.id)}
                                             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
                                                 selectedColorId === color.id
-                                                    ? 'bg-cherry-600 text-white border-cherry-500'
+                                                    ? 'bg-amber-600 text-white border-amber-500'
                                                     : 'bg-white/10 text-gray-300 hover:bg-white/20 border-white/20'
                                             }`}
                                         >
@@ -498,7 +498,7 @@ function ProductModal({ product, isOpen, onClose }) {
                                             onClick={() => setSelectedSizeId(size.id)}
                                             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
                                                 selectedSizeId === size.id
-                                                    ? 'bg-cherry-600 text-white border-cherry-500'
+                                                    ? 'bg-amber-600 text-white border-amber-500'
                                                     : 'bg-white/10 text-gray-300 hover:bg-white/20 border-white/20'
                                             }`}
                                         >
@@ -561,7 +561,7 @@ function ProductModal({ product, isOpen, onClose }) {
                                     ? 'bg-red-600 text-white'
                                     : isOutOfStock
                                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                    : 'bg-cherry-600 hover:bg-cherry-700 text-white'
+                                    : 'bg-amber-600 hover:bg-amber-700 text-white'
                             }`}
                         >
                             {adding ? (

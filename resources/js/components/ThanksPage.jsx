@@ -5,7 +5,7 @@ function ThanksPage() {
     const { invoiceId } = useParams();
     
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
             <div className="max-w-md w-full">
                 {/* Success Card */}
                 <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-xl rounded-3xl border border-green-500/20 shadow-2xl p-8 text-center">
@@ -48,7 +48,7 @@ function ThanksPage() {
                     <div className="space-y-3">
                         <button
                             onClick={() => window.location.href = '/account/orders'}
-                            className="w-full bg-gradient-to-r from-cherry-500 to-cherry-600 hover:from-cherry-600 hover:to-cherry-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
+                            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"
                         >
                             مشاهده سفارشات
                         </button>

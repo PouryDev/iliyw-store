@@ -260,7 +260,7 @@ function VariantSelectorModal({
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
             
             {/* Modal */}
-            <div className="relative w-full max-w-md h-[85vh] md:h-[80vh] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="relative w-full max-w-md h-[85vh] md:h-[80vh] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-t-3xl md:rounded-2xl shadow-2xl overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="sticky top-0 bg-gray-900/80 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center justify-between z-10">
                     <button
@@ -280,7 +280,7 @@ function VariantSelectorModal({
                     {loading ? (
                         <div className="flex items-center justify-center h-64">
                             <div className="flex flex-col items-center gap-4">
-                                <div className="w-8 h-8 border-2 border-cherry-500 border-t-transparent rounded-full animate-spin" />
+                                <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
                                 <span className="text-gray-400">در حال بارگذاری...</span>
                             </div>
                         </div>
@@ -289,12 +289,12 @@ function VariantSelectorModal({
                             {/* Product Info */}
                             <div className="p-4 border-b border-white/10">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-cherry-500/20 to-pink-500/20 flex items-center justify-center text-2xl flex-shrink-0">
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-amber-500/20 to-indigo-500/20 flex items-center justify-center text-2xl flex-shrink-0">
                                         🛍️
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-semibold text-white text-sm leading-tight">{currentProduct.title}</h3>
-                                        <div className="text-xs text-cherry-400 mt-1">{Number(currentProduct.price || 0).toLocaleString('fa-IR')} تومان</div>
+                                        <div className="text-xs text-amber-400 mt-1">{Number(currentProduct.price || 0).toLocaleString('fa-IR')} تومان</div>
                                     </div>
                                 </div>
                             </div>
@@ -314,7 +314,7 @@ function VariantSelectorModal({
                                                     onClick={() => setSelectedColorId(color.id)}
                                                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all border ${
                                                         selectedColorId === color.id
-                                                            ? 'bg-cherry-600 text-white border-cherry-500 shadow-lg'
+                                                            ? 'bg-amber-600 text-white border-amber-500 shadow-lg'
                                                             : 'bg-white/10 text-gray-300 hover:bg-white/20 border-white/20'
                                                     }`}
                                                 >
@@ -344,7 +344,7 @@ function VariantSelectorModal({
                                                     onClick={() => setSelectedSizeId(size.id)}
                                                     className={`px-4 py-3 rounded-xl text-sm font-medium transition-all border ${
                                                         selectedSizeId === size.id
-                                                            ? 'bg-cherry-600 text-white border-cherry-500 shadow-lg'
+                                                            ? 'bg-amber-600 text-white border-amber-500 shadow-lg'
                                                             : 'bg-white/10 text-gray-300 hover:bg-white/20 border-white/20'
                                                     }`}
                                                 >
@@ -374,7 +374,7 @@ function VariantSelectorModal({
                                         <button
                                             onClick={() => setQuantity(Math.min(maxQuantity, quantity + 1))}
                                             disabled={quantity >= maxQuantity}
-                                            className="w-12 h-12 rounded-full bg-cherry-600 hover:bg-cherry-500 text-white text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                            className="w-12 h-12 rounded-full bg-amber-600 hover:bg-amber-500 text-white text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                                         >
                                             +
                                         </button>
@@ -413,7 +413,7 @@ function VariantSelectorModal({
                                 ? 'bg-red-600 text-white'
                                 : isOutOfStock
                                 ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                : 'bg-cherry-600 hover:bg-cherry-700 text-white shadow-lg'
+                                : 'bg-amber-600 hover:bg-amber-700 text-white shadow-lg'
                         }`}
                     >
                         {adding ? (

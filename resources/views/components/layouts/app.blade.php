@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ $title ?? 'جمه‌شاپ' }}</title>
+        <title>{{ $title ?? 'iliyw Store' }}</title>
         
         <!-- PWA Meta Tags -->
-        <meta name="application-name" content="جمه شاپ">
+        <meta name="application-name" content="iliyw Store">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="جمه شاپ">
-        <meta name="description" content="فروشگاه آنلاین جمه شاپ - جدیدترین محصولات مد و پوشاک با بهترین قیمت">
+        <meta name="apple-mobile-web-app-title" content="iliyw Store">
+        <meta name="description" content="فروشگاه آنلاین تابلوهای هنری iliyw - تابلوهای مدرن و موزیکال با بهترین کیفیت">
         <meta name="format-detection" content="telephone=no">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="msapplication-config" content="/browserconfig.xml">
@@ -69,9 +69,9 @@
         <header class="sticky top-0 z-40 brand-grad/90 shadow">
             <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between relative">
                 <a href="/" class="flex items-center gap-2">
-                    <img src="{{ asset('images/logo.png') }}" alt="JemehShop" class="h-10 w-auto">
+                    <img src="{{ asset('images/logo.png') }}" alt="iliyw Store" class="h-10 w-auto">
                     <span class="text-xl font-extrabold tracking-tight">
-                        <span class="brand-text">Jemeh</span><span class="text-white">Shop</span>
+                        <span class="brand-text">iliyw</span><span class="text-white"> Store</span>
                     </span>
                 </a>
                 <nav class="hidden md:flex items-center gap-6 text-sm text-gray-200">
@@ -117,7 +117,7 @@
         </main>
         <footer class="border-t border-white/10">
             <div class="max-w-6xl mx-auto px-4 py-6 text-xs text-gray-400 flex items-center justify-between">
-                <div>© {{ date('Y') }} JemehShop</div>
+                <div>© {{ date('Y') }} iliyw Store</div>
                 <div class="space-x-3 space-x-reverse">
                     <a href="/" class="hover:text-white">قوانین</a>
                     <a href="/" class="hover:text-white">حریم خصوصی</a>
@@ -129,9 +129,9 @@
         <div id="mobileMenu" class="md:hidden hidden fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] h-[100dvh] overflow-y-auto border-r border-white/10 bg-[#0d0d14]/95 shadow-2xl transform -translate-x-full transition-transform duration-300 ease-out will-change-transform">
             <div class="flex items-center justify-between h-14 px-4 border-b border-white/10">
                 <a href="/" class="flex items-center gap-2">
-                    <img src="{{ asset('images/logo.png') }}" alt="JemehShop" class="h-8 w-auto">
+                    <img src="{{ asset('images/logo.png') }}" alt="iliyw Store" class="h-8 w-auto">
                     <span class="text-lg font-extrabold tracking-tight">
-                        <span class="brand-text">Jemeh</span><span class="text-white">Shop</span>
+                        <span class="brand-text">iliyw</span><span class="text-white"> Store</span>
                     </span>
                 </a>
                 <button id="mobileCloseBtn" class="inline-flex items-center justify-center w-9 h-9 rounded border border-white/15 text-white/90 hover:text-white hover:border-white/30" aria-label="Close">

@@ -99,7 +99,7 @@
   "related_applications": [
     {
       "platform": "webapp",
-      "url": "https://jeme.shop/manifest.json"
+      "url": "https://iliyw.store/manifest.json"
     }
   ],
   "prefer_related_applications": false,
@@ -113,7 +113,7 @@
   "capture_links": "new-client",
   "protocol_handlers": [
     {
-      "protocol": "web+jeme",
+      "protocol": "web+iliw",
       "url": "/?q=%s"
     }
   ],
@@ -146,6 +146,6 @@
     "standalone",
     "minimal-ui"
   ],
-  "id": "jeme-shop-pwa",
+  "id": "iliw-store-pwa",
   "version": "1.0.0"
 }

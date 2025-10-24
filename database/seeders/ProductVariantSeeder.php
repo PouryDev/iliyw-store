@@ -15,69 +15,73 @@ class ProductVariantSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('🎨 Creating product variants...');
+        $this->command->info('🖼️ Creating artwork variants (frame types & dimensions)...');
 
         $products = Product::where('has_variants', true)->get();
-        $colors = Color::all();
-        $sizes = Size::all();
+        $colors = Color::all(); // Frame types
+        $sizes = Size::all(); // Dimensions
 
         if ($products->isEmpty() || $colors->isEmpty() || $sizes->isEmpty()) {
-            $this->command->warn('⚠️ No products with variants, colors, or sizes found. Skipping variant creation.');
+            $this->command->warn('⚠️ No products with variants, frame types, or dimensions found. Skipping variant creation.');
             return;
         }
 
         foreach ($products as $product) {
-            $this->command->info("Creating variants for: {$product->title}");
+            $this->command->info("Creating variants for artwork: {$product->title}");
 
-            // Determine if product has colors and/or sizes
-            $hasColors = $product->has_colors && $colors->isNotEmpty();
-            $hasSizes = $product->has_sizes && $sizes->isNotEmpty();
+            // Determine if product has frame types and/or dimensions
+            $hasFrameTypes = $product->has_colors && $colors->isNotEmpty();
+            $hasDimensions = $product->has_sizes && $sizes->isNotEmpty();
 
-            if (!$hasColors && !$hasSizes) {
+            if (!$hasFrameTypes && !$hasDimensions) {
                 continue;
             }
 
             // Create variants based on product configuration
-            if ($hasColors && $hasSizes) {
-                // Product has both colors and sizes
-                $selectedColors = $colors->random(rand(2, 4));
-                $selectedSizes = $sizes->random(rand(2, 4));
+            if ($hasFrameTypes && $hasDimensions) {
+                // Product has both frame types and dimensions
+                $selectedFrames = $colors->random(rand(2, 4));
+                $selectedDimensions = $sizes->random(rand(2, 4));
 
-                foreach ($selectedColors as $color) {
-                    foreach ($selectedSizes as $size) {
-                        $this->createVariant($product, $color, $size);
+                foreach ($selectedFrames as $frame) {
+                    foreach ($selectedDimensions as $dimension) {
+                        $this->createVariant($product, $frame, $dimension);
                     }
                 }
-            } elseif ($hasColors) {
-                // Product has only colors
-                $selectedColors = $colors->random(rand(2, 5));
-                foreach ($selectedColors as $color) {
-                    $this->createVariant($product, $color, null);
+            } elseif ($hasFrameTypes) {
+                // Product has only frame types
+                $selectedFrames = $colors->random(rand(2, 5));
+                foreach ($selectedFrames as $frame) {
+                    $this->createVariant($product, $frame, null);
                 }
-            } elseif ($hasSizes) {
-                // Product has only sizes
-                $selectedSizes = $sizes->random(rand(2, 5));
-                foreach ($selectedSizes as $size) {
-                    $this->createVariant($product, null, $size);
+            } elseif ($hasDimensions) {
+                // Product has only dimensions
+                $selectedDimensions = $sizes->random(rand(2, 5));
+                foreach ($selectedDimensions as $dimension) {
+                    $this->createVariant($product, null, $dimension);
                 }
             }
         }
 
-        $this->command->info('✅ Product variants created successfully!');
+        $this->command->info('✅ Artwork variants created successfully!');
     }
 
     private function createVariant($product, $color = null, $size = null)
     {
         $basePrice = $product->price;
-        $variantPrice = $basePrice + rand(-10000, 20000); // Slight price variation
-        $variantPrice = max($variantPrice, 10000); // Minimum price
+        
+        // Price variation based on frame type and dimensions
+        // Larger sizes and special frames cost more
+        $priceVariation = rand(-50000, 150000); // Wider range for art pieces
+        $variantPrice = $basePrice + $priceVariation;
+        $variantPrice = max($variantPrice, 150000); // Higher minimum price for artworks
 
-        $stock = rand(0, 50);
+        $stock = rand(1, 12); // Lower stock for art pieces
 
         ProductVariant::create([
             'product_id' => $product->id,
-            'color_id' => $color?->id,
-            'size_id' => $size?->id,
+            'color_id' => $color?->id, // Frame type
+            'size_id' => $size?->id, // Dimensions
             'stock' => $stock,
             'price' => $variantPrice,
             'is_active' => true,

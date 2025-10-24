@@ -57,7 +57,7 @@ function AccountInvoice() {
             <div className="glass-card rounded-2xl p-8 border border-white/10 text-center">
                 <div className="text-6xl mb-4">❌</div>
                 <h3 className="text-xl font-semibold text-white mb-2">فاکتور یافت نشد</h3>
-                <button onClick={() => navigate(-1)} className="text-cherry-400 hover:text-cherry-300">
+                <button onClick={() => navigate(-1)} className="text-amber-400 hover:text-amber-300">
                     بازگشت
                 </button>
             </div>
@@ -70,14 +70,14 @@ function AccountInvoice() {
             <div className="flex items-center justify-between print:hidden">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-1 text-cherry-400 hover:text-cherry-300 text-sm"
+                    className="flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
                     بازگشت
                 </button>
                 <button
                     onClick={handlePrint}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cherry-600 hover:bg-cherry-700 text-white text-sm font-semibold transition"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold transition"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
                     چاپ فاکتور
@@ -87,7 +87,7 @@ function AccountInvoice() {
             {/* Invoice Card */}
             <div className="glass-card rounded-2xl border border-white/10 overflow-hidden">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-cherry-600/20 to-pink-600/20 p-6 border-b border-white/10">
+                <div className="bg-gradient-to-r from-amber-600/20 to-indigo-600/20 p-6 border-b border-white/10">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h2 className="text-2xl font-bold text-white mb-1">فاکتور فروش</h2>
@@ -178,7 +178,7 @@ function AccountInvoice() {
                             )}
                             <div className="border-t border-white/10 pt-2 mt-2 flex justify-between">
                                 <span className="text-white font-bold text-lg">مبلغ قابل پرداخت:</span>
-                                <span className="text-cherry-400 font-bold text-xl">
+                                <span className="text-amber-400 font-bold text-xl">
                                     {formatPrice(invoice.final_amount)} تومان
                                 </span>
                             </div>

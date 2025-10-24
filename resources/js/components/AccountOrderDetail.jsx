@@ -65,7 +65,7 @@ function AccountOrderDetail() {
             <div className="glass-card rounded-2xl p-8 border border-white/10 text-center">
                 <div className="text-6xl mb-4">❌</div>
                 <h3 className="text-xl font-semibold text-white mb-2">سفارش یافت نشد</h3>
-                <button onClick={() => navigate(-1)} className="text-cherry-400 hover:text-cherry-300">
+                <button onClick={() => navigate(-1)} className="text-amber-400 hover:text-amber-300">
                     بازگشت
                 </button>
             </div>
@@ -80,7 +80,7 @@ function AccountOrderDetail() {
             <div className="flex items-center justify-between">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-1 text-cherry-400 hover:text-cherry-300 text-sm"
+                    className="flex items-center gap-1 text-amber-400 hover:text-amber-300 text-sm"
                 >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
                     بازگشت
@@ -116,12 +116,12 @@ function AccountOrderDetail() {
                         return (
                             <div key={s} className="flex-1 flex items-center">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
-                                    isActive ? 'bg-cherry-600 text-white' : 'bg-white/10 text-gray-500'
+                                    isActive ? 'bg-amber-600 text-white' : 'bg-white/10 text-gray-500'
                                 }`}>
                                     {i + 1}
                                 </div>
                                 {i < 4 && (
-                                    <div className={`flex-1 h-1 mx-1 ${isActive ? 'bg-cherry-600' : 'bg-white/10'}`} />
+                                    <div className={`flex-1 h-1 mx-1 ${isActive ? 'bg-amber-600' : 'bg-white/10'}`} />
                                 )}
                             </div>
                         );
@@ -152,7 +152,7 @@ function AccountOrderDetail() {
                                 <p className="text-xs text-gray-400 mt-1">تعداد: {formatPrice(item.quantity)}</p>
                             </div>
                             <div className="text-left">
-                                <div className="text-cherry-400 font-bold">
+                                <div className="text-amber-400 font-bold">
                                     {formatPrice(item.unit_price)} تومان
                                 </div>
                                 <div className="text-xs text-gray-400 mt-1">
@@ -186,7 +186,7 @@ function AccountOrderDetail() {
                     )}
                     <div className="border-t border-white/10 pt-2 mt-2 flex justify-between text-white font-bold text-lg">
                         <span>مبلغ نهایی:</span>
-                        <span className="text-cherry-400">{formatPrice(order.final_amount)} تومان</span>
+                        <span className="text-amber-400">{formatPrice(order.final_amount)} تومان</span>
                     </div>
                 </div>
             </div>
@@ -196,7 +196,7 @@ function AccountOrderDetail() {
                 <div className="glass-card rounded-2xl p-5 border border-white/10">
                     <h3 className="text-lg font-bold text-white mb-4">آدرس تحویل</h3>
                     <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-full bg-cherry-600/20 flex items-center justify-center text-cherry-400 flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-amber-600/20 flex items-center justify-center text-amber-400 flex-shrink-0">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </div>
                         <div className="flex-1">
@@ -212,7 +212,7 @@ function AccountOrderDetail() {
             {order.invoice && (
                 <Link 
                     to={`/account/invoices/${order.invoice.id}`}
-                    className="block w-full text-center px-6 py-3 rounded-lg bg-cherry-600 hover:bg-cherry-700 text-white font-semibold transition"
+                    className="block w-full text-center px-6 py-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold transition"
                 >
                     مشاهده فاکتور
                 </Link>

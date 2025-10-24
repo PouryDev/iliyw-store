@@ -263,7 +263,7 @@ function AdminDiscountForm() {
                 <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
                     <h2 className="text-xl font-bold text-white mb-6">پیش‌نمایش</h2>
                     
-                    <div className="bg-gradient-to-r from-purple-500/20 to-purple-600/20 rounded-xl p-6 border border-purple-500/30">
+                    <div className="bg-gradient-to-r from-amber-500/20 to-indigo-600/20 rounded-xl p-6 border border-purple-500/30">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-white font-bold text-xl">{form.code || 'کد تخفیف'}</h3>
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -333,7 +333,7 @@ function AdminDiscountForm() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex-1 bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-600 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                         {loading ? (
                             <div className="flex items-center justify-center space-x-2 space-x-reverse">

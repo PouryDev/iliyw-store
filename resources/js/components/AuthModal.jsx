@@ -144,7 +144,7 @@ function AuthModal({ open, onClose, onSuccess, initialTab = 'login' }) {
                                     <input type="password" value={loginForm.password} onChange={(e)=>setLoginForm({...loginForm, password:e.target.value})} required className={`w-full bg-white/5 border ${errors.password ? 'border-red-500' : 'border-white/10'} rounded-lg px-3 py-2 text-white`} />
                                     {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password[0]}</p>}
                                 </div>
-                                <button type="submit" disabled={loading} className="w-full bg-cherry-600 hover:bg-cherry-500 disabled:opacity-60 text-white rounded-lg px-4 py-2.5">{loading?'در حال ورود...':'ورود'}</button>
+                                <button type="submit" disabled={loading} className="w-full bg-amber-600 hover:bg-amber-500 disabled:opacity-60 text-white rounded-lg px-4 py-2.5">{loading?'در حال ورود...':'ورود'}</button>
                             </form>
                         ) : (
                             <form onSubmit={handleRegister} className="space-y-3">
@@ -174,7 +174,7 @@ function AuthModal({ open, onClose, onSuccess, initialTab = 'login' }) {
                                         <input type="password" value={registerForm.password_confirmation} onChange={(e)=>setRegisterForm({...registerForm, password_confirmation:e.target.value})} required className={`w-full bg-white/5 border ${errors.password_confirmation ? 'border-red-500' : 'border-white/10'} rounded-lg px-3 py-2 text-white`} />
                                     </div>
                                 </div>
-                                <button type="submit" disabled={loading} className="w-full bg-cherry-600 hover:bg-cherry-500 disabled:opacity-60 text-white rounded-lg px-4 py-2.5">{loading?'در حال ثبت‌نام...':'ثبت‌نام'}</button>
+                                <button type="submit" disabled={loading} className="w-full bg-amber-600 hover:bg-amber-500 disabled:opacity-60 text-white rounded-lg px-4 py-2.5">{loading?'در حال ثبت‌نام...':'ثبت‌نام'}</button>
                             </form>
                         )}
 

@@ -289,7 +289,7 @@ function CheckoutPage() {
     }, [cart.total, selectedDeliveryMethod, discountInfo]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
             {/* Mobile Header */}
             <div className="sticky top-0 z-30 bg-black/20 backdrop-blur-md border-b border-white/10 lg:hidden">
                 <div className="max-w-md mx-auto px-4 py-4">
@@ -306,7 +306,7 @@ function CheckoutPage() {
 
                 {loading ? (
                 <div className="flex items-center justify-center py-12">
-                    <div className="w-8 h-8 border-2 border-cherry-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             ) : (
                 <div className="max-w-md mx-auto lg:max-w-7xl px-4 py-6 lg:py-8">
@@ -324,7 +324,7 @@ function CheckoutPage() {
                             <div className="p-4 space-y-3">
                                 {cart.items.map((item) => (
                                     <div key={item.key} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl">
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cherry-500/20 to-pink-500/20 flex items-center justify-center text-lg flex-shrink-0">
+                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-indigo-500/20 flex items-center justify-center text-lg flex-shrink-0">
                                             🛍️
                                         </div>
                                         
@@ -417,7 +417,7 @@ function CheckoutPage() {
                                 <div className="border-t border-white/10 pt-2">
                                     <div className="flex items-center justify-between text-white">
                                         <span className="font-semibold">مبلغ نهایی</span>
-                                        <span className="font-extrabold text-cherry-400 text-lg">{formatPrice(finalAmount)}</span>
+                                        <span className="font-extrabold text-amber-400 text-lg">{formatPrice(finalAmount)}</span>
                                     </div>
                                 </div>
                             </div>
@@ -433,7 +433,7 @@ function CheckoutPage() {
                                     name="name" 
                                     value={form.name} 
                                     onChange={handleChange} 
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-cherry-500 focus:ring-cherry-500 transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-amber-500 focus:ring-amber-500 transition-colors"
                                     required 
                                 />
                             </div>
@@ -445,7 +445,7 @@ function CheckoutPage() {
                                     value={form.phone} 
                                     onChange={handleChange} 
                                     placeholder="09123456789" 
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-cherry-500 focus:ring-cherry-500 transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-amber-500 focus:ring-amber-500 transition-colors"
                                     required 
                                 />
                             </div>
@@ -478,7 +478,7 @@ function CheckoutPage() {
                                     value={form.address} 
                                     onChange={handleChange} 
                                     rows={4} 
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-cherry-500 focus:ring-cherry-500 transition-colors resize-none"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-amber-500 focus:ring-amber-500 transition-colors resize-none"
                                     required 
                                     placeholder="آدرس کامل خود را وارد کنید..."
                                 />
@@ -503,14 +503,14 @@ function CheckoutPage() {
                                         >
                                             <div className={`bg-white/5 rounded-xl p-3 border transition-all duration-200 ${
                                                 form.delivery_method_id === method.id
-                                                    ? 'border-cherry-500/50 bg-cherry-500/5'
-                                                    : 'border-white/10 hover:border-cherry-400/30'
+                                                    ? 'border-amber-500/50 bg-amber-500/5'
+                                                    : 'border-white/10 hover:border-amber-400/30'
                                             }`}>
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-3">
                                                         <div className={`w-4 h-4 rounded-full border-2 transition-all duration-200 ${
                                                             form.delivery_method_id === method.id
-                                                                ? 'border-cherry-500 bg-cherry-500'
+                                                                ? 'border-amber-500 bg-amber-500'
                                                                 : 'border-white/40 bg-white/5'
                                                         }`}>
                                                             {form.delivery_method_id === method.id && (
@@ -522,7 +522,7 @@ function CheckoutPage() {
                                                     <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                                                         method.fee === 0 
                                                             ? 'text-green-400 bg-green-500/10' 
-                                                            : 'text-cherry-400 bg-cherry-500/10'
+                                                            : 'text-amber-400 bg-amber-500/10'
                                                     }`}>
                                                         {method.fee === 0 ? 'رایگان' : formatPrice(method.fee)}
                                                     </span>
@@ -542,7 +542,7 @@ function CheckoutPage() {
                                         value={form.discount_code} 
                                         onChange={handleChange} 
                                         placeholder="کد تخفیف را وارد کنید" 
-                                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-cherry-500 focus:ring-cherry-500 transition-colors"
+                                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:ring-1 focus:border-amber-500 focus:ring-amber-500 transition-colors"
                                     />
                                     <button 
                                         type="button" 
@@ -575,7 +575,7 @@ function CheckoutPage() {
                                 type="submit" 
                                 onClick={handleSubmit}
                                 disabled={submitting} 
-                                className="w-full bg-gradient-to-r from-cherry-600 to-cherry-500 hover:from-cherry-500 hover:to-cherry-400 disabled:opacity-60 text-white rounded-xl px-4 py-4 font-semibold text-lg transition-all duration-200 shadow-lg"
+                                className="w-full bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 disabled:opacity-60 text-white rounded-xl px-4 py-4 font-semibold text-lg transition-all duration-200 shadow-lg"
                             >
                                 {submitting ? 'در حال ثبت...' : 'ثبت سفارش'}
                             </button>
@@ -662,7 +662,7 @@ function CheckoutPage() {
                                     )}
                                     <div className="flex items-center justify-between text-white mt-2">
                                         <span className="font-semibold">مبلغ نهایی</span>
-                                        <span className="font-extrabold text-cherry-400">{formatPrice(finalAmount)} تومان</span>
+                                        <span className="font-extrabold text-amber-400">{formatPrice(finalAmount)} تومان</span>
                                     </div>
                                 </div>
                                 
@@ -772,14 +772,14 @@ function CheckoutPage() {
                                                 {/* Card Container */}
                                                 <div className={`bg-white/5 rounded-2xl p-4 border transition-all duration-200 ${
                                                     form.delivery_method_id === method.id
-                                                        ? 'border-cherry-500/50 bg-cherry-500/5'
-                                                        : 'border-white/10 hover:border-cherry-400/30 hover:bg-white/10'
+                                                        ? 'border-amber-500/50 bg-amber-500/5'
+                                                        : 'border-white/10 hover:border-amber-400/30 hover:bg-white/10'
                                                 }`}>
                                                     <div className="flex items-start gap-3">
                                                         {/* Radio Button */}
                                                         <div className={`w-5 h-5 rounded-full border-2 transition-all duration-200 flex items-center justify-center flex-shrink-0 mt-0.5 ${
                                                             form.delivery_method_id === method.id
-                                                                ? 'border-cherry-500 bg-cherry-500'
+                                                                ? 'border-amber-500 bg-amber-500'
                                                                 : 'border-white/40 bg-white/5'
                                                         }`}>
                                                             {form.delivery_method_id === method.id && (
@@ -799,7 +799,7 @@ function CheckoutPage() {
                                                                 <span className={`text-xs font-bold px-2 py-1 rounded-full flex-shrink-0 ${
                                                                     method.fee === 0 
                                                                         ? 'text-green-400 bg-green-500/10' 
-                                                                        : 'text-cherry-400 bg-cherry-500/10'
+                                                                        : 'text-amber-400 bg-amber-500/10'
                                                                 }`}>
                                                                     {method.fee === 0 ? 'رایگان' : `${formatPrice(method.fee)} تومان`}
                                                                 </span>
@@ -841,7 +841,7 @@ function CheckoutPage() {
                                     className="mt-2"
                                 />
 
-                                <button type="submit" disabled={submitting} className="w-full bg-cherry-600 hover:bg-cherry-500 disabled:opacity-60 text-white rounded-lg px-4 py-2.5">
+                                <button type="submit" disabled={submitting} className="w-full bg-amber-600 hover:bg-amber-500 disabled:opacity-60 text-white rounded-lg px-4 py-2.5">
                                     {submitting ? 'در حال ثبت...' : 'ثبت سفارش'}
                                 </button>
                             </form>

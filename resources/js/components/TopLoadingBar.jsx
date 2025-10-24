@@ -50,7 +50,7 @@ function TopLoadingBar() {
     return (
         <div className="fixed top-0 left-0 right-0 z-[100] h-1 overflow-hidden">
             <div 
-                className="h-full bg-gradient-to-r from-cherry-600 via-pink-500 to-cherry-600 transition-all duration-300 ease-out shadow-lg shadow-cherry-500/50"
+                className="h-full bg-gradient-to-r from-amber-600 via-pink-500 to-amber-600 transition-all duration-300 ease-out shadow-lg shadow-amber-500/50"
                 style={{ 
                     width: `${progress}%`,
                     transition: progress === 100 ? 'width 0.2s ease-in' : 'width 0.3s ease-out'

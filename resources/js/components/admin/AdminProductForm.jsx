@@ -21,11 +21,16 @@ function AdminProductForm() {
         is_active: true,
         has_variants: false,
         has_colors: false,
-        has_sizes: false
+        has_sizes: false,
+        is_musical: false,
+        artist: '',
+        technique: '',
+        year: ''
     });
     
     const [variants, setVariants] = useState([]);
     const [images, setImages] = useState([]);
+    const [musicTracks, setMusicTracks] = useState([]);
     const [categories, setCategories] = useState([]);
     const [colors, setColors] = useState([]);
     const [sizes, setSizes] = useState([]);
@@ -76,8 +81,26 @@ function AdminProductForm() {
                                 is_active: product.is_active ?? true,
                                 has_variants: product.has_variants ?? false,
                                 has_colors: product.has_colors ?? false,
-                                has_sizes: product.has_sizes ?? false
+                                has_sizes: product.has_sizes ?? false,
+                                is_musical: product.is_musical ?? false,
+                                artist: product.artist || '',
+                                technique: product.technique || '',
+                                year: product.year || ''
                             });
+                            
+                            // Load music tracks if editing
+                            if (product.is_musical) {
+                                apiRequest(`/api/admin/products/${id}/music-tracks`)
+                                    .then(async (res) => {
+                                        if (res.ok) {
+                                            const data = await res.json();
+                                            if (data.success) {
+                                                setMusicTracks(data.data || []);
+                                            }
+                                        }
+                                    })
+                                    .catch(() => {});
+                            }
                             // Convert existing images to FileUpload format
                             const existingImages = (product.images || []).map((img, index) => ({
                                 id: img.id || `existing-${index}`,
@@ -192,6 +215,10 @@ function AdminProductForm() {
             formData.append('has_variants', form.has_variants ? '1' : '0');
             formData.append('has_colors', form.has_colors ? '1' : '0');
             formData.append('has_sizes', form.has_sizes ? '1' : '0');
+            formData.append('is_musical', form.is_musical ? '1' : '0');
+            if (form.artist) formData.append('artist', form.artist);
+            if (form.technique) formData.append('technique', form.technique);
+            if (form.year) formData.append('year', form.year.toString());
 
             // Add images
             const newImages = images.filter(img => img.isNew && img.file);
@@ -390,12 +417,60 @@ function AdminProductForm() {
                         />
                     </div>
 
+                    {/* Artwork Details */}
+                    <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label className="block text-white font-medium mb-2">هنرمند</label>
+                            <input
+                                type="text"
+                                name="artist"
+                                value={form.artist}
+                                onChange={handleInputChange}
+                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                placeholder="نام هنرمند"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-white font-medium mb-2">تکنیک</label>
+                            <input
+                                type="text"
+                                name="technique"
+                                value={form.technique}
+                                onChange={handleInputChange}
+                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                placeholder="مثلاً: آکریلیک، آبرنگ"
+                            />
+                        </div>
+                        
+                        <div>
+                            <label className="block text-white font-medium mb-2">سال</label>
+                            <input
+                                type="number"
+                                name="year"
+                                value={form.year}
+                                onChange={handleInputChange}
+                                min="1900"
+                                max="2100"
+                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                placeholder="سال تولید"
+                            />
+                        </div>
+                    </div>
+
                     <div className="mt-6 flex flex-wrap gap-6">
                         <ModernCheckbox
                             name="is_active"
                             checked={form.is_active}
                             onChange={(e) => setForm(prev => ({ ...prev, is_active: e.target.checked }))}
                             label="فعال"
+                        />
+
+                        <ModernCheckbox
+                            name="is_musical"
+                            checked={form.is_musical}
+                            onChange={(e) => setForm(prev => ({ ...prev, is_musical: e.target.checked }))}
+                            label="موزیکال"
                         />
 
                         <ModernCheckbox
@@ -409,17 +484,72 @@ function AdminProductForm() {
                             name="has_colors"
                             checked={form.has_colors}
                             onChange={(e) => setForm(prev => ({ ...prev, has_colors: e.target.checked }))}
-                            label="دارای رنگ"
+                            label="دارای نوع قاب"
                         />
 
                         <ModernCheckbox
                             name="has_sizes"
                             checked={form.has_sizes}
                             onChange={(e) => setForm(prev => ({ ...prev, has_sizes: e.target.checked }))}
-                            label="دارای سایز"
+                            label="دارای ابعاد"
                         />
                     </div>
                 </div>
+
+                {/* Music Tracks - Only show if is_musical is checked */}
+                {form.is_musical && (
+                    <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
+                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <svg className="w-6 h-6 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+                            </svg>
+                            موسیقی همراه تابلو
+                        </h2>
+                        
+                        {musicTracks.length > 0 && (
+                            <div className="mb-4 space-y-2">
+                                {musicTracks.map((track, index) => (
+                                    <div key={track.id} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-lg p-3">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-gray-400 text-sm">{index + 1}</span>
+                                            <div>
+                                                <div className="text-white font-medium">{track.title}</div>
+                                                {track.artist && <div className="text-gray-400 text-sm">{track.artist}</div>}
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={async () => {
+                                                if (confirm('آیا از حذف این آهنگ اطمینان دارید؟')) {
+                                                    try {
+                                                        const res = await apiRequest(`/api/admin/products/${id}/music-tracks/${track.id}`, {
+                                                            method: 'DELETE'
+                                                        });
+                                                        if (res.ok) {
+                                                            setMusicTracks(prev => prev.filter(t => t.id !== track.id));
+                                                            showToast('آهنگ حذف شد', 'success');
+                                                        }
+                                                    } catch (error) {
+                                                        showToast('خطا در حذف آهنگ', 'error');
+                                                    }
+                                                }
+                                            }}
+                                            className="text-red-400 hover:text-red-300 transition"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        
+                        <div className="text-gray-400 text-sm mb-4">
+                            برای آپلود موزیک جدید، ابتدا محصول را ذخیره کنید و سپس از صفحه ویرایش، فایل‌های موزیک را اضافه نمایید.
+                        </div>
+                    </div>
+                )}
 
                 {/* Images */}
                 <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
@@ -539,7 +669,7 @@ function AdminProductForm() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex-1 bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-600 hover:to-indigo-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     >
                         {loading ? (
                             <div className="flex items-center justify-center space-x-2 space-x-reverse">

@@ -21,7 +21,7 @@ function ModernCheckbox({
                 />
                 <div className={`w-5 h-5 rounded border-2 transition-all duration-200 flex items-center justify-center ${
                     checked
-                        ? 'bg-gradient-to-r from-purple-500 to-purple-600 border-purple-500'
+                        ? 'bg-gradient-to-r from-amber-500 to-indigo-600 border-purple-500'
                         : 'border-white/30 hover:border-purple-400'
                 } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                     {checked && (

@@ -130,7 +130,7 @@ function AdminDashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
             ),
-            color: 'from-purple-500 to-purple-600',
+            color: 'from-amber-500 to-indigo-600',
             onClick: () => navigate('/admin/campaigns/create')
         }
     ];
@@ -211,7 +211,7 @@ function AdminDashboard() {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 backdrop-blur-xl rounded-xl border border-purple-500/20 p-6">
+                <div className="bg-gradient-to-br from-amber-500/10 to-indigo-600/10 backdrop-blur-xl rounded-xl border border-purple-500/20 p-6">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-400 text-sm">درآمد کل</p>
@@ -256,7 +256,7 @@ function AdminDashboard() {
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-pink-500/10 to-pink-600/10 backdrop-blur-xl rounded-xl border border-pink-500/20 p-6">
+                <div className="bg-gradient-to-br from-indigo-500/10 to-indigo-600/10 backdrop-blur-xl rounded-xl border border-pink-500/20 p-6">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-400 text-sm">کمپین‌های فعال</p>

@@ -86,8 +86,8 @@ function ProductCard({ product, index }) {
     return (
         <>
             <div
-                className={`product-card group relative rounded-2xl overflow-hidden border border-white/10 bg-white/5 glass-card hover-lift soft-shadow opacity-0 translate-y-4 transition-all duration-500 ease-out ${
-                    isHovered ? 'border-cherry-500/30' : ''
+                className={`product-card group relative rounded-2xl overflow-hidden border border-white/10 bg-white/5 glass-card hover-lift elegant-shadow opacity-0 translate-y-4 transition-all duration-500 ease-out ${
+                    isHovered ? 'border-amber-500/40 shadow-amber-500/10' : ''
                 }`}
                 style={{ 
                     animationDelay: `${index * 100}ms`,
@@ -98,10 +98,22 @@ function ProductCard({ product, index }) {
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={handleCardClick}
             >
+            {/* Musical Badge */}
+            {product.is_musical && (
+                <div className="absolute top-2 right-2 z-20">
+                    <span className="px-2 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap bg-gradient-to-r from-amber-600/90 to-indigo-600/90 text-white ring-1 ring-white/20 shadow flex items-center gap-1">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+                        </svg>
+                        موزیکال
+                    </span>
+                </div>
+            )}
+            
             {/* Campaign Badge */}
             {product.campaigns && product.campaigns.length > 0 && (
                 <div className="absolute top-2 left-2 z-20">
-                    <span className="px-2 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap bg-gradient-to-r from-cherry-600/90 to-pink-600/90 text-white ring-1 ring-white/20 shadow">
+                    <span className="px-2 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap bg-gradient-to-r from-amber-600/90 to-indigo-600/90 text-white ring-1 ring-white/20 shadow">
                         {product.campaigns[0].badge_text || `${product.campaigns[0].discount_value}% تخفیف`}
                     </span>
                 </div>
@@ -125,7 +137,7 @@ function ProductCard({ product, index }) {
                         <div className="min-w-[28px] text-center text-white text-[11px] bg-black/20 rounded px-1 py-0.5">
                             {formatPriceFa(qtyInCart || 0)}
                         </div>
-                        <button onClick={increment} className="w-7 h-7 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cherry-600 to-pink-600 hover:from-cherry-500 hover:to-pink-500 text-white text-xs">+</button>
+                        <button onClick={increment} className="w-7 h-7 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-amber-600 to-indigo-600 hover:from-amber-500 hover:to-indigo-500 text-white text-xs">+</button>
                     </div>
                 </div>
             </div>
@@ -142,12 +154,12 @@ function ProductCard({ product, index }) {
                             <span className="text-gray-400 text-xs line-through">
                                 {formatPriceFa(product.price)} تومان
                             </span>
-                            <span className="text-cherry-400 text-sm font-bold">
+                            <span className="text-amber-400 text-sm font-bold">
                                 {formatPriceFa(Math.round(product.price * (1 - product.campaigns[0].discount_value / 100)))} تومان
                             </span>
                         </>
                     ) : (
-                        <span className="text-cherry-400 text-sm font-bold">
+                        <span className="text-amber-400 text-sm font-bold">
                             {formatPriceFa(product.price)} تومان
                         </span>
                     )}
