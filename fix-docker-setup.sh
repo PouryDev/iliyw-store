@@ -72,10 +72,6 @@ echo "✅ .env.docker file created successfully!"
 echo "🛑 Stopping existing containers..."
 docker compose down
 
-# Remove old images to force rebuild
-echo "🗑️ Removing old images..."
-docker compose down --rmi all
-
 # Build and start containers
 echo "🚀 Building and starting containers..."
 docker compose up -d --build
