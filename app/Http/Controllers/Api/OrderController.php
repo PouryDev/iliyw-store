@@ -8,9 +8,11 @@ use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Campaign;
+use App\Models\OrderItemUpload;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class OrderController extends Controller
 {
@@ -160,7 +162,16 @@ class OrderController extends Controller
             }
             $order->save();
 
-            // Items and stock reduction
+            // Items, stock reduction, attach uploads
+            $sessionId = $request->session()->getId();
+            // Accept JSON string from multipart form-data and decode
+            $rawUploads = $request->input('item_uploads', []);
+            if (is_string($rawUploads)) {
+                $decoded = json_decode($rawUploads, true);
+                $rawUploads = is_array($decoded) ? $decoded : [];
+            }
+            $itemUploadsMap = (array) $rawUploads; // { cart_key: [temp_id, ...] }
+
             foreach ($itemsPayload as $row) {
                 $orderItem = $order->items()->create($row);
                 
@@ -189,6 +200,55 @@ class OrderController extends Controller
                         $product->decrement('stock', $quantity);
                     }
                 }
+
+                // Attach any customer uploads for this cart item
+                $cartKey = $row['cart_key'];
+                $tempIds = isset($itemUploadsMap[$cartKey]) && is_array($itemUploadsMap[$cartKey])
+                    ? array_slice($itemUploadsMap[$cartKey], 0, 10)
+                    : [];
+
+                $tempBasePath = "order_uploads/tmp/{$sessionId}/{$cartKey}";
+                $files = Storage::disk('private')->exists($tempBasePath)
+                    ? Storage::disk('private')->files($tempBasePath)
+                    : [];
+
+                // Fallback: اگر کلیدها از کلاینت نرسید، تمام فایل‌های tmp این آیتم را منتقل کن
+                if (empty($tempIds) && !empty($files)) {
+                    $tempIds = array_map(function ($p) { return sha1($p); }, $files);
+                }
+
+                foreach ($tempIds as $tempId) {
+                    $matched = null;
+                    foreach ($files as $path) {
+                        if (sha1($path) === $tempId) { $matched = $path; break; }
+                    }
+                    if (!$matched) { continue; }
+
+                    $ext = strtolower(pathinfo($matched, PATHINFO_EXTENSION));
+                    $type = in_array($ext, ['mp3','wav','ogg','m4a','aac','webm','3gp']) ? 'audio' : 'image';
+                    $filename = basename($matched);
+                    $finalDir = "order_uploads/orders/{$order->id}/{$orderItem->id}";
+                    $finalPath = $finalDir . '/' . $filename;
+
+                    // Ensure directory exists and move file
+                    Storage::disk('private')->makeDirectory($finalDir);
+                    Storage::disk('private')->move($matched, $finalPath);
+
+                    // Best-effort metadata
+                    $size = Storage::disk('private')->size($finalPath);
+                    $mime = null;
+
+                    OrderItemUpload::create([
+                        'order_item_id' => $orderItem->id,
+                        'purpose' => 'customer_upload',
+                        'type' => $type,
+                        'disk' => 'private',
+                        'path' => $finalPath,
+                        'size' => $size,
+                        'mime' => $mime,
+                        'original_name' => $filename,
+                    ]);
+                }
             }
 
             // Invoice
@@ -208,18 +268,20 @@ class OrderController extends Controller
         // Clear cart after successful order creation
         $request->session()->forget('cart');
 
+        // Eager-load relations so client immediately sees uploads
+        $order->load(['user', 'items.product.images', 'items.color', 'items.size', 'items.uploads', 'deliveryAddress', 'deliveryMethod']);
+
+        // Build receipt URL if present
+        $receiptUrl = null;
+        if (!empty($order->receipt_path)) {
+            $receiptUrl = url('/storage/' . ltrim($order->receipt_path, '/'));
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'سفارش با موفقیت ثبت شد',
-            'order' => [
-                'id' => $order->id,
-            ],
-            'invoice' => [
-                'id' => $order->invoice->id,
-                'invoice_number' => $order->invoice->invoice_number,
-                'amount' => $order->invoice->amount,
-                'status' => $order->invoice->status,
-            ]
+            'data' => array_merge($order->toArray(), [
+                'receipt_url' => $receiptUrl,
+            ]),
         ]);
     }
 

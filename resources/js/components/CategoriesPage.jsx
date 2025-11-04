@@ -28,6 +28,58 @@ function CategoriesPage(){
         return categories.filter(c => (c.name || '').includes(q));
     }, [categories, query]);
 
+    // Function to get emoji for category
+    const getCategoryEmoji = (categoryName) => {
+        const emojiMap = {
+            // تابلو و هنر
+            'تابلو': '🖼️',
+            'هنری': '🎨',
+            'موزیکال': '🎵',
+            'مدرن': '✨',
+            'کلاسیک': '🏛️',
+            'دکوری': '🎭',
+            
+            // اکسسوری
+            'اکسسوری': '🎧',
+            'گوگولی اکسسوری': '🎧',
+            'گوگل اکسسوری': '🎧',
+            'گوگولی': '🎧',
+            'ساعت': '⌚',
+            'عینک': '🕶️',
+            'کیف': '👜',
+            'جواهرات': '💍',
+            
+            // دسته‌بندی‌های دیگر
+            'مردانه': '👔',
+            'زنانه': '👗',
+            'تابستانی': '☀️',
+            'زمستانی': '❄️'
+        };
+        
+        // Try to find exact match first
+        if (emojiMap[categoryName]) {
+            return emojiMap[categoryName];
+        }
+        
+        // Try to find partial match (check for Google/گوگولی and اکسسوری)
+        if (categoryName.includes('گوگولی') || categoryName.includes('گوگل')) {
+            if (categoryName.includes('اکسسوری')) {
+                return '🎧';
+            }
+            return '🎧';
+        }
+        
+        // Try to find partial match
+        for (const [key, emoji] of Object.entries(emojiMap)) {
+            if (categoryName.includes(key) || key.includes(categoryName)) {
+                return emoji;
+            }
+        }
+        
+        // Default emoji for art/gallery theme
+        return '🖼️';
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white anim-page">
             {/* Hero / Sticky search */}
@@ -72,8 +124,8 @@ function CategoriesPage(){
                                     onClick={() => navigate(`/category/${cat.id}`)}
                                     className="group rounded-xl glass-card soft-shadow border border-white/10 p-3 text-right hover:border-amber-500/40 hover:bg-white/10 transition flex items-center gap-3"
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600/25 to-indigo-600/15 flex items-center justify-center text-white text-sm ring-1 ring-white/10">
-                                        {(cat.name || '?').charAt(0)}
+                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-600/25 to-indigo-600/15 flex items-center justify-center text-white text-lg ring-1 ring-white/10">
+                                        {getCategoryEmoji(cat.name)}
                                     </div>
                                     <div className="min-w-0 flex-1">
                                         <div className="text-sm font-semibold text-white truncate">{cat.name}</div>

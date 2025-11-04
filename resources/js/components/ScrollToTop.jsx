@@ -5,11 +5,8 @@ function ScrollToTop() {
     const { pathname } = useLocation();
 
     useEffect(() => {
-        // Don't scroll to top for home page (preserve scroll position)
-        if (pathname === '/') {
-            return;
-        }
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        // Always scroll to top when route changes, except when staying on home page
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [pathname]);
 
     return null;

@@ -29,6 +29,8 @@ function CheckoutPage() {
     const [discountInfo, setDiscountInfo] = React.useState(null);
     const [deliveryMethods, setDeliveryMethods] = React.useState([]);
     const [selectedDeliveryMethod, setSelectedDeliveryMethod] = React.useState(null);
+    const [itemTempUploads, setItemTempUploads] = React.useState({}); // { cartKey: [tempId,...] }
+    const MAX_ITEM_FILES = 10;
 
     const formatPrice = (v) => {
         try { return Number(v || 0).toLocaleString('fa-IR'); } catch { return v; }
@@ -176,6 +178,47 @@ function CheckoutPage() {
         setForm((prev) => ({ ...prev, delivery_method_id: methodId }));
     };
 
+    async function uploadForItem(cartKey, file) {
+        if (!file) return;
+        const current = itemTempUploads[cartKey] || [];
+        if (current.length >= MAX_ITEM_FILES) {
+            showToast('حداکثر ۱۰ فایل برای هر آیتم مجاز است', 'error');
+            return;
+        }
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+            const res = await apiRequest(`/api/cart/items/${encodeURIComponent(cartKey)}/uploads`, {
+                method: 'POST',
+                body: fd,
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.message || 'خطای آپلود');
+            setItemTempUploads((prev) => ({
+                ...prev,
+                [cartKey]: [...(prev[cartKey] || []), data.data.temp_id]
+            }));
+            showToast('فایل اضافه شد', 'success');
+        } catch (e) {
+            showToast(e.message || 'آپلود ناموفق بود', 'error');
+        }
+    }
+
+    async function removeTempForItem(cartKey, tempId) {
+        try {
+            const res = await apiRequest(`/api/cart/items/${encodeURIComponent(cartKey)}/uploads/${encodeURIComponent(tempId)}`, {
+                method: 'DELETE'
+            });
+            if (!res.ok) throw new Error('خطا در حذف فایل');
+            setItemTempUploads((prev) => ({
+                ...prev,
+                [cartKey]: (prev[cartKey] || []).filter(id => id !== tempId)
+            }));
+        } catch (e) {
+            showToast(e.message || 'حذف فایل ناموفق بود', 'error');
+        }
+    }
+
     async function applyDiscount() {
         // Placeholder: here you could call a dedicated API to validate discount; for now just show a dummy confirmation
         if (!form.discount_code) return;
@@ -224,6 +267,9 @@ function CheckoutPage() {
             formData.append('delivery_method_id', form.delivery_method_id);
             if (form.discount_code) {
                 formData.append('discount_code', form.discount_code);
+            }
+            if (itemTempUploads && Object.keys(itemTempUploads).length > 0) {
+                formData.append('item_uploads', JSON.stringify(itemTempUploads));
             }
             
             const res = await apiRequest('/api/checkout', {
@@ -354,6 +400,47 @@ function CheckoutPage() {
                                             )}
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+
+                            {/* Item Uploads (Mobile) - only for musical paintings */}
+                            <div className="p-4 space-y-4">
+                                {cart.items.map((item) => (
+                                    (() => {
+                                        const isMusical = !!(item.is_musical || item.product?.is_musical);
+                                        if (!isMusical) return null;
+                                        return (
+                                            <div key={`upload-${item.key}`} className="bg-white/5 rounded-xl border border-white/10 p-3">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="text-white text-sm font-semibold">موسیقی‌های ضمیمه ({(itemTempUploads[item.key]||[]).length}/10)</div>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    {/* Stylish upload trigger */}
+                                                    <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-medium cursor-pointer active:scale-[0.98] transition-all">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-2v13M9 10l12-2M5 19h4" />
+                                                        </svg>
+                                                        افزودن ترک صوتی
+                                                        <input
+                                                            type="file"
+                                                            accept="audio/mp3,audio/wav,audio/ogg,audio/*"
+                                                            onChange={(e)=>{ const f=e.target.files?.[0]; if (f) uploadForItem(item.key,f); e.target.value=''; }}
+                                                            className="sr-only"
+                                                        />
+                                                    </label>
+                                                    <div className="flex-1 flex flex-wrap gap-2">
+                                                        {(itemTempUploads[item.key]||[]).map((tid)=>(
+                                                            <span key={tid} className="inline-flex items-center gap-2 text-[10px] bg-white/10 text-gray-200 px-2 py-1 rounded-lg border border-white/10">
+                                                                <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                                                ترک انتخاب‌شده
+                                                                <button type="button" onClick={()=>removeTempForItem(item.key, tid)} className="ml-1 text-red-400">×</button>
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })()
                                 ))}
                             </div>
                             
@@ -687,6 +774,45 @@ function CheckoutPage() {
                         {/* Form */}
                         <div>
                             <form onSubmit={handleSubmit} className="bg-white/5 glass-card rounded-xl p-4 space-y-3 soft-shadow">
+                                {/* Musical uploads per item (Desktop) */}
+                                {cart.items && cart.items.some((it) => (it.is_musical || it.product?.is_musical)) && (
+                                    <div className="bg-white/5 border border-white/10 rounded-xl p-3">
+                                        <div className="text-white font-semibold mb-2">ضمیمه موسیقی برای تابلوهای موزیکال</div>
+                                        <div className="space-y-3">
+                                            {cart.items.map((it) => {
+                                                const isMusical = !!(it.is_musical || it.product?.is_musical);
+                                                if (!isMusical) return null;
+                                                return (
+                                                    <div key={`desk-upload-${it.key}`} className="flex items-center gap-3">
+                                                        <div className="text-xs text-gray-300 min-w-[140px] truncate">{it.product?.title || it.title}</div>
+                                                        <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-medium cursor-pointer active:scale-[0.98] transition-all">
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-2v13M9 10l12-2M5 19h4" />
+                                                            </svg>
+                                                            افزودن ترک صوتی
+                                                            <input
+                                                                type="file"
+                                                                accept="audio/mp3,audio/wav,audio/ogg,audio/*"
+                                                                onChange={(e)=>{ const f=e.target.files?.[0]; if (f) uploadForItem(it.key,f); e.target.value=''; }}
+                                                                className="sr-only"
+                                                            />
+                                                        </label>
+                                                        <div className="flex-1 flex flex-wrap gap-2">
+                                                            {(itemTempUploads[it.key]||[]).map((tid)=>(
+                                                                <span key={tid} className="inline-flex items-center gap-2 text-[10px] bg-white/10 text-gray-200 px-2 py-1 rounded-lg border border-white/10">
+                                                                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                                                    ترک انتخاب‌شده
+                                                                    <button type="button" onClick={()=>removeTempForItem(it.key, tid)} className="ml-1 text-red-400">×</button>
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-[10px] text-gray-400">{(itemTempUploads[it.key]||[]).length}/10</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                                 <div>
                                     <label className="block text-sm text-gray-300 mb-1">نام و نام خانوادگی</label>
                                     <input 

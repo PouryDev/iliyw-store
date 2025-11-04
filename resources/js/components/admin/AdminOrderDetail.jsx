@@ -8,6 +8,7 @@ function AdminOrderDetail() {
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [audioSrcMap, setAudioSrcMap] = useState({}); // { [uploadId]: objectUrl }
 
     useEffect(() => {
         fetchOrderDetails();
@@ -50,6 +51,50 @@ function AdminOrderDetail() {
             alert('خطا در ارتباط با سرور');
         }
     };
+
+    const downloadUpload = async (itemId, uploadId, suggestedName) => {
+        try {
+            const res = await apiRequest(`/api/admin/orders/${id}/items/${itemId}/uploads/${uploadId}/download`, {
+                method: 'GET'
+            });
+            if (!res.ok) throw new Error('دانلود ناموفق بود');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = suggestedName || `upload-${uploadId}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            alert(e.message || 'دانلود ناموفق بود');
+        }
+    };
+
+    const playUpload = async (itemId, upload) => {
+        try {
+            const res = await apiRequest(`/api/admin/orders/${id}/items/${itemId}/uploads/${upload.id}/download`, {
+                method: 'GET'
+            });
+            if (!res.ok) throw new Error('دریافت فایل ناموفق بود');
+            const blob = await res.blob();
+            const url = window.URL.createObjectURL(blob);
+            setAudioSrcMap((prev) => ({ ...prev, [upload.id]: url }));
+        } catch (e) {
+            alert(e.message || 'پخش ناموفق بود');
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            // cleanup object URLs
+            Object.values(audioSrcMap).forEach((u) => {
+                try { window.URL.revokeObjectURL(u); } catch {}
+            });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -287,6 +332,39 @@ function AdminOrderDetail() {
                                                 {(item.quantity * item.price)?.toLocaleString('fa-IR')} تومان
                                             </span>
                                         </div>
+                                        {(item.uploads && item.uploads.length > 0) && (
+                                            <div className="mt-3">
+                                                <div className="text-xs text-gray-300 mb-1">فایل‌های ضمیمه کاربر:</div>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {item.uploads.map((up) => (
+                                                        <div key={up.id} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-2 py-1.5">
+                                                            <span className="text-[10px] text-gray-300 truncate max-w-[140px]" title={up.original_name || ''}>
+                                                                {up.type === 'audio' ? 'ترک صوتی' : 'فایل'}
+                                                            </span>
+                                                            {up.type === 'audio' && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => playUpload(item.id, up)}
+                                                                    className="px-2 py-1 rounded text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/15 transition"
+                                                                >
+                                                                    پخش
+                                                                </button>
+                                                            )}
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => downloadUpload(item.id, up.id, up.original_name)}
+                                                                className="px-2 py-1 rounded text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/15 transition"
+                                                            >
+                                                                دانلود
+                                                            </button>
+                                                            {up.type === 'audio' && audioSrcMap[up.id] && (
+                                                                <audio src={audioSrcMap[up.id]} controls className="h-7" />
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>

@@ -418,11 +418,11 @@ class DatabaseSeeder extends Seeder
         // Add musical category as target
         $musicalCategory = collect($categories)->where('name', 'تابلوهای موزیکال')->first();
         if ($musicalCategory) {
-            CampaignTarget::create([
+        CampaignTarget::create([
                 'campaign_id' => $musicalCampaign->id,
-                'targetable_type' => Category::class,
+            'targetable_type' => Category::class,
                 'targetable_id' => $musicalCategory->id,
-            ]);
+        ]);
         }
 
         // Campaign 3: Fixed Discount for Modern Art

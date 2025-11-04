@@ -20,7 +20,7 @@ function CategoryPage() {
         description: category ? `خرید ${category.name} با کیفیت از فروشگاه جمه. لباس‌های مینیمال و کاربردی با قیمت مناسب.` : 'دسته‌بندی محصولات فروشگاه جمه',
         keywords: category ? `${category.name}, لباس, جمه, خرید آنلاین` : 'دسته‌بندی محصولات, لباس, جمه',
         image: '/images/logo.png',
-        canonical: window.location.origin + `/categories/${id}`
+        canonical: window.location.origin + `/category/${id}`
     });
 
     const fetchCategory = useCallback(async () => {

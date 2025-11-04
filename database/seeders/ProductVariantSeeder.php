@@ -7,6 +7,7 @@ use App\Models\Color;
 use App\Models\Size;
 use App\Models\ProductVariant;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ProductVariantSeeder extends Seeder
 {
@@ -78,6 +79,14 @@ class ProductVariantSeeder extends Seeder
 
         $stock = rand(1, 12); // Lower stock for art pieces
 
+        // Build ASCII-only SKU to avoid invalid utf8 issues
+        $skuParts = [
+            $product->slug ?? Str::slug($product->title ?? 'product'),
+            $color?->id,
+            $size?->id,
+        ];
+        $sku = strtoupper(Str::limit(Str::slug(implode('-', array_filter($skuParts)), '-'), 64, ''));
+
         ProductVariant::create([
             'product_id' => $product->id,
             'color_id' => $color?->id, // Frame type
@@ -85,6 +94,7 @@ class ProductVariantSeeder extends Seeder
             'stock' => $stock,
             'price' => $variantPrice,
             'is_active' => true,
+            'sku' => $sku,
         ]);
     }
 }

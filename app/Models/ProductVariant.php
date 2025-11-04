@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class ProductVariant extends Model
 {
@@ -29,9 +30,13 @@ class ProductVariant extends Model
         parent::boot();
 
         static::creating(function ($variant) {
-            if (empty($variant->sku)) {
-                $variant->sku = $variant->generateSku();
-            }
+            $proposed = $variant->sku ?: $variant->generateSku();
+            $variant->sku = self::sanitizeSku($proposed, $variant);
+        });
+
+        static::updating(function ($variant) {
+            $proposed = $variant->sku ?: $variant->generateSku();
+            $variant->sku = self::sanitizeSku($proposed, $variant);
         });
     }
 
@@ -113,30 +118,39 @@ class ProductVariant extends Model
 
     public function generateSku(): string
     {
-        $productSku = $this->product->slug ?? 'PROD';
-        
-        $parts = [$productSku];
-        
-        if ($this->color) {
-            // Convert Persian color names to ASCII
-            $colorCode = $this->getColorCode($this->color->name);
-            $parts[] = strtoupper($colorCode);
-        }
-        
-        if ($this->size) {
-            // Size names are usually already in English (XS, S, M, L, XL, XXL)
-            $parts[] = strtoupper($this->size->name);
-        }
-        
-        $baseSku = implode('-', array_filter($parts));
-        $uniqueSku = $baseSku;
+        $productSlug = $this->product?->slug ?: Str::slug($this->product?->title ?? 'product', '-');
+
+        $colorPart = $this->color ? ($this->getColorCode($this->color->name) ?: $this->color->id) : null;
+        $sizePart = $this->size ? ($this->size->name ?: $this->size->id) : null;
+
+        // Slugify parts to keep ASCII only
+        $parts = array_filter([
+            Str::slug(Str::ascii($productSlug), '-'),
+            $colorPart ? Str::upper(Str::slug(Str::ascii($colorPart), '-')) : null,
+            $sizePart ? Str::upper(Str::slug(Str::ascii($sizePart), '-')) : null,
+        ]);
+
+        $baseSku = implode('-', $parts);
+        $uniqueSku = $baseSku ?: ('PROD-' . ($this->product?->id ?? 'X'));
         $counter = 1;
         
         while (self::where('sku', $uniqueSku)->where('id', '!=', $this->id ?? 0)->exists()) {
             $uniqueSku = $baseSku . '-' . $counter++;
         }
         
-        return $uniqueSku;
+        return self::sanitizeSku($uniqueSku, $this);
+    }
+
+    protected static function sanitizeSku($value, $variant): string
+    {
+        // fallback if empty
+        if (!$value) {
+            $value = 'PROD-' . ($variant->product?->id ?? 'X');
+        }
+        $ascii = Str::ascii($value);
+        $slug = Str::slug($ascii, '-');
+        $upper = Str::upper($slug);
+        return Str::limit($upper, 64, '');
     }
 
     private function getColorCode(string $colorName): string

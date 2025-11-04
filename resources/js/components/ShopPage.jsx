@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link, useLocation } from 'react-router-dom';
 import { apiRequest } from '../utils/sanctumAuth';
 import ProductCard from './ProductCard';
 import LoadingSpinner from './LoadingSpinner';
@@ -17,33 +17,44 @@ function ShopPage() {
     const [bestSellers, setBestSellers] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Check if we're on products page (not home page)
+    const isProductsPage = location.pathname === '/products';
 
     // SEO
     useSeo({
-        title: 'فروشگاه آنلاین تابلوهای هنری iliyw - خرید تابلو با کیفیت بالا',
-        description: 'فروشگاه آنلاین تابلوهای هنری iliyw با تمرکز روی کیفیت، هنر اصیل و تجربه خرید آسان. تابلوهای مدرن، کلاسیک، موزیکال و تابلوهای هنری با قیمت مناسب.',
-        keywords: 'فروشگاه تابلو, خرید آنلاین تابلو, تابلو مدرن, تابلو موزیکال, تابلو دکوری, تابلو هنری, iliyw',
+        title: isProductsPage ? 'تابلوها - فروشگاه آنلاین iliyw' : 'فروشگاه آنلاین تابلوهای هنری iliyw - خرید تابلو با کیفیت بالا',
+        description: isProductsPage ? 'مشاهده و خرید همه تابلوهای هنری با کیفیت از فروشگاه آنلاین iliyw' : 'فروشگاه آنلاین تابلوهای هنری iliyw با تمرکز روی کیفیت، هنر اصیل و تجربه خرید آسان. تابلوهای مدرن، کلاسیک، موزیکال و تابلوهای هنری با قیمت مناسب.',
+        keywords: isProductsPage ? 'تابلوها, محصولات, خرید آنلاین تابلو, iliyw' : 'فروشگاه تابلو, خرید آنلاین تابلو, تابلو مدرن, تابلو موزیکال, تابلو دکوری, تابلو هنری, iliyw',
         image: '/images/logo.png',
-        canonical: window.location.origin + '/products'
+        canonical: window.location.origin + (isProductsPage ? '/products' : '/')
     });
 
     // Function to get emoji for category
     const getCategoryEmoji = (categoryName) => {
         const emojiMap = {
-            'لباس': '👕',
-            'شلوار': '👖',
-            'کفش': '👟',
-            'کیف': '👜',
+            // تابلو و هنر
+            'تابلو': '🖼️',
+            'هنری': '🎨',
+            'موزیکال': '🎵',
+            'مدرن': '✨',
+            'کلاسیک': '🏛️',
+            'دکوری': '🎭',
+            
+            // اکسسوری
+            'اکسسوری': '🎧',
+            'گوگولی اکسسوری': '🎧',
+            'گوگل اکسسوری': '🎧',
+            'گوگولی': '🎧',
             'ساعت': '⌚',
             'عینک': '🕶️',
+            'کیف': '👜',
             'جواهرات': '💍',
-            'اکسسوری': '🎀',
+            
+            // دسته‌بندی‌های دیگر
             'مردانه': '👔',
             'زنانه': '👗',
-            'بچه': '👶',
-            'ورزشی': '🏃',
-            'رسمی': '🤵',
-            'کژوال': '👕',
             'تابستانی': '☀️',
             'زمستانی': '❄️'
         };
@@ -53,6 +64,14 @@ function ShopPage() {
             return emojiMap[categoryName];
         }
         
+        // Try to find partial match (check for Google/گوگولی and اکسسوری)
+        if (categoryName.includes('گوگولی') || categoryName.includes('گوگل')) {
+            if (categoryName.includes('اکسسوری')) {
+                return '🎧';
+            }
+            return '🎧';
+        }
+        
         // Try to find partial match
         for (const [key, emoji] of Object.entries(emojiMap)) {
             if (categoryName.includes(key) || key.includes(categoryName)) {
@@ -60,8 +79,8 @@ function ShopPage() {
             }
         }
         
-        // Default emoji
-        return '🛍️';
+        // Default emoji for art/gallery theme
+        return '🖼️';
     };
 
     // Initialize search query from URL
@@ -144,6 +163,11 @@ function ShopPage() {
         } catch {}
     }, []);
 
+    // Scroll to top when pathname changes (e.g., from / to /products)
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [location.pathname]);
+
     // Load initial products and campaigns
     useEffect(() => {
         fetchProducts(1, searchQuery);
@@ -196,138 +220,161 @@ function ShopPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
-            {/* Categories Carousel */}
-            {categories.length > 0 && (
-                <section className="px-4 py-4">
+            {/* Search Bar - Show on both pages, at the top on home page */}
+            {!isProductsPage && (
+                <section className="px-4 mb-6 pt-4">
                     <div className="max-w-7xl mx-auto">
-                        <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch' }}>
-                            {categories.map((category) => (
-                                <Link
-                                    key={category.id}
-                                    to={`/category/${category.id}`}
-                                    className="snap-start shrink-0 flex-none"
-                                >
-                                    <div className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-full px-4 py-2 transition-all duration-200 min-w-fit">
-                                        <span className="text-lg">{getCategoryEmoji(category.name)}</span>
-                                        <span className="text-white text-sm font-medium whitespace-nowrap">{category.name}</span>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-            )}
-            {/* Search Bar */}
-            <section className="px-4 mb-6">
-                <div className="max-w-7xl mx-auto">
-                    <SearchDropdown initialQuery={searchQuery} />
-                </div>
-            </section>
-
-            
-
-            {/* Best Sellers Carousel */}
-            {bestSellers.length > 0 && (
-                <section className="px-4 mb-8">
-                    <div className="max-w-7xl mx-auto">
-                        <h2 className="text-white font-bold text-lg mb-4">محبوب‌ترین‌ها</h2>
-                        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch' }}>
-                            {bestSellers.map((p, i) => (
-                                <div key={p.id} className="snap-start w-[200px] sm:w-72 shrink-0 flex-none">
-                                    <ProductCard product={p} index={i} />
-                                </div>
-                            ))}
-                        </div>
+                        <SearchDropdown initialQuery={searchQuery} />
                     </div>
                 </section>
             )}
 
-            {/* Instagram Banner */}
-            <section className="px-4 mb-8">
-                <div className="max-w-7xl mx-auto">
-                    <a 
-                        href="https://instagram.com/iliywstore" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="block group"
-                    >
-                        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 via-indigo-500 to-indigo-500 p-1 shadow-2xl">
-                            <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-xl p-6">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-indigo-500 rounded-full flex items-center justify-center">
-                                                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                                                </svg>
+            {/* Home page sections - only show on / */}
+            {!isProductsPage && (
+                <>
+                    {/* Categories Carousel */}
+                    {categories.length > 0 && (
+                        <section className="px-4 py-4">
+                            <div className="max-w-7xl mx-auto">
+                                <div className="flex gap-2 overflow-x-auto snap-x snap-proximity pb-2 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', overscrollBehaviorX: 'contain' }}>
+                                    {categories.map((category) => (
+                                        <Link
+                                            key={category.id}
+                                            to={`/category/${category.id}`}
+                                            className="snap-start shrink-0 flex-none"
+                                        >
+                                            <div className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-full px-4 py-2 transition-all duration-200 min-w-fit">
+                                                <span className="text-lg">{getCategoryEmoji(category.name)}</span>
+                                                <span className="text-white text-sm font-medium whitespace-nowrap">{category.name}</span>
                                             </div>
-                                            <div>
-                                                <h3 className="text-white font-bold text-lg">iliywstore</h3>
-                                                <p className="text-gray-300 text-sm">اینستاگرام رسمی</p>
-                                            </div>
-                                        </div>
-                                        <h2 className="text-white font-bold text-xl mb-2">
-                                            🎉 جدیدترین محصولات و تخفیف‌های ویژه
-                                        </h2>
-                                        <p className="text-gray-300 text-sm mb-4">
-                                            برای دیدن آخرین محصولات، استایل‌های جدید و تخفیف‌های ویژه ما را در اینستاگرام دنبال کنید
-                                        </p>
-                                        <div className="flex items-center gap-2 text-pink-400 font-semibold text-sm group-hover:text-pink-300 transition-colors">
-                                            <span>فالو کنید</span>
-                                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div className="hidden md:block">
-                                        <div className="relative">
-                                            <div className="w-24 h-24 bg-gradient-to-r from-indigo-500/20 to-indigo-500/20 rounded-full flex items-center justify-center">
-                                                <div className="text-4xl">📱</div>
-                                            </div>
-                                            <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-indigo-500 rounded-full flex items-center justify-center animate-pulse">
-                                                <span className="text-white text-xs font-bold">+</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        </Link>
+                                    ))}
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            </section>
+                        </section>
+                    )}
 
-            {/* Category Carousels */}
-            {categories.slice(0, 5).map((cat) => (
-                <section key={cat.id} className="px-4 mb-8">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-white font-bold text-lg">{cat.name}</h2>
-                            <Link 
-                                to={`/category/${cat.id}`} 
-                                className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
-                            >
-                                مشاهده همه
-                            </Link>
-                        </div>
-                        <CategoryCarousel categoryId={cat.id} />
-                    </div>
-                </section>
-            ))}
-
-            {/* Campaigns Banners Carousel */}
-            {campaigns.length > 0 && (
-                <section className="px-4 mb-10">
-                    <div className="max-w-7xl mx-auto">
-                        <h2 className="text-white font-bold text-lg mb-4">کمپین‌ها</h2>
-                        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch' }}>
-                            {campaigns.map((campaign) => (
-                                <div key={campaign.id} className="snap-start w-[320px] sm:w-96 shrink-0 flex-none">
-                                    <BannerCard campaign={campaign} />
+                    {/* Best Sellers Carousel */}
+                    {bestSellers.length > 0 && (
+                        <section className="px-4 mb-8">
+                            <div className="max-w-7xl mx-auto">
+                                <h2 className="text-white font-bold text-lg mb-4">محبوب‌ترین‌ها</h2>
+                                <div className="flex gap-3 overflow-x-auto snap-x snap-proximity pb-3 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', overscrollBehaviorX: 'contain' }}>
+                                    {bestSellers.map((p, i) => (
+                                        <div key={p.id} className="snap-start w-[200px] sm:w-72 shrink-0 flex-none">
+                                            <ProductCard product={p} index={i} />
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* Instagram Banner */}
+                    <section className="px-4 mb-8">
+                        <div className="max-w-7xl mx-auto">
+                            <a 
+                                href="https://instagram.com/iliywstore" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block group"
+                            >
+                                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-500 via-indigo-500 to-indigo-500 p-1 shadow-2xl">
+                                    <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-xl p-6">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-3">
+                                                    <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-indigo-500 rounded-full flex items-center justify-center">
+                                                        <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-white font-bold text-lg">iliywstore</h3>
+                                                        <p className="text-gray-300 text-sm">اینستاگرام رسمی</p>
+                                                    </div>
+                                                </div>
+                                                <h2 className="text-white font-bold text-xl mb-2">
+                                                    🎉 جدیدترین محصولات و تخفیف‌های ویژه
+                                                </h2>
+                                                <p className="text-gray-300 text-sm mb-4">
+                                                    برای دیدن آخرین محصولات، استایل‌های جدید و تخفیف‌های ویژه ما را در اینستاگرام دنبال کنید
+                                                </p>
+                                                <div className="flex items-center gap-2 text-pink-400 font-semibold text-sm group-hover:text-pink-300 transition-colors">
+                                                    <span>فالو کنید</span>
+                                                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                            <div className="hidden md:block">
+                                                <div className="relative">
+                                                    <div className="w-24 h-24 bg-gradient-to-r from-indigo-500/20 to-indigo-500/20 rounded-full flex items-center justify-center">
+                                                        <div className="text-4xl">📱</div>
+                                                    </div>
+                                                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-indigo-500 to-indigo-500 rounded-full flex items-center justify-center animate-pulse">
+                                                        <span className="text-white text-xs font-bold">+</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
-                    </div>
-                </section>
+                    </section>
+
+                    {/* Category Carousels */}
+                    {categories.slice(0, 5).map((cat) => (
+                        <section key={cat.id} className="px-4 mb-8">
+                            <div className="max-w-7xl mx-auto">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className="text-white font-bold text-lg">{cat.name}</h2>
+                                    <Link 
+                                        to={`/category/${cat.id}`} 
+                                        className="text-sm text-amber-400 hover:text-amber-300 transition-colors"
+                                    >
+                                        مشاهده همه
+                                    </Link>
+                                </div>
+                                <CategoryCarousel categoryId={cat.id} />
+                            </div>
+                        </section>
+                    ))}
+
+                    {/* Campaigns Banners Carousel */}
+                    {campaigns.length > 0 && (
+                        <section className="px-4 mb-10">
+                            <div className="max-w-7xl mx-auto">
+                                <h2 className="text-white font-bold text-lg mb-4">کمپین‌ها</h2>
+                                <div className="flex gap-3 overflow-x-auto snap-x snap-proximity pb-3 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', overscrollBehaviorX: 'contain' }}>
+                                    {campaigns.map((campaign) => (
+                                        <div key={campaign.id} className="snap-start w-[320px] sm:w-96 shrink-0 flex-none">
+                                            <BannerCard campaign={campaign} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+                    )}
+                </>
+            )}
+
+            {/* Search Bar and Title for Products Page */}
+            {isProductsPage && (
+                <>
+                    <section className="px-4 mb-6 pt-4">
+                        <div className="max-w-7xl mx-auto">
+                            <SearchDropdown initialQuery={searchQuery} />
+                        </div>
+                    </section>
+                    <section className="px-4 mb-6">
+                        <div className="max-w-7xl mx-auto">
+                            <h1 className="text-2xl md:text-3xl font-bold text-white">تابلوها</h1>
+                            <p className="text-gray-400 text-sm mt-1">مشاهده همه محصولات</p>
+                        </div>
+                    </section>
+                </>
             )}
 
             {/* Products Grid */}
@@ -435,7 +482,7 @@ function CategoryCarousel({ categoryId }) {
         })();
     }, [categoryId]);
     return (
-        <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch' }}>
+        <div className="flex gap-3 overflow-x-auto snap-x snap-proximity pb-3 [-ms-overflow-style:none] [scrollbar-width:none]" style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', overscrollBehaviorX: 'contain' }}>
             {items.map((p, i) => (
                 <div key={p.id} className="snap-start w-[200px] sm:w-72 shrink-0 flex-none">
                     <ProductCard product={p} index={i} />

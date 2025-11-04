@@ -61,6 +61,11 @@ class OrderItem extends Model
         return $this->hasMany(CampaignSale::class);
     }
 
+    public function uploads(): HasMany
+    {
+        return $this->hasMany(OrderItemUpload::class);
+    }
+
     public function getDisplayNameAttribute(): string
     {
         if ($this->variant_display_name) {

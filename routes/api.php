@@ -64,6 +64,10 @@ Route::middleware([
     Route::put('/cart/update', [CartController::class, 'update']);
     Route::delete('/cart/remove/{cartKey}', [CartController::class, 'remove']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
+
+    // Temporary uploads for checkout per cart item key
+    Route::post('/cart/items/{cartKey}/uploads', [\App\Http\Controllers\Api\CheckoutUploadController::class, 'storeTemp']);
+    Route::delete('/cart/items/{cartKey}/uploads/{tempId}', [\App\Http\Controllers\Api\CheckoutUploadController::class, 'destroyTemp']);
 });
 
 // Protected routes (using Sanctum for authentication)
@@ -177,10 +181,33 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureUserIsAdmin::class
             'items.product.images', 
             'items.color', 
             'items.size', 
+            'items.uploads',
             'deliveryAddress', 
             'deliveryMethod'
         ])->findOrFail($orderId);
         return response()->json(['success' => true, 'data' => $order]);
+    });
+
+    // List uploads for an order item
+    Route::get('/orders/{order}/items/{item}/uploads', function ($orderId, $itemId) {
+        $order = \App\Models\Order::findOrFail($orderId);
+        $item = $order->items()->with('uploads')->findOrFail($itemId);
+        return response()->json(['success' => true, 'data' => $item->uploads]);
+    });
+
+    // Download a specific upload (from private disk)
+    Route::get('/orders/{order}/items/{item}/uploads/{upload}/download', function ($orderId, $itemId, $uploadId) {
+        $order = \App\Models\Order::findOrFail($orderId);
+        $item = $order->items()->findOrFail($itemId);
+        $upload = $item->uploads()->findOrFail($uploadId);
+
+        $disk = $upload->disk ?: 'private';
+        if (!\Illuminate\Support\Facades\Storage::disk($disk)->exists($upload->path)) {
+            return response()->json(['success' => false, 'message' => 'فایل یافت نشد'], 404);
+        }
+        $filename = $upload->original_name ?: basename($upload->path);
+        $absolutePath = \Illuminate\Support\Facades\Storage::disk($disk)->path($upload->path);
+        return response()->download($absolutePath, $filename);
     });
     
     Route::patch('/orders/{order}/status', function (\Illuminate\Http\Request $request, $orderId) {

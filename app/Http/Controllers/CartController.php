@@ -104,6 +104,7 @@ class CartController extends Controller
                     'id' => $product->id,
                     'slug' => $product->slug,
                     'title' => $product->title,
+                    'is_musical' => (bool) ($product->is_musical ?? false),
                     'variant_display_name' => $variantDisplayName,
                     'original_price' => $originalPrice,
                     'price' => $unitPrice,

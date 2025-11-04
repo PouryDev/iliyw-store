@@ -171,6 +171,11 @@ function FileUpload({
                                         alt="Preview"
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
+                                            // Prevent infinite loop: if already showing placeholder, stop trying
+                                            if (e.target.src.includes('placeholder.jpg')) {
+                                                e.target.style.display = 'none';
+                                                return;
+                                            }
                                             e.target.src = '/images/placeholder.jpg';
                                         }}
                                     />

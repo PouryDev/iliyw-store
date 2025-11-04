@@ -105,7 +105,14 @@ function AccountOrders() {
                                         src={item.product_image || '/images/placeholder.jpg'} 
                                         alt={item.product_title}
                                         className="w-12 h-12 rounded object-cover"
-                                        onError={(e) => { e.target.src = '/images/placeholder.jpg'; }}
+                                        onError={(e) => {
+                                            // Prevent infinite loop: if already showing placeholder, stop trying
+                                            if (e.target.src.includes('placeholder.jpg')) {
+                                                e.target.style.display = 'none';
+                                                return;
+                                            }
+                                            e.target.src = '/images/placeholder.jpg';
+                                        }}
                                     />
                                     <div className="flex-1 min-w-0">
                                         <div className="text-white text-sm truncate">{item.product_title}</div>

@@ -142,7 +142,7 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                         value={query}
                         onChange={handleInputChange}
                         onFocus={handleInputFocus}
-                        placeholder="جستجوی محصول، مثل: دستبند نقره"
+                        placeholder="جستجوی تابلو، مثل: تابلو موزیکال یا تابلو هنری"
                         className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 px-3 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-600 text-white"
                     />
                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -215,6 +215,11 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                                                 alt={product.title}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
+                                                    // Prevent infinite loop: if already showing placeholder, stop trying
+                                                    if (e.target.src.includes('placeholder.jpg')) {
+                                                        e.target.style.display = 'none';
+                                                        return;
+                                                    }
                                                     e.target.src = '/images/placeholder.jpg';
                                                 }}
                                             />
