@@ -12,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Trust proxy headers from CDN
+        $middleware->trustProxies(at: '*');
+        
         // Register global middleware to convert Persian numbers to English
         $middleware->web(append: [
             \App\Http\Middleware\ConvertPersianNumbers::class,
