@@ -40,7 +40,7 @@ RUN echo "APP_NAME=\"iliyw Store\"" > .env && \
     echo "APP_ENV=production" >> .env && \
     echo "APP_KEY=" >> .env && \
     echo "APP_DEBUG=false" >> .env && \
-    echo "APP_URL=http://localhost" >> .env && \
+    echo "APP_URL=https://iliwstore.ir" >> .env && \
     echo "" >> .env && \
     echo "DB_CONNECTION=mysql" >> .env && \
     echo "DB_HOST=db" >> .env && \
