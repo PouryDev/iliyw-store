@@ -21,6 +21,10 @@ WORKDIR /var/www/html
 # Copy project (we will bind-mount in compose, but keep a copy for image-only runs)
 COPY . /var/www/html
 
+# Install dependencies
+RUN set -eux; \
+    composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist || true
+
 # Optimize permissions for runtime directories
 RUN set -eux; \
     mkdir -p storage/framework/{cache,sessions,views} storage/logs bootstrap/cache \
@@ -45,7 +49,7 @@ RUN echo "APP_NAME=\"iliyw Store\"" > .env && \
     echo "DB_USERNAME=root" >> .env && \
     echo "DB_PASSWORD=rootpass" >> .env && \
     echo "LOG_CHANNEL=daily" >> .env && \
-    php artisan key:generate --no-interaction
+    php artisan key:generate --no-interaction || true
 
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
