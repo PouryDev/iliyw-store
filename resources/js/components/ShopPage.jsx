@@ -258,7 +258,7 @@ function ShopPage() {
             <section className="px-4 mb-8">
                 <div className="max-w-7xl mx-auto">
                     <a 
-                        href="https://instagram.com/jemehshopp" 
+                        href="https://instagram.com/iliywstore_" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="block group"
@@ -274,7 +274,7 @@ function ShopPage() {
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h3 className="text-white font-bold text-lg">jemehshopp</h3>
+                                                <h3 className="text-white font-bold text-lg">iliywstore_</h3>
                                                 <p className="text-gray-300 text-sm">اینستاگرام رسمی</p>
                                             </div>
                                         </div>
