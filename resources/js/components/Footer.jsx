@@ -12,11 +12,7 @@ function Footer() {
                             {/* <img src="/images/logo.png" alt="Logo" className="h-8 w-8"/> */}
                             <span className="font-bold text-xl text-white">ایلی استور</span>
                             {/* E-Namad logo */}
-                            <a referrerPolicy="origin" target="_blank"
-                               href="https://trustseal.enamad.ir/?id=674581&Code=ET4La7gkVYrzYQ0tyceMQvKvcRCjJd3G"><img
-                                referrerPolicy="origin"
-                                src="https://trustseal.enamad.ir/logo.aspx?id=674581&Code=ET4La7gkVYrzYQ0tyceMQvKvcRCjJd3G"
-                                alt="" style={{cursor: 'pointer'}} code="ET4La7gkVYrzYQ0tyceMQvKvcRCjJd3G"/></a>
+                            <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=674556&Code=81yH64Nnp4T3nhMSRqlEpaYxcR6WaLdu'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=674556&Code=81yH64Nnp4T3nhMSRqlEpaYxcR6WaLdu' alt='' style={{cursor: 'pointer'}} code='81yH64Nnp4T3nhMSRqlEpaYxcR6WaLdu'></a>
                         </div>
                         <p className="text-gray-400 mb-4">
                             فروشگاه آنلاین اکسسوری و تابلو با بهترین قیمت
