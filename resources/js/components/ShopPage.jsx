@@ -274,7 +274,7 @@ function ShopPage() {
                                                 </svg>
                                             </div>
                                             <div>
-                                                <h3 className="text-white font-bold text-lg">iliywstore_</h3>
+                                                <h3 className="text-white font-bold text-lg" style={{direction: 'ltr'}}>iliywstore_</h3>
                                                 <p className="text-gray-300 text-sm">اینستاگرام رسمی</p>
                                             </div>
                                         </div>
