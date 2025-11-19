@@ -110,11 +110,11 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureUserIsAdmin::class
     Route::apiResource('products', \App\Http\Controllers\Api\AdminProductController::class);
     Route::delete('products/{product}/images/{image}', [\App\Http\Controllers\Api\AdminProductController::class, 'destroyImage']);
     
-    // Categories, Colors, Sizes
-    Route::get('/categories', function () {
-        $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
-        return response()->json(['success' => true, 'data' => $categories]);
-    });
+    // Categories
+    Route::apiResource('categories', \App\Http\Controllers\Api\AdminCategoryController::class);
+    Route::patch('/categories/{category}/toggle', [\App\Http\Controllers\Api\AdminCategoryController::class, 'toggle']);
+    
+    // Colors, Sizes
     
     Route::get('/colors', function () {
         $colors = \App\Models\Color::orderBy('name')->get();

@@ -22,6 +22,8 @@ import AdminDiscountForm from './admin/AdminDiscountForm';
 import AdminHeroSlideManagement from './admin/AdminHeroSlideManagement';
 import AdminHeroSlideForm from './admin/AdminHeroSlideForm';
 import AdminPaymentGateways from './admin/AdminPaymentGateways';
+import AdminCategoryManagement from './admin/AdminCategoryManagement';
+import AdminCategoryForm from './admin/AdminCategoryForm';
 import AccountLayout from './account/AccountLayout';
 import AccountProfile from './account/AccountProfile';
 import AccountOrders from './account/AccountOrders';
@@ -96,6 +98,9 @@ function App() {
                             <Route path="hero-slides/create" element={<AdminHeroSlideForm />} />
                             <Route path="hero-slides/:id/edit" element={<AdminHeroSlideForm />} />
                             <Route path="payment-gateways" element={<AdminPaymentGateways />} />
+                            <Route path="categories" element={<AdminCategoryManagement />} />
+                            <Route path="categories/create" element={<AdminCategoryForm />} />
+                            <Route path="categories/:id/edit" element={<AdminCategoryForm />} />
                         </Route>
                         </Routes>
                     </Layout>
