@@ -1,0 +1,91 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: iliywstore-php:prod
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL:-https://iliywstore.ir}
+      APP_KEY: ${APP_KEY:-}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-iliywstore}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-rootpass}
+      LOG_CHANNEL: daily
+      SESSION_DRIVER: file
+      CACHE_DRIVER: file
+    volumes:
+      - ./:/var/www/html:rw
+      - storage_data:/var/www/html/storage
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - storage_data:/var/www/html/storage
+    depends_on:
+      - php
+
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_DATABASE:-iliywstore_db}
+      MARIADB_USER: ${DB_USERNAME:-iliywstore}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-secret}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MARIADB_AUTO_UPGRADE: 1
+    command:
+      [
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+        "--bind-address=0.0.0.0",
+        "--skip-name-resolve",
+      ]
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      timeout: 20s
+      retries: 10
+
+  backup:
+    image: alpine:3.20
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    environment:
+      DB_HOST: db
+      DB_DATABASE: ${DB_DATABASE:-iliywstore_db}
+      DB_USERNAME: ${DB_USERNAME:-iliywstore}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - ./docker/backup/backup.sh:/backup.sh:ro
+      - db_backups:/backups
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "crond -f -l 8 & echo '0 3 * * * /backup.sh' > /etc/crontabs/root && tail -f /dev/null",
+      ]
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+  storage_data:
+  db_backups:
