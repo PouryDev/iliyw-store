@@ -59,9 +59,15 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h localhost -u root -prootpass || exit 1",
+        ]
       timeout: 20s
       retries: 10
+      interval: 10s
+      start_period: 30s
 
   backup:
     image: alpine:3.20
