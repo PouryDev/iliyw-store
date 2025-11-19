@@ -24,9 +24,6 @@ services:
     volumes:
       - ./:/var/www/html:rw
       - storage_data:/var/www/html/storage
-    depends_on:
-      db:
-        condition: service_healthy
 
   nginx:
     image: nginx:1.27-alpine
@@ -58,10 +55,6 @@ services:
       ]
     volumes:
       - db_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-      timeout: 20s
-      retries: 10
 
   backup:
     image: alpine:3.20
