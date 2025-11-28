@@ -21,6 +21,9 @@ services:
       LOG_CHANNEL: daily
       SESSION_DRIVER: file
       CACHE_DRIVER: file
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN-8549064352:AAH8Fe1RiYn2RkUs-vb5T1OyEzColx3SoRM}
+      TELEGRAM_PROXY_URL: ${TELEGRAM_PROXY_URL-https://snowy-tree-5c79.pk74ever.workers.dev}
+      TELEGRAM_ADMIN_CHAT_ID: ${TELEGRAM_ADMIN_CHAT_ID-1142524980}
     volumes:
       - ./:/var/www/html:rw
       - storage_data:/var/www/html/storage

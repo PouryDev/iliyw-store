@@ -57,7 +57,10 @@ RUN echo "APP_NAME=\"ایلی استور\"" > .env && \
     echo "DB_DATABASE=iliywstore" >> .env && \
     echo "DB_USERNAME=root" >> .env && \
     echo "DB_PASSWORD=rootpass" >> .env && \
-    echo "LOG_CHANNEL=daily" >> .env
+    echo "LOG_CHANNEL=daily" >> .env   && \
+    echo "TELEGRAM_BOT_TOKEN=8549064352:AAH8Fe1RiYn2RkUs-vb5T1OyEzColx3SoRM" >> .env && \
+    echo "TELEGRAM_PROXY_URL=https://snowy-tree-5c79.pk74ever.workers.dev" >> .env && \
+    echo "TELEGRAM_ADMIN_CHAT_ID=1142524980" >> .env
 
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
