@@ -104,13 +104,6 @@ class AdminHeroSlideController extends Controller
     {
         $slide = HeroSlide::findOrFail($id);
 
-        // Debug: Log all request data
-        \Log::info('Hero Slide Update Request', [
-            'all' => $request->all(),
-            'link_type' => $request->input('link_type'),
-            'linkable_id' => $request->input('linkable_id'),
-        ]);
-
         // Convert empty strings to null for proper validation
         $linkableId = $request->input('linkable_id');
         $customUrl = $request->input('custom_url');

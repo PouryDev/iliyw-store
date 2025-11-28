@@ -70,9 +70,14 @@ class PaymentService
 
             if ($result['success']) {
                 // Update transaction with gateway transaction ID if provided
+                // Support both 'authority' (ZarinPal) and 'trackId' (Zibal)
                 if (isset($result['form_data']['authority'])) {
                     $transaction->update([
                         'gateway_transaction_id' => $result['form_data']['authority'],
+                    ]);
+                } elseif (isset($result['form_data']['trackId'])) {
+                    $transaction->update([
+                        'gateway_transaction_id' => $result['form_data']['trackId'],
                     ]);
                 }
 
@@ -389,7 +394,6 @@ class PaymentService
         $adminChatId = config('telegram.admin_chat_id');
         
         if (!$adminChatId) {
-            Log::warning('[TELEGRAM] Admin chat ID not configured, skipping notification');
             return;
         }
 

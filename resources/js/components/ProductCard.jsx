@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ProductModal from './ProductModal';
 import { apiRequest } from '../utils/sanctumAuth';
 import { useCart } from '../contexts/CartContext';
+import { calculateCampaignPrice } from '../utils/pricing';
 
 function ProductCard({ product, index }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -19,6 +20,9 @@ function ProductCard({ product, index }) {
     }
 
     const qtyInCart = getProductQuantity(product.id);
+
+    const primaryCampaign = product.campaigns && product.campaigns.length > 0 ? product.campaigns[0] : null;
+    const campaignPrice = calculateCampaignPrice(product.price, primaryCampaign);
 
     const increment = async (e) => {
         e.stopPropagation();
@@ -101,10 +105,13 @@ function ProductCard({ product, index }) {
                 onClick={handleCardClick}
             >
             {/* Campaign Badge */}
-            {product.campaigns && product.campaigns.length > 0 && (
+            {primaryCampaign && (
                 <div className="absolute top-2 left-2 z-20">
                     <span className="px-2 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap bg-gradient-to-r from-cherry-600/90 to-violet-600/90 text-white ring-1 ring-white/20 shadow">
-                        {product.campaigns[0].badge_text || `${product.campaigns[0].discount_value}% تخفیف`}
+                        {primaryCampaign.badge_text ||
+                            (primaryCampaign.type === 'percentage'
+                                ? `${primaryCampaign.discount_value}% تخفیف`
+                                : `${formatPriceFa(primaryCampaign.discount_value)} تومان`)}
                     </span>
                 </div>
             )}
@@ -147,13 +154,13 @@ function ProductCard({ product, index }) {
                 </h3>
                 {/* Price Section */}
                 <div className="mt-1 flex items-center gap-2">
-                    {product.campaigns && product.campaigns.length > 0 ? (
+                    {primaryCampaign ? (
                         <>
                             <span className="text-gray-400 text-xs line-through">
-                                {formatPriceFa(product.price)} تومان
+                                {formatPriceFa(campaignPrice.originalPrice)} تومان
                             </span>
                             <span className="text-cherry-400 text-sm font-bold">
-                                {formatPriceFa(Math.round(product.price * (1 - product.campaigns[0].discount_value / 100)))} تومان
+                                {formatPriceFa(campaignPrice.finalPrice)} تومان
                             </span>
                         </>
                     ) : (

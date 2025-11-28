@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Models\PaymentGateway;
 use App\Models\Transaction;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
@@ -51,11 +52,14 @@ class PaymentController extends Controller
             ], 403);
         }
 
+        // Get gateway type for callback URL
+        $gateway = PaymentGateway::findOrFail($request->gateway_id);
+
         $result = $this->paymentService->initiatePayment(
             $invoice,
             $request->gateway_id,
             [
-                'callback_url' => route('payment.callback', ['gateway' => 'zarinpal']),
+                'callback_url' => route('payment.callback', ['gateway' => $gateway->type]),
             ]
         );
 

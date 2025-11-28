@@ -275,7 +275,6 @@ class OrderController extends Controller
         $adminChatId = config('telegram.admin_chat_id');
         
         if (!$adminChatId) {
-            logger()->warning('[TELEGRAM] Admin chat ID not configured, skipping notification');
             return;
         }
 

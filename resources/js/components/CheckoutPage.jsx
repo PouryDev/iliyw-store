@@ -388,8 +388,8 @@ function CheckoutPage() {
                 } else {
                     throw new Error('خطا در ایجاد تراکنش پرداخت');
                 }
-            } else if (gateway.type === 'zarinpal') {
-                // Redirect to ZarinPal
+            } else if (gateway.type === 'zarinpal' || gateway.type === 'zibal') {
+                // Redirect to payment gateway (ZarinPal or Zibal)
                 if (paymentData.success && paymentData.data.redirect_url) {
                     window.location.href = paymentData.data.redirect_url;
                     return;

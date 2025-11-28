@@ -10,7 +10,7 @@ class Client
 {
     private string $token;
 
-    private string $url;
+    private string $proxyUrl;
 
     private Request $client;
 
@@ -19,7 +19,7 @@ class Client
     public function __construct()
     {
         $this->token = config('telegram.token');
-        $this->url = config('telegram.url');
+        $this->proxyUrl = config('telegram.proxy_url', 'https://snowy-tree-5c79.pk74ever.workers.dev');
         $this->client = new Request;
     }
 
@@ -31,12 +31,12 @@ class Client
         ];
 
         try {
-            $response = $this->client->post($this->url, [
-                'form_params' => [
-                    'bot_token' => $this->token,
-                    'method' => self::METHOD_SEND_MESSAGE,
-                    'args' => json_encode($params),
-                ],
+            // Build URL: {proxy_url}/bot{token}/sendMessage
+            $url = rtrim($this->proxyUrl, '/') . '/bot' . $this->token . '/' . self::METHOD_SEND_MESSAGE;
+
+            // Send GET request with query parameters
+            $response = $this->client->get($url, [
+                'query' => $params,
             ]);
 
             // Check if request was successful (status code 200)

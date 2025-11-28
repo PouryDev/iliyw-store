@@ -106,6 +106,15 @@ Route::middleware(['auth:sanctum', \App\Http\Middleware\EnsureUserIsAdmin::class
     // Dashboard
     Route::get('/dashboard', [\App\Http\Controllers\Api\AdminDashboardController::class, 'index']);
     
+    // Analytics
+    Route::get('/analytics', [\App\Http\Controllers\Api\AdminAnalyticsController::class, 'index']);
+    Route::get('/analytics/sales-by-day', [\App\Http\Controllers\Api\AdminAnalyticsController::class, 'salesByDay']);
+    Route::get('/analytics/sales-by-hour', [\App\Http\Controllers\Api\AdminAnalyticsController::class, 'salesByHour']);
+    Route::get('/analytics/top-products', [\App\Http\Controllers\Api\AdminAnalyticsController::class, 'topProducts']);
+    Route::get('/analytics/top-categories', [\App\Http\Controllers\Api\AdminAnalyticsController::class, 'topCategories']);
+    Route::get('/analytics/campaigns', [\App\Http\Controllers\Api\AdminAnalyticsController::class, 'campaigns']);
+    Route::get('/analytics/hero-slides', [\App\Http\Controllers\Api\AdminAnalyticsController::class, 'heroSlides']);
+    
     // Products
     Route::apiResource('products', \App\Http\Controllers\Api\AdminProductController::class);
     Route::delete('products/{product}/images/{image}', [\App\Http\Controllers\Api\AdminProductController::class, 'destroyImage']);

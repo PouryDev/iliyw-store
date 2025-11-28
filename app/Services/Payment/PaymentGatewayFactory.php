@@ -6,6 +6,7 @@ use App\Contracts\PaymentGatewayInterface;
 use App\Models\PaymentGateway;
 use App\Services\Payment\Gateways\CardToCardGateway;
 use App\Services\Payment\Gateways\ZarinPalGateway;
+use App\Services\Payment\Gateways\ZibalGateway;
 use InvalidArgumentException;
 
 class PaymentGatewayFactory
@@ -22,6 +23,7 @@ class PaymentGatewayFactory
         return match ($gateway->type) {
             'zarinpal' => new ZarinPalGateway($gateway),
             'card_to_card' => new CardToCardGateway($gateway),
+            'zibal' => new ZibalGateway($gateway),
             default => throw new InvalidArgumentException("Gateway type '{$gateway->type}' is not supported"),
         };
     }

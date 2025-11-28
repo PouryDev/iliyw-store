@@ -10,6 +10,7 @@ import CartPage from './CartPage';
 import CheckoutPage from './CheckoutPage';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
+import AdminAnalytics from './admin/AdminAnalytics';
 import AdminProductManagement from './admin/AdminProductManagement';
 import AdminProductForm from './admin/AdminProductForm';
 import AdminOrderManagement from './admin/AdminOrderManagement';
@@ -82,6 +83,7 @@ function App() {
                         {/* Admin Routes */}
                         <Route path="/admin" element={<AdminLayout />}>
                             <Route index element={<AdminDashboard />} />
+                            <Route path="analytics" element={<AdminAnalytics />} />
                             <Route path="products" element={<AdminProductManagement />} />
                             <Route path="products/create" element={<AdminProductForm />} />
                             <Route path="products/:id/edit" element={<AdminProductForm />} />

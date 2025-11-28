@@ -490,7 +490,7 @@ function ProductModal({ product, isOpen, onClose }) {
                         )}
 
                         {/* Colors */}
-                        {currentProduct.has_colors && (
+                        {currentProduct.has_colors && getAvailableColors().length > 0 && (
                             <div>
                                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                                     رنگ {selectedColorId && `(${getAvailableColors().find(c => c.id === selectedColorId)?.name})`}
@@ -520,7 +520,7 @@ function ProductModal({ product, isOpen, onClose }) {
                         )}
 
                         {/* Sizes */}
-                        {currentProduct.has_sizes && (
+                        {currentProduct.has_sizes && getAvailableSizes().length > 0 && (
                             <div>
                                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                                     سایز {selectedSizeId && `(${getAvailableSizes().find(s => s.id === selectedSizeId)?.name})`}

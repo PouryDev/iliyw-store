@@ -44,5 +44,21 @@ class PaymentGatewaySeeder extends Seeder
                 'sort_order' => 2,
             ]
         );
+
+        // Zibal Gateway
+        PaymentGateway::updateOrCreate(
+            ['type' => 'zibal'],
+            [
+                'name' => 'زیبال',
+                'display_name' => 'زیبال',
+                'description' => 'درگاه پرداخت آنلاین زیبال',
+                'config' => [
+                    'merchant_id' => env('ZIBAL_MERCHANT_ID', ''),
+                    'sandbox' => env('ZIBAL_SANDBOX', false),
+                ],
+                'is_active' => false, // Default to inactive until configured
+                'sort_order' => 3,
+            ]
+        );
     }
 }

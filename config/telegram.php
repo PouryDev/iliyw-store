@@ -15,14 +15,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Telegram API URL
+    | Telegram API Proxy URL
     |--------------------------------------------------------------------------
     |
-    | The URL endpoint for your Telegram API proxy/wrapper.
+    | The proxy URL that forwards requests to Telegram Bot API.
+    | This proxy bypasses sanctions by routing requests through a proxy server.
+    | Default: https://snowy-tree-5c79.pk74ever.workers.dev
     |
     */
 
-    'url' => env('TELEGRAM_API_URL'),
+    'proxy_url' => env('TELEGRAM_PROXY_URL', 'https://snowy-tree-5c79.pk74ever.workers.dev'),
 
     /*
     |--------------------------------------------------------------------------

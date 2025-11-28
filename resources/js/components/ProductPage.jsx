@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../utils/sanctumAuth';
 import { useSeo } from '../hooks/useSeo';
+import { calculateCampaignPrice } from '../utils/pricing';
 
 function ProductPage() {
     const { slug } = useParams();
@@ -144,24 +145,6 @@ function ProductPage() {
         return Array.isArray(p?.campaigns) && p.campaigns.length > 0 ? p.campaigns[0] : null;
     }
 
-    function calculateCampaignPrice(basePrice, p) {
-        const campaign = getActiveCampaign(p);
-        if (!campaign) return { finalPrice: basePrice, originalPrice: null, discountAmount: 0 };
-        let finalPrice = basePrice;
-        if (campaign.type === 'percentage') {
-            const raw = Math.round(basePrice * (1 - (campaign.discount_value || 0) / 100));
-            finalPrice = raw;
-        } else if (campaign.type === 'fixed') {
-            finalPrice = Math.max(0, basePrice - (campaign.discount_value || 0));
-        }
-        if (typeof campaign.max_discount_amount === 'number' && campaign.type === 'percentage') {
-            const discount = basePrice - finalPrice;
-            if (discount > campaign.max_discount_amount) {
-                finalPrice = basePrice - campaign.max_discount_amount;
-            }
-        }
-        return { finalPrice, originalPrice: basePrice, discountAmount: basePrice - finalPrice };
-    }
 
     // Update price when selection changes
     React.useEffect(() => {
@@ -295,10 +278,11 @@ function ProductPage() {
                         <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-6">
                             {(() => {
                                 const base = displayPrice ?? product.price;
-                                const { finalPrice, originalPrice } = calculateCampaignPrice(base, product);
+                                const activeCampaign = getActiveCampaign(product);
+                                const { finalPrice, originalPrice } = calculateCampaignPrice(base, activeCampaign);
                                 return (
                                     <>
-                                        {originalPrice && originalPrice !== finalPrice ? (
+                                        {activeCampaign && originalPrice !== finalPrice ? (
                                             <>
                                                 <span className="text-gray-400 line-through">{formatPrice(originalPrice)} تومان</span>
                                                 <span className="text-xl md:text-2xl font-extrabold">{formatPrice(finalPrice)} تومان</span>
@@ -436,7 +420,8 @@ function ProductPage() {
                             <div className="text-xs text-gray-300">قیمت</div>
                             {(() => {
                                 const base = displayPrice ?? product.price;
-                                const { finalPrice } = calculateCampaignPrice(base, product);
+                                const activeCampaign = getActiveCampaign(product);
+                                const { finalPrice } = calculateCampaignPrice(base, activeCampaign);
                                 return <div className="text-white font-extrabold">{formatPrice(finalPrice)} تومان</div>;
                             })()}
                         </div>

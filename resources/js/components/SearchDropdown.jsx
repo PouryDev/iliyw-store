@@ -15,10 +15,77 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
     const dropdownRef = useRef(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 'auto' });
 
     useEffect(() => {
         setQuery(initialQuery);
     }, [initialQuery]);
+
+    // Calculate dropdown position
+    useEffect(() => {
+        if (showDropdown && inputRef.current) {
+            const updatePosition = () => {
+                if (!inputRef.current) return;
+
+                const rect = inputRef.current.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const viewportWidth = window.innerWidth;
+                const dropdownMaxHeight = 320; // max-h-80 = 20rem = 320px
+                const spacing = 4; // 4px spacing from input
+                
+                // Calculate available space below and above
+                const spaceBelow = viewportHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                
+                let top;
+                let left = rect.left;
+                let width = rect.width;
+                
+                // Check if dropdown should appear above input
+                if (spaceBelow < dropdownMaxHeight && spaceAbove > spaceBelow) {
+                    // Position above input
+                    top = rect.top - dropdownMaxHeight - spacing;
+                } else {
+                    // Position below input (default)
+                    top = rect.bottom + spacing;
+                }
+                
+                // Ensure dropdown doesn't go outside viewport
+                if (top < 0) {
+                    top = spacing;
+                }
+                if (top + dropdownMaxHeight > viewportHeight) {
+                    top = Math.max(spacing, viewportHeight - dropdownMaxHeight - spacing);
+                }
+                
+                // Ensure dropdown doesn't overflow horizontally
+                if (left + width > viewportWidth) {
+                    left = Math.max(0, viewportWidth - width);
+                }
+                if (left < 0) {
+                    left = spacing;
+                    width = Math.min(width, viewportWidth - spacing * 2);
+                }
+                
+                setDropdownPosition({
+                    top,
+                    left,
+                    width: Math.max(width, 300) // minWidth: 300px
+                });
+            };
+
+            updatePosition();
+            
+            // Update position on scroll and resize
+            window.addEventListener('scroll', updatePosition, true);
+            window.addEventListener('resize', updatePosition);
+            
+            return () => {
+                window.removeEventListener('scroll', updatePosition, true);
+                window.removeEventListener('resize', updatePosition);
+            };
+        }
+    }, [showDropdown, results]);
 
     // Handle click outside to close dropdown
     useEffect(() => {
@@ -165,9 +232,9 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
                         className="fixed bg-[#0d0d14]/95 border border-white/10 rounded-xl shadow-2xl backdrop-blur-sm max-h-80 overflow-y-auto"
                         style={{ 
                             zIndex: 99999,
-                            top: inputRef.current ? inputRef.current.getBoundingClientRect().bottom + window.scrollY + 4 : 0,
-                            left: inputRef.current ? inputRef.current.getBoundingClientRect().left + window.scrollX : 0,
-                            width: inputRef.current ? inputRef.current.getBoundingClientRect().width : 'auto',
+                            top: `${dropdownPosition.top}px`,
+                            left: `${dropdownPosition.left}px`,
+                            width: typeof dropdownPosition.width === 'number' ? `${dropdownPosition.width}px` : dropdownPosition.width,
                             minWidth: '300px'
                         }}
                     >

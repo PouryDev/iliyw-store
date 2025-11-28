@@ -399,6 +399,7 @@ function AdminPaymentGateways() {
                                     <option value="">انتخاب کنید</option>
                                     <option value="zarinpal">زرین‌پال</option>
                                     <option value="card_to_card">کارت به کارت</option>
+                                    <option value="zibal">زیبال</option>
                                 </select>
                             </div>
                             <div>
@@ -526,6 +527,29 @@ function AdminPaymentGateways() {
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
                                             placeholder="نام دارنده کارت"
                                         />
+                                    </div>
+                                </>
+                            )}
+                            {configGateway.type === 'zibal' && (
+                                <>
+                                    <div>
+                                        <label className="block text-sm text-gray-300 mb-2 font-medium">Merchant ID</label>
+                                        <input
+                                            type="text"
+                                            value={configData.merchant_id || ''}
+                                            onChange={(e) => setConfigData({ ...configData, merchant_id: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                                            placeholder="مرچنت کد زیبال"
+                                        />
+                                    </div>
+                                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-xl border border-white/10">
+                                        <input
+                                            type="checkbox"
+                                            checked={configData.sandbox || false}
+                                            onChange={(e) => setConfigData({ ...configData, sandbox: e.target.checked })}
+                                            className="w-5 h-5 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                                        />
+                                        <label className="text-sm text-gray-300 font-medium">Sandbox Mode</label>
                                     </div>
                                 </>
                             )}
