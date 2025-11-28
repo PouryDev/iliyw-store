@@ -23,12 +23,17 @@ class Client
         $this->client = new Request;
     }
 
-    public function sendMessage(int $chatID, string $message): bool
+    public function sendMessage(int $chatID, string $message, ?array $replyMarkup = null): bool
     {
         $params = [
             'chat_id' => $chatID,
             'text' => $message,
         ];
+
+        // Add reply_markup if provided
+        if ($replyMarkup !== null) {
+            $params['reply_markup'] = json_encode($replyMarkup);
+        }
 
         try {
             // Build URL: {proxy_url}/bot{token}/sendMessage

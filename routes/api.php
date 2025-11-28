@@ -72,6 +72,9 @@ Route::middleware([
     Route::put('/cart/update', [CartController::class, 'update']);
     Route::delete('/cart/remove/{cartKey}', [CartController::class, 'remove']);
     Route::delete('/cart/clear', [CartController::class, 'clear']);
+    
+    // Order notification route (public, uses session)
+    Route::post('/orders/send-notification', [OrderController::class, 'sendNotification']);
 });
 
 // Protected routes (using Sanctum for authentication)

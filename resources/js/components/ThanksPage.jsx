@@ -1,8 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 function ThanksPage() {
     const { invoiceId } = useParams();
+    const [notificationSent, setNotificationSent] = useState(false);
+    
+    useEffect(() => {
+        // Send notification when page loads
+        // Retry mechanism: try up to 5 times with 2 second delay between retries
+        // This is needed because for card-to-card payment, Order might not be created yet
+        const sendNotification = async (retryCount = 0) => {
+            const maxRetries = 5;
+            
+            try {
+                const response = await fetch('/api/orders/send-notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        invoice_id: invoiceId,
+                    }),
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    setNotificationSent(true);
+                    console.log('Telegram notification sent successfully');
+                } else {
+                    // If order not found and we haven't exceeded max retries, retry
+                    if (data.message && data.message.includes('سفارش یافت نشد') && retryCount < maxRetries) {
+                        console.log(`Order not found yet, retrying... (${retryCount + 1}/${maxRetries})`);
+                        setTimeout(() => {
+                            sendNotification(retryCount + 1);
+                        }, 2000); // Wait 2 seconds before retry
+                    } else {
+                        console.warn('Failed to send notification:', data.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                // Retry on network errors too
+                if (retryCount < maxRetries) {
+                    setTimeout(() => {
+                        sendNotification(retryCount + 1);
+                    }, 2000);
+                }
+            }
+        };
+        
+        if (invoiceId) {
+            sendNotification();
+        }
+    }, [invoiceId]);
     
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">

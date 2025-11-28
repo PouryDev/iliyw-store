@@ -268,6 +268,87 @@ class OrderController extends Controller
     }
 
     /**
+     * Send Telegram notification for an order based on invoice
+     * This endpoint is called from the Thanks page
+     */
+    public function sendNotification(Request $request)
+    {
+        $request->validate([
+            'invoice_id' => 'nullable|exists:invoices,id',
+            'invoice_number' => 'nullable|string',
+        ]);
+
+        $invoice = null;
+        
+        if ($request->has('invoice_id')) {
+            $invoice = \App\Models\Invoice::find($request->input('invoice_id'));
+        } elseif ($request->has('invoice_number')) {
+            $invoice = \App\Models\Invoice::where('invoice_number', $request->input('invoice_number'))->first();
+        }
+
+        if (!$invoice) {
+            logger()->warning('[OrderController][sendNotification] Invoice not found', [
+                'invoice_id' => $request->input('invoice_id'),
+                'invoice_number' => $request->input('invoice_number'),
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'فاکتور یافت نشد'
+            ], 404);
+        }
+
+        // Check if notification already sent in this session
+        $notificationKey = "telegram_notification_sent_{$invoice->id}";
+        if ($request->session()->has($notificationKey)) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification already sent',
+                'already_sent' => true,
+            ]);
+        }
+
+        // Find order for this invoice
+        $order = $invoice->order;
+        
+        if (!$order) {
+            logger()->warning('[OrderController][sendNotification] Order not found for invoice', [
+                'invoice_id' => $invoice->id,
+                'invoice_number' => $invoice->invoice_number,
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'سفارش یافت نشد'
+            ], 404);
+        }
+
+        // Send notification
+        try {
+            $this->sendOrderNotification($order);
+            
+            // Mark as sent in session (expires when session expires)
+            $request->session()->put($notificationKey, true);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Notification sent successfully'
+            ]);
+        } catch (\Exception $e) {
+            logger()->error('[OrderController][sendNotification] Failed to send notification', [
+                'order_id' => $order->id,
+                'invoice_id' => $invoice->id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ارسال notification: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Send Telegram notification when a new order is created
      */
     private function sendOrderNotification(Order $order): void
@@ -301,8 +382,23 @@ class OrderController extends Controller
                 $message .= "📎 فایل رسید: دارد\n";
             }
 
+            // Build admin order detail URL
+            $adminOrderUrl = url('/admin/orders/' . $order->id);
+
+            // Create inline keyboard with order detail button
+            $replyMarkup = [
+                'inline_keyboard' => [
+                    [
+                        [
+                            'text' => '🔍 مشاهده جزئیات سفارش',
+                            'url' => $adminOrderUrl,
+                        ],
+                    ],
+                ],
+            ];
+
             $telegramClient = new TelegramClient();
-            $telegramClient->sendMessage((int) $adminChatId, $message);
+            $telegramClient->sendMessage((int) $adminChatId, $message, $replyMarkup);
         } catch (\Exception $e) {
             // Log error but don't fail order creation
             logger()->error('[OrderController][sendOrderNotification][TELEGRAM] Failed to send order notification', [

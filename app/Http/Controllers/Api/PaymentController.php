@@ -4,10 +4,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\PaymentGateway;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Transaction;
+use App\Services\CampaignService;
+use App\Services\DiscountCodeService;
 use App\Services\Payment\PaymentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
@@ -113,9 +123,11 @@ class PaymentController extends Controller
         ]);
 
         $transaction = Transaction::findOrFail($request->transaction_id);
+        $invoice = $transaction->invoice;
+        $gateway = $transaction->gateway;
 
         // Check if transaction belongs to authenticated user
-        if ($request->user() && $transaction->invoice->order && $transaction->invoice->order->user_id !== $request->user()->id) {
+        if ($request->user() && $invoice->order && $invoice->order->user_id !== $request->user()->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'شما دسترسی به این تراکنش ندارید',
@@ -131,6 +143,161 @@ class PaymentController extends Controller
             'status' => 'pending', // Will be verified by admin
         ]);
 
+        // For card-to-card payments, create order immediately
+        if ($gateway && $gateway->type === 'card_to_card') {
+            try {
+                // Get order data from cache (with fallback to session)
+                $orderData = Cache::get("pending_order_{$invoice->id}");
+                if (!$orderData && Session::has("pending_order_{$invoice->id}")) {
+                    $orderData = Session::get("pending_order_{$invoice->id}");
+                }
+
+                if (!$orderData) {
+                    Log::error('[PaymentController][verify] Order data not found for invoice', [
+                        'invoice_id' => $invoice->id,
+                        'transaction_id' => $transaction->id,
+                    ]);
+
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'داده‌های سفارش یافت نشد',
+                    ], 400);
+                }
+
+                // Update receipt path in order data
+                $orderData['receipt_path'] = $receiptPath;
+
+                DB::transaction(function () use ($transaction, $invoice, $orderData) {
+                    // Create Order immediately for card-to-card payment
+                    $order = Order::create([
+                        'user_id' => $orderData['user_id'],
+                        'customer_name' => $orderData['customer_name'],
+                        'customer_phone' => $orderData['customer_phone'],
+                        'customer_address' => $orderData['customer_address'],
+                        'delivery_method_id' => $orderData['delivery_method_id'],
+                        'delivery_address_id' => $orderData['delivery_address_id'] ?? null,
+                        'delivery_fee' => $orderData['delivery_fee'],
+                        'total_amount' => $orderData['total_amount'],
+                        'original_amount' => $orderData['original_amount'],
+                        'campaign_discount_amount' => $orderData['campaign_discount_amount'],
+                        'discount_code' => $orderData['discount_code'],
+                        'discount_amount' => $orderData['discount_amount'],
+                        'final_amount' => $orderData['final_amount'],
+                        'status' => 'pending', // Pending admin verification
+                        'receipt_path' => $orderData['receipt_path'],
+                    ]);
+
+                    Log::info('[PaymentController][verify] Order created for card-to-card payment', [
+                        'order_id' => $order->id,
+                        'invoice_id' => $invoice->id,
+                        'transaction_id' => $transaction->id,
+                    ]);
+
+                    // Link Order to Invoice
+                    $invoice->update([
+                        'order_id' => $order->id,
+                        'status' => 'unpaid', // Remains unpaid until admin verifies receipt
+                    ]);
+
+                    // Create OrderItems and reduce stock
+                    $campaignService = new CampaignService();
+                    $cart = $orderData['cart'] ?? [];
+
+                    foreach ($orderData['items'] as $itemData) {
+                        // Create OrderItem
+                        $orderItem = OrderItem::create([
+                            'order_id' => $order->id,
+                            'product_id' => $itemData['product_id'],
+                            'product_variant_id' => $itemData['product_variant_id'] ?? null,
+                            'color_id' => $itemData['color_id'],
+                            'size_id' => $itemData['size_id'],
+                            'variant_display_name' => $itemData['variant_display_name'] ?? null,
+                            'campaign_id' => $itemData['campaign_id'] ?? null,
+                            'original_price' => $itemData['original_price'],
+                            'campaign_discount_amount' => $itemData['campaign_discount_amount'],
+                            'unit_price' => $itemData['unit_price'],
+                            'quantity' => $itemData['quantity'],
+                            'line_total' => $itemData['line_total'],
+                        ]);
+
+                        // Record campaign sale if applicable
+                        if ($itemData['campaign_id']) {
+                            $campaignService->recordCampaignSale($orderItem);
+                        }
+
+                        // Reduce stock based on variant selection
+                        $cartKey = $itemData['cart_key'] ?? null;
+                        $cartItem = $cart[$cartKey] ?? null;
+
+                        if ($cartItem) {
+                            $product = Product::find($itemData['product_id']);
+                            $quantity = $itemData['quantity'];
+
+                            if ($cartItem['color_id'] || $cartItem['size_id']) {
+                                // Find and reduce variant stock
+                                $variant = ProductVariant::where('product_id', $product->id)
+                                    ->when($cartItem['color_id'], function ($query) use ($cartItem) {
+                                        $query->where('color_id', $cartItem['color_id']);
+                                    })
+                                    ->when($cartItem['size_id'], function ($query) use ($cartItem) {
+                                        $query->where('size_id', $cartItem['size_id']);
+                                    })
+                                    ->first();
+
+                                if ($variant) {
+                                    $variant->decrement('stock', $quantity);
+                                }
+                            } else {
+                                // Reduce main product stock
+                                $product->decrement('stock', $quantity);
+                            }
+                        }
+                    }
+
+                    // Apply discount code if provided
+                    if (!empty($orderData['discount_code']) && $orderData['discount_amount'] > 0) {
+                        $discountService = new DiscountCodeService();
+                        $discountCode = \App\Models\DiscountCode::where('code', $orderData['discount_code'])->first();
+
+                        if ($discountCode) {
+                            $discountService->applyDiscountToOrder(
+                                $order,
+                                $discountCode,
+                                $orderData['discount_amount']
+                            );
+                        }
+                    }
+                });
+
+                // Clear order data from cache and session
+                Cache::forget("pending_order_{$invoice->id}");
+                Session::forget("pending_order_{$invoice->id}");
+
+                // Clear cart after successful order creation
+                Session::forget('cart');
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'سفارش با موفقیت ثبت شد. پس از تایید پرداخت، سفارش شما پردازش خواهد شد.',
+                    'transaction_id' => $transaction->id,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('[PaymentController][verify] Error creating order for card-to-card payment', [
+                    'error' => $e->getMessage(),
+                    'invoice_id' => $invoice->id,
+                    'transaction_id' => $transaction->id,
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'خطا در ثبت سفارش: ' . $e->getMessage(),
+                ], 500);
+            }
+        }
+
+        // For non-card-to-card payments, return success message
         return response()->json([
             'success' => true,
             'message' => 'فیش واریزی با موفقیت آپلود شد. پس از تایید، سفارش شما پردازش خواهد شد.',
