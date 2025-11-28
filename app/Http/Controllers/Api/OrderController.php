@@ -274,22 +274,33 @@ class OrderController extends Controller
     public function sendNotification(Request $request)
     {
         $request->validate([
-            'invoice_id' => 'nullable|exists:invoices,id',
-            'invoice_number' => 'nullable|string',
+            'invoice_id' => 'nullable|string',
         ]);
 
+        if (!$request->has('invoice_id') || empty($request->input('invoice_id'))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'invoice_id الزامی است'
+            ], 400);
+        }
+
+        $invoiceIdValue = $request->input('invoice_id');
+
+        // Search for invoice by id or invoice_number
+        // Try as id first (if numeric), then as invoice_number
         $invoice = null;
+        if (is_numeric($invoiceIdValue)) {
+            $invoice = \App\Models\Invoice::find((int)$invoiceIdValue);
+        }
         
-        if ($request->has('invoice_id')) {
-            $invoice = \App\Models\Invoice::find($request->input('invoice_id'));
-        } elseif ($request->has('invoice_number')) {
-            $invoice = \App\Models\Invoice::where('invoice_number', $request->input('invoice_number'))->first();
+        // If not found or not numeric, try as invoice_number
+        if (!$invoice) {
+            $invoice = \App\Models\Invoice::where('invoice_number', $invoiceIdValue)->first();
         }
 
         if (!$invoice) {
             logger()->warning('[OrderController][sendNotification] Invoice not found', [
-                'invoice_id' => $request->input('invoice_id'),
-                'invoice_number' => $request->input('invoice_number'),
+                'invoice_id' => $invoiceIdValue,
             ]);
             return response()->json([
                 'success' => false,
