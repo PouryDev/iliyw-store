@@ -97,6 +97,28 @@ function ThanksPage() {
                         </div>
                     </div>
                     
+                    {/* Delivery Information */}
+                    <div className="mb-8 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 backdrop-blur-sm rounded-xl p-5 border border-blue-400/30">
+                        <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 mt-0.5">
+                                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-white text-sm leading-relaxed font-medium mb-2">
+                                    اطلاعات ارسال و پرداخت
+                                </p>
+                                <p className="text-gray-200 text-sm leading-relaxed">
+                                    بستتون ۴ تا ۶ روز کاری بعد ثبت سفارش به دستتون میرسه و حتما بسته رو در حضور مامور دکاپست بازکنید تا بسته درصورت شکسته شدن از بیمه برخوردار باشد‼️
+                                </p>
+                                <p className="text-gray-300 text-xs mt-2 leading-relaxed">
+                                    (درب منزل تسویه میشه هزینه ارسال، ارسال با دکاپست)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     {/* Action Buttons */}
                     <div className="space-y-3">
                         <button
