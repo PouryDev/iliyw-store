@@ -60,7 +60,7 @@ RUN echo "APP_NAME=\"ایلی استور\"" > .env && \
     echo "LOG_CHANNEL=daily" >> .env   && \
     echo "TELEGRAM_BOT_TOKEN=8549064352:AAH8Fe1RiYn2RkUs-vb5T1OyEzColx3SoRM" >> .env && \
     echo "TELEGRAM_PROXY_URL=https://snowy-tree-5c79.pk74ever.workers.dev" >> .env && \
-    echo "TELEGRAM_ADMIN_CHAT_ID=1142524980" >> .env
+    echo "TELEGRAM_ADMIN_CHAT_ID=-5040084534" >> .env
 
 EXPOSE 9000
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
