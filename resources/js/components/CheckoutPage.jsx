@@ -533,7 +533,7 @@ function CheckoutPage() {
                                                 ? 'text-green-400' 
                                                 : 'text-white'
                                         }`}>
-                                            {selectedDeliveryMethod.fee === 0 ? 'رایگان' : formatPrice(selectedDeliveryMethod.fee)}
+                                            {selectedDeliveryMethod.fee === 0 ? 'پس‌پرداخت' : formatPrice(selectedDeliveryMethod.fee)}
                                         </span>
                                     </div>
                                 )}
@@ -655,7 +655,7 @@ function CheckoutPage() {
                                                             ? 'text-green-400 bg-green-500/10' 
                                                             : 'text-cherry-400 bg-cherry-500/10'
                                                     }`}>
-                                                        {method.fee === 0 ? 'رایگان' : formatPrice(method.fee)}
+                                                        {method.fee === 0 ? 'پس‌پرداخت' : formatPrice(method.fee)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -897,7 +897,7 @@ function CheckoutPage() {
                                                     ? 'text-green-400' 
                                                     : 'text-white'
                                             }`}>
-                                                {selectedDeliveryMethod.fee === 0 ? 'رایگان' : `${formatPrice(selectedDeliveryMethod.fee)} تومان`}
+                                                {selectedDeliveryMethod.fee === 0 ? 'پس‌پرداخت' : `${formatPrice(selectedDeliveryMethod.fee)} تومان`}
                                             </span>
                                         </div>
                                     )}
@@ -1048,7 +1048,7 @@ function CheckoutPage() {
                                                                         ? 'text-green-400 bg-green-500/10' 
                                                                         : 'text-cherry-400 bg-cherry-500/10'
                                                                 }`}>
-                                                                    {method.fee === 0 ? 'رایگان' : `${formatPrice(method.fee)} تومان`}
+                                                                    {method.fee === 0 ? 'پس‌پرداخت' : `${formatPrice(method.fee)} تومان`}
                                                                 </span>
                                                             </div>
                                                         </div>

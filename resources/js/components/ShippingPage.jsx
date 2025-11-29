@@ -65,7 +65,7 @@ function ShippingPage() {
                                         </tr>
                                         <tr>
                                             <td className="py-3 text-gray-300">بالای 1 میلیون تومان</td>
-                                            <td className="py-3 text-green-400 font-medium">رایگان</td>
+                                            <td className="py-3 text-green-400 font-medium">پس‌پرداخت</td>
                                         </tr>
                                     </tbody>
                                 </table>
