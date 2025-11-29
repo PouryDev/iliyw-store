@@ -21,16 +21,21 @@ function ProductCard({ product, index }) {
 
     // Check if product is out of stock
     function isOutOfStock() {
-        // For products with variants, check total_stock if available
+        // For products with variants, check if at least one variant has stock
         if (product.has_variants || product.has_colors || product.has_sizes) {
+            // If total_stock is available, use it (if > 0, product is available)
             if (product.total_stock !== undefined && product.total_stock !== null) {
                 return product.total_stock <= 0;
             }
-            // Fallback: check if any variant has stock
-            if (product.active_variants && product.active_variants.length > 0) {
-                return !product.active_variants.some(variant => (variant.stock || 0) > 0);
+            // Check active_variants array if available
+            if (product.active_variants && Array.isArray(product.active_variants)) {
+                // Product is available if at least one variant has stock > 0
+                const hasAvailableVariant = product.active_variants.some(variant => (variant.stock || 0) > 0);
+                return !hasAvailableVariant; // Out of stock if no variant has stock
             }
-            return true; // No variants available means out of stock
+            // If variants data is not loaded, check if product has any variants at all
+            // In this case, we can't determine, so assume it's available (don't show out of stock)
+            return false;
         }
         // For products without variants, check main stock
         return (product.stock || 0) <= 0;
