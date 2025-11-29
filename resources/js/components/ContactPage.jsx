@@ -22,19 +22,16 @@ function ContactPage(){
                         تیم پشتیبانی ایلی استور اینجاست تا سریع پاسخ بدهد. اگر درباره سفارش یا موجودی سوال دارید، همین حالا از یکی از راه‌های زیر پیام بفرستید.
                     </p>
                     <div className="mt-4 space-y-2 text-sm">
-                        <a href="https://t.me/jemeh_shop" target="_blank" rel="noopener noreferrer" className="block rounded-lg bg-white/5 border border-white/10 p-3 hover:bg-white/10 transition">
-                            تلگرام: @jemeh_shop
+                        <a href="https://t.me/iliystore" target="_blank" rel="noopener noreferrer" className="block rounded-lg bg-white/5 border border-white/10 p-3 hover:bg-white/10 transition">
+                            تلگرام: @iliywstore
                         </a>
-                        <a href="mailto:support@jemeh.shop" className="block rounded-lg bg-white/5 border border-white/10 p-3 hover:bg-white/10 transition">
-                            ایمیل: support@jemeh.shop
-                        </a>
-                        <a href="https://instagram.com/jemehshopp" target="_blank" rel="noopener noreferrer" className="block rounded-lg bg-white/5 border border-white/10 p-3 hover:bg-white/10 transition">
-                            اینستاگرام: @jemehshopp
+                        <a href="https://instagram.com/iliywstore_" target="_blank" rel="noopener noreferrer" className="block rounded-lg bg-white/5 border border-white/10 p-3 hover:bg-white/10 transition">
+                            اینستاگرام: @iliywstore_
                         </a>
                     </div>
                 </section>
 
-                
+
             </div>
         </div>
     );

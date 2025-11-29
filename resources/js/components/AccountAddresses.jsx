@@ -24,7 +24,7 @@ function AccountAddresses() {
     }, []);
 
     useSeo({
-        title: 'آدرس‌ها - فروشگاه جمه',
+        title: 'آدرس‌ها - فروشگاه ایلی استور',
         description: 'مدیریت آدرس‌های من',
         canonical: window.location.origin + '/account/addresses'
     });
@@ -48,12 +48,12 @@ function AccountAddresses() {
         e.preventDefault();
         setErrors({});
         setSaving(true);
-        
+
         try {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const url = editing ? `/api/account/addresses/${editing.id}` : '/api/account/addresses';
             const method = editing ? 'PUT' : 'POST';
-            
+
             const res = await fetch(url, {
                 method,
                 headers: {
@@ -64,27 +64,27 @@ function AccountAddresses() {
                 body: JSON.stringify(form),
                 credentials: 'same-origin'
             });
-            
+
             const data = await res.json();
-            
+
             if (res.ok) {
                 fetchAddresses();
                 resetForm();
-                window.dispatchEvent(new CustomEvent('toast:show', { 
-                    detail: { type: 'success', message: editing ? 'آدرس ویرایش شد' : 'آدرس افزوده شد' } 
+                window.dispatchEvent(new CustomEvent('toast:show', {
+                    detail: { type: 'success', message: editing ? 'آدرس ویرایش شد' : 'آدرس افزوده شد' }
                 }));
             } else if (res.status === 422) {
                 // Validation errors
                 setErrors(data.errors || {});
-                window.dispatchEvent(new CustomEvent('toast:show', { 
-                    detail: { type: 'error', message: 'لطفا فیلدها را بررسی کنید' } 
+                window.dispatchEvent(new CustomEvent('toast:show', {
+                    detail: { type: 'error', message: 'لطفا فیلدها را بررسی کنید' }
                 }));
             } else {
                 throw new Error('Failed');
             }
         } catch (e) {
-            window.dispatchEvent(new CustomEvent('toast:show', { 
-                detail: { type: 'error', message: 'خطا در ذخیره آدرس' } 
+            window.dispatchEvent(new CustomEvent('toast:show', {
+                detail: { type: 'error', message: 'خطا در ذخیره آدرس' }
             }));
         } finally {
             setSaving(false);
@@ -102,13 +102,13 @@ function AccountAddresses() {
             });
             if (res.ok) {
                 fetchAddresses();
-                window.dispatchEvent(new CustomEvent('toast:show', { 
-                    detail: { type: 'success', message: 'آدرس حذف شد' } 
+                window.dispatchEvent(new CustomEvent('toast:show', {
+                    detail: { type: 'success', message: 'آدرس حذف شد' }
                 }));
             }
         } catch (e) {
-            window.dispatchEvent(new CustomEvent('toast:show', { 
-                detail: { type: 'error', message: 'خطا در حذف آدرس' } 
+            window.dispatchEvent(new CustomEvent('toast:show', {
+                detail: { type: 'error', message: 'خطا در حذف آدرس' }
             }));
         }
     };
@@ -180,7 +180,7 @@ function AccountAddresses() {
                     <h3 className="text-lg font-bold text-white">
                         {editing ? 'ویرایش آدرس' : 'افزودن آدرس جدید'}
                     </h3>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm text-gray-400 mb-1">عنوان آدرس</label>
@@ -317,8 +317,8 @@ function AccountAddresses() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {addresses.map((addr) => (
-                        <div 
-                            key={addr.id} 
+                        <div
+                            key={addr.id}
                             className={`glass-card rounded-2xl p-5 border ${
                                 addr.is_default ? 'border-cherry-500/50' : 'border-white/10'
                             } hover:border-cherry-500/30 transition relative`}
@@ -330,7 +330,7 @@ function AccountAddresses() {
                                     </span>
                                 </div>
                             )}
-                            
+
                             <div className="flex items-start gap-3 mb-3">
                                 <div className="w-10 h-10 rounded-full bg-cherry-600/20 flex items-center justify-center text-cherry-400 flex-shrink-0">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>

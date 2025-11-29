@@ -27,7 +27,7 @@ function ReturnsPage() {
                             <h2 className="text-xl font-bold text-white mb-4">سیاست بازگشت کالا</h2>
                             <div className="space-y-4 text-gray-300">
                                 <p>
-                                    در فروشگاه ایلی استور، رضایت مشتریان اولویت اول ماست. به همین دلیل امکان بازگردانی کالا 
+                                    در فروشگاه ایلی استور، رضایت مشتریان اولویت اول ماست. به همین دلیل امکان بازگردانی کالا
                                     در شرایط خاص برای شما فراهم شده است.
                                 </p>
                                 <p>
@@ -145,7 +145,7 @@ function ReturnsPage() {
                             <h2 className="text-xl font-bold text-white mb-4">استرداد وجه</h2>
                             <div className="space-y-4 text-gray-300">
                                 <p>
-                                    پس از تایید بازگشت کالا و دریافت آن در انبار، وجه شما به همان روش پرداخت اولیه 
+                                    پس از تایید بازگشت کالا و دریافت آن در انبار، وجه شما به همان روش پرداخت اولیه
                                     بازگردانده می‌شود.
                                 </p>
                                 <div className="bg-white/5 rounded-xl p-4">
@@ -166,10 +166,10 @@ function ReturnsPage() {
                                 تیم پشتیبانی ما آماده پاسخگویی به سوالات شما درباره بازگشت کالا است
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <a href="https://instagram.com/jemehshopp" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://instagram.com/iliywstore_" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     اینستاگرام
                                 </a>
-                                <a href="https://t.me/jemeh_shop" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://t.me/iliywstore" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     تلگرام
                                 </a>
                             </div>

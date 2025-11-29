@@ -125,10 +125,10 @@ function ShippingPage() {
                                 برای اطلاعات بیشتر درباره ارسال و تحویل، با ما تماس بگیرید
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <a href="https://instagram.com/jemehshopp" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://instagram.com/iliywstore_" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     اینستاگرام
                                 </a>
-                                <a href="https://t.me/jemeh_shop" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
+                                <a href="https://t.me/iliywstore" target="_blank" rel="noopener noreferrer" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors">
                                     تلگرام
                                 </a>
                     </div>

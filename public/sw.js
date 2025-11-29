@@ -67,7 +67,7 @@ function doBackgroundSync() {
 // Push notifications
 self.addEventListener('push', (event) => {
     const options = {
-        body: event.data ? event.data.text() : 'به‌روزرسانی جدید از جمه شاپ',
+        body: event.data ? event.data.text() : 'به‌روزرسانی جدید از ایلی استور',
         icon: '/images/logo.png',
         badge: '/images/favicon.ico',
         vibrate: [100, 50, 100],

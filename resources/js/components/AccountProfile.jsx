@@ -27,7 +27,7 @@ function AccountProfile() {
     }, []);
 
     useSeo({
-        title: 'پروفایل - فروشگاه جمه',
+        title: 'پروفایل - فروشگاه ایلی استور',
         description: 'مدیریت اطلاعات حساب کاربری',
         canonical: window.location.origin + '/account'
     });
@@ -35,7 +35,7 @@ function AccountProfile() {
     const handleSave = async () => {
         setSaving(true);
         setErrors({});
-        
+
         try {
             const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const res = await fetch('/account/profile', {
@@ -48,9 +48,9 @@ function AccountProfile() {
                 body: JSON.stringify(form),
                 credentials: 'same-origin'
             });
-            
+
             const data = await res.json();
-            
+
             if (res.ok) {
                 if (data.success) {
                     setUser(data.user);
