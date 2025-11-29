@@ -40,26 +40,44 @@ function AdminProductManagement() {
         }
     };
 
-    const handleDeleteProduct = async (productId) => {
-        if (!confirm('آیا مطمئن هستید که می‌خواهید این محصول را حذف کنید؟')) {
-            return;
-        }
+    const handleToggleProduct = async (productId) => {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+
+        const newStatus = !product.is_active;
+        const actionText = newStatus ? 'فعال' : 'غیرفعال';
 
         try {
             const res = await apiRequest(`/api/admin/products/${productId}`, {
-                method: 'DELETE',
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: product.title,
+                    description: product.description || '',
+                    price: product.price,
+                    stock: product.stock,
+                    category_id: product.category_id || null,
+                    has_variants: product.has_variants || false,
+                    has_colors: product.has_colors || false,
+                    has_sizes: product.has_sizes || false,
+                    is_active: newStatus,
+                }),
             });
 
             if (res.ok) {
-                setProducts(products.filter(p => p.id !== productId));
+                setProducts(products.map(p => 
+                    p.id === productId ? { ...p, is_active: newStatus } : p
+                ));
                 window.dispatchEvent(new CustomEvent('toast:show', { 
-                    detail: { type: 'success', message: 'محصول با موفقیت حذف شد' } 
+                    detail: { type: 'success', message: `محصول با موفقیت ${actionText} شد` } 
                 }));
             }
         } catch (error) {
-            console.error('Failed to delete product:', error);
+            console.error('Failed to toggle product status:', error);
             window.dispatchEvent(new CustomEvent('toast:show', { 
-                detail: { type: 'error', message: 'خطا در حذف محصول' } 
+                detail: { type: 'error', message: `خطا در ${actionText} کردن محصول` } 
             }));
         }
     };
@@ -190,10 +208,14 @@ function AdminProductManagement() {
                                     ویرایش
                                 </button>
                                 <button
-                                    onClick={() => handleDeleteProduct(product.id)}
-                                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 hover:scale-105 text-sm"
+                                    onClick={() => handleToggleProduct(product.id)}
+                                    className={`font-semibold py-2 px-4 rounded-lg transition-all duration-200 hover:scale-105 text-sm ${
+                                        product.is_active
+                                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white'
+                                            : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white'
+                                    }`}
                                 >
-                                    حذف
+                                    {product.is_active ? 'غیرفعال' : 'فعال'}
                                 </button>
                             </div>
                         </div>
