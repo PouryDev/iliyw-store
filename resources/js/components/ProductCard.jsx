@@ -19,13 +19,37 @@ function ProductCard({ product, index }) {
         try { return Number(value || 0).toLocaleString('fa-IR'); } catch { return value; }
     }
 
+    // Check if product is out of stock
+    function isOutOfStock() {
+        // For products with variants, check total_stock if available
+        if (product.has_variants || product.has_colors || product.has_sizes) {
+            if (product.total_stock !== undefined && product.total_stock !== null) {
+                return product.total_stock <= 0;
+            }
+            // Fallback: check if any variant has stock
+            if (product.active_variants && product.active_variants.length > 0) {
+                return !product.active_variants.some(variant => (variant.stock || 0) > 0);
+            }
+            return true; // No variants available means out of stock
+        }
+        // For products without variants, check main stock
+        return (product.stock || 0) <= 0;
+    }
+
     const qtyInCart = getProductQuantity(product.id);
+    const outOfStock = isOutOfStock();
 
     const primaryCampaign = product.campaigns && product.campaigns.length > 0 ? product.campaigns[0] : null;
     const campaignPrice = calculateCampaignPrice(product.price, primaryCampaign);
 
     const increment = async (e) => {
         e.stopPropagation();
+        
+        // Check if product is out of stock
+        if (isOutOfStock()) {
+            window.dispatchEvent(new CustomEvent('toast:show', { detail: { type: 'error', message: 'محصول موجود نیست' } }));
+            return;
+        }
         
         // If product has variants, open modal instead of direct add to cart
         if (product.has_variants || product.has_colors || product.has_sizes) {
@@ -104,9 +128,30 @@ function ProductCard({ product, index }) {
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={handleCardClick}
             >
+            {/* Out of Stock Badge */}
+            {outOfStock && (
+                <div className="absolute top-2 left-2 z-30">
+                    <span className="px-2 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap bg-gray-600/90 text-white ring-1 ring-white/20 shadow">
+                        ناموجود
+                    </span>
+                </div>
+            )}
+            
             {/* Campaign Badge */}
-            {primaryCampaign && (
+            {primaryCampaign && !outOfStock && (
                 <div className="absolute top-2 left-2 z-20">
+                    <span className="px-2 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap bg-gradient-to-r from-cherry-600/90 to-violet-600/90 text-white ring-1 ring-white/20 shadow">
+                        {primaryCampaign.badge_text ||
+                            (primaryCampaign.type === 'percentage'
+                                ? `${primaryCampaign.discount_value}% تخفیف`
+                                : `${formatPriceFa(primaryCampaign.discount_value)} تومان`)}
+                    </span>
+                </div>
+            )}
+            
+            {/* Campaign Badge - Right side when out of stock badge is shown */}
+            {primaryCampaign && outOfStock && (
+                <div className="absolute top-2 right-2 z-20">
                     <span className="px-2 py-1 rounded-full text-[10px] md:text-xs font-semibold whitespace-nowrap bg-gradient-to-r from-cherry-600/90 to-violet-600/90 text-white ring-1 ring-white/20 shadow">
                         {primaryCampaign.badge_text ||
                             (primaryCampaign.type === 'percentage'
@@ -142,7 +187,17 @@ function ProductCard({ product, index }) {
                         <div className="min-w-[28px] text-center text-white text-[11px] bg-black/20 rounded px-1 py-0.5">
                             {formatPriceFa(qtyInCart || 0)}
                         </div>
-                        <button onClick={increment} className="w-7 h-7 inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cherry-600 to-violet-600 hover:from-cherry-500 hover:to-violet-500 text-white text-xs">+</button>
+                        <button 
+                            onClick={increment} 
+                            disabled={outOfStock}
+                            className={`w-7 h-7 inline-flex items-center justify-center rounded-full text-white text-xs ${
+                                outOfStock 
+                                    ? 'bg-gray-600/50 cursor-not-allowed opacity-50' 
+                                    : 'bg-gradient-to-r from-cherry-600 to-violet-600 hover:from-cherry-500 hover:to-violet-500'
+                            }`}
+                        >
+                            +
+                        </button>
                     </div>
                 </div>
             </div>
