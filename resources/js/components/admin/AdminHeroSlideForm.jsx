@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ModernCheckbox from './ModernCheckbox';
+import ModernSelect from './ModernSelect';
 import { adminApiRequest } from '../../utils/adminApi';
 import { showToast } from '../../utils/toast';
 import { scrollToTop } from '../../utils/scrollToTop';
@@ -151,6 +152,13 @@ function AdminHeroSlideForm() {
             return item.title || item.name;
         }
         return '';
+    };
+
+    const getLinkableSelectOptions = () => {
+        return getLinkableOptions().map(item => ({
+            value: String(item.id),
+            label: getLinkableLabel(item)
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -326,17 +334,25 @@ function AdminHeroSlideForm() {
                     <div className="space-y-6">
                         <div>
                             <label className="block text-white font-medium mb-2">نوع لینک</label>
-                            <select
+                            <ModernSelect
                                 name="link_type"
                                 value={form.link_type}
-                                onChange={handleInputChange}
-                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                            >
-                                <option value="custom">URL سفارشی</option>
-                                <option value="product">محصول</option>
-                                <option value="category">دسته‌بندی</option>
-                                <option value="campaign">کمپین</option>
-                            </select>
+                                onChange={(value) => {
+                                    setForm(prev => ({
+                                        ...prev,
+                                        link_type: value,
+                                        linkable_id: '',
+                                        custom_url: ''
+                                    }));
+                                }}
+                                options={[
+                                    { value: 'custom', label: 'URL سفارشی' },
+                                    { value: 'product', label: 'محصول' },
+                                    { value: 'category', label: 'دسته‌بندی' },
+                                    { value: 'campaign', label: 'کمپین' }
+                                ]}
+                                placeholder="نوع لینک را انتخاب کنید"
+                            />
                         </div>
 
                         {form.link_type === 'custom' ? (
@@ -358,20 +374,18 @@ function AdminHeroSlideForm() {
                                     {form.link_type === 'product' ? 'محصول' :
                                      form.link_type === 'category' ? 'دسته‌بندی' : 'کمپین'}
                                 </label>
-                                <select
+                                <ModernSelect
                                     name="linkable_id"
-                                    value={form.linkable_id}
-                                    onChange={handleInputChange}
-                                    required
-                                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                                >
-                                    <option value="">انتخاب کنید...</option>
-                                    {getLinkableOptions().map((item) => (
-                                        <option key={item.id} value={item.id}>
-                                            {getLinkableLabel(item)}
-                                        </option>
-                                    ))}
-                                </select>
+                                    value={String(form.linkable_id || '')}
+                                    onChange={(value) => {
+                                        setForm(prev => ({
+                                            ...prev,
+                                            linkable_id: value
+                                        }));
+                                    }}
+                                    options={getLinkableSelectOptions()}
+                                    placeholder="انتخاب کنید..."
+                                />
                             </div>
                         )}
 

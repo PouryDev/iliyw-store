@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ModernSelect from './ModernSelect';
 import { adminApiRequest } from '../../utils/adminApi';
 
 function AdminCategoryManagement() {
@@ -152,15 +153,16 @@ function AdminCategoryManagement() {
                         />
                     </div>
                     <div className="sm:w-48">
-                        <select
+                        <ModernSelect
                             value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 min-h-[44px]"
-                        >
-                            <option value="all">همه دسته‌بندی‌ها</option>
-                            <option value="active">فعال</option>
-                            <option value="inactive">غیرفعال</option>
-                        </select>
+                            onChange={(value) => setFilterStatus(value)}
+                            options={[
+                                { value: 'all', label: 'همه دسته‌بندی‌ها' },
+                                { value: 'active', label: 'فعال' },
+                                { value: 'inactive', label: 'غیرفعال' }
+                            ]}
+                            placeholder="فیلتر وضعیت"
+                        />
                     </div>
                 </div>
             </div>

@@ -49,7 +49,10 @@ class AdminProductController extends Controller
             'is_active' => 'sometimes|boolean',
             'images.*' => 'sometimes|image|max:4096',
             'variants.*.color_id' => 'nullable|exists:colors,id',
+            'variants.*.color_name' => 'nullable|string|max:255',
+            'variants.*.color_hex_code' => 'nullable|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
             'variants.*.size_id' => 'nullable|exists:sizes,id',
+            'variants.*.size_name' => 'nullable|string|max:255',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock' => 'nullable|integer|min:0',
         ]);
@@ -80,7 +83,47 @@ class AdminProductController extends Controller
         // Handle variants
         if ($request->has('variants')) {
             foreach ($request->input('variants') as $variantData) {
-                $product->variants()->create($variantData);
+                $variantDataToSave = [];
+                
+                // Process color
+                if (!empty($variantData['color_id'])) {
+                    $variantDataToSave['color_id'] = $variantData['color_id'];
+                } elseif (!empty($variantData['color_name'])) {
+                    $colorName = trim($variantData['color_name']);
+                    $color = Color::firstOrCreate(
+                        ['name' => $colorName],
+                        [
+                            'hex_code' => $variantData['color_hex_code'] ?? null,
+                            'is_active' => true
+                        ]
+                    );
+                    
+                    // Update hex_code if provided and different
+                    if (!empty($variantData['color_hex_code']) && $color->hex_code !== $variantData['color_hex_code']) {
+                        $color->hex_code = $variantData['color_hex_code'];
+                        $color->save();
+                    }
+                    
+                    $variantDataToSave['color_id'] = $color->id;
+                }
+                
+                // Process size
+                if (!empty($variantData['size_id'])) {
+                    $variantDataToSave['size_id'] = $variantData['size_id'];
+                } elseif (!empty($variantData['size_name'])) {
+                    $sizeName = trim($variantData['size_name']);
+                    $size = Size::firstOrCreate(
+                        ['name' => $sizeName],
+                        ['is_active' => true]
+                    );
+                    $variantDataToSave['size_id'] = $size->id;
+                }
+                
+                // Add other fields
+                $variantDataToSave['price'] = $variantData['price'] ?? null;
+                $variantDataToSave['stock'] = $variantData['stock'] ?? 0;
+                
+                $product->variants()->create($variantDataToSave);
             }
         }
 
@@ -107,7 +150,10 @@ class AdminProductController extends Controller
             'images.*' => 'sometimes|image|max:4096',
             'existing_images.*' => 'sometimes|integer|exists:product_images,id',
             'variants.*.color_id' => 'nullable|exists:colors,id',
+            'variants.*.color_name' => 'nullable|string|max:255',
+            'variants.*.color_hex_code' => 'nullable|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
             'variants.*.size_id' => 'nullable|exists:sizes,id',
+            'variants.*.size_name' => 'nullable|string|max:255',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock' => 'nullable|integer|min:0',
         ]);
@@ -142,7 +188,47 @@ class AdminProductController extends Controller
         if ($request->has('variants')) {
             $product->variants()->delete();
             foreach ($request->input('variants') as $variantData) {
-                $product->variants()->create($variantData);
+                $variantDataToSave = [];
+                
+                // Process color
+                if (!empty($variantData['color_id'])) {
+                    $variantDataToSave['color_id'] = $variantData['color_id'];
+                } elseif (!empty($variantData['color_name'])) {
+                    $colorName = trim($variantData['color_name']);
+                    $color = Color::firstOrCreate(
+                        ['name' => $colorName],
+                        [
+                            'hex_code' => $variantData['color_hex_code'] ?? null,
+                            'is_active' => true
+                        ]
+                    );
+                    
+                    // Update hex_code if provided and different
+                    if (!empty($variantData['color_hex_code']) && $color->hex_code !== $variantData['color_hex_code']) {
+                        $color->hex_code = $variantData['color_hex_code'];
+                        $color->save();
+                    }
+                    
+                    $variantDataToSave['color_id'] = $color->id;
+                }
+                
+                // Process size
+                if (!empty($variantData['size_id'])) {
+                    $variantDataToSave['size_id'] = $variantData['size_id'];
+                } elseif (!empty($variantData['size_name'])) {
+                    $sizeName = trim($variantData['size_name']);
+                    $size = Size::firstOrCreate(
+                        ['name' => $sizeName],
+                        ['is_active' => true]
+                    );
+                    $variantDataToSave['size_id'] = $size->id;
+                }
+                
+                // Add other fields
+                $variantDataToSave['price'] = $variantData['price'] ?? null;
+                $variantDataToSave['stock'] = $variantData['stock'] ?? 0;
+                
+                $product->variants()->create($variantDataToSave);
             }
         }
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ModernCheckbox from './ModernCheckbox';
+import ModernSelect from './ModernSelect';
 import PersianDatePicker from './PersianDatePicker';
 import { apiRequest } from '../../utils/sanctumAuth';
 import { adminApiRequest } from '../../utils/adminApi';
@@ -194,15 +195,21 @@ function AdminCampaignForm() {
 
                         <div>
                             <label className="block text-white font-medium mb-2">نوع تخفیف</label>
-                            <select
+                            <ModernSelect
                                 name="discount_type"
                                 value={form.discount_type}
-                                onChange={handleInputChange}
-                                className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                            >
-                                <option value="percentage">درصدی</option>
-                                <option value="fixed">مبلغی</option>
-                            </select>
+                                onChange={(value) => {
+                                    setForm(prev => ({
+                                        ...prev,
+                                        discount_type: value
+                                    }));
+                                }}
+                                options={[
+                                    { value: 'percentage', label: 'درصدی' },
+                                    { value: 'fixed', label: 'مبلغی' }
+                                ]}
+                                placeholder="نوع تخفیف را انتخاب کنید"
+                            />
                         </div>
 
                         <div>

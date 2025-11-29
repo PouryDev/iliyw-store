@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ModernSelect from './ModernSelect';
 import { adminApiRequest } from '../../utils/adminApi';
 
 function AdminOrderManagement() {
@@ -121,18 +122,19 @@ function AdminOrderManagement() {
             <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-xl border border-white/10 p-6 mb-8">
                 <div className="flex flex-col sm:flex-row gap-4">
                     <div className="sm:w-48">
-                        <select
+                        <ModernSelect
                             value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                        >
-                            <option value="all">همه سفارش‌ها</option>
-                            <option value="pending">در انتظار</option>
-                            <option value="processing">در حال پردازش</option>
-                            <option value="shipped">ارسال شده</option>
-                            <option value="delivered">تحویل داده شده</option>
-                            <option value="cancelled">لغو شده</option>
-                        </select>
+                            onChange={(value) => setFilterStatus(value)}
+                            options={[
+                                { value: 'all', label: 'همه سفارش‌ها' },
+                                { value: 'pending', label: 'در انتظار' },
+                                { value: 'processing', label: 'در حال پردازش' },
+                                { value: 'shipped', label: 'ارسال شده' },
+                                { value: 'delivered', label: 'تحویل داده شده' },
+                                { value: 'cancelled', label: 'لغو شده' }
+                            ]}
+                            placeholder="فیلتر وضعیت"
+                        />
                     </div>
                 </div>
             </div>

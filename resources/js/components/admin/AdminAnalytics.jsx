@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from '../../utils/sanctumAuth';
+import ModernSelect from './ModernSelect';
 import {
     LineChart,
     Line,
@@ -231,23 +232,24 @@ function AdminAnalytics() {
                     <div className="mt-2 bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-xl border border-white/10 shadow-lg p-4 space-y-3 w-full max-w-full min-w-0">
                         <div>
                             <label className="block text-xs sm:text-sm text-gray-400 mb-2">بازه زمانی</label>
-                            <select
+                            <ModernSelect
                                 value={dateRange}
-                                onChange={(e) => {
-                                    setDateRange(e.target.value);
-                                    if (e.target.value !== 'custom') {
+                                onChange={(value) => {
+                                    setDateRange(value);
+                                    if (value !== 'custom') {
                                         setStartDate('');
                                         setEndDate('');
                                     }
                                 }}
-                                className="w-full max-w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500 box-border"
-                            >
-                                <option value="today">امروز</option>
-                                <option value="week">این هفته</option>
-                                <option value="month">این ماه</option>
-                                <option value="year">امسال</option>
-                                <option value="custom">سفارشی</option>
-                            </select>
+                                options={[
+                                    { value: 'today', label: 'امروز' },
+                                    { value: 'week', label: 'این هفته' },
+                                    { value: 'month', label: 'این ماه' },
+                                    { value: 'year', label: 'امسال' },
+                                    { value: 'custom', label: 'سفارشی' }
+                                ]}
+                                placeholder="بازه زمانی را انتخاب کنید"
+                            />
                         </div>
 
                         {dateRange === 'custom' && (
@@ -275,19 +277,20 @@ function AdminAnalytics() {
 
                         <div>
                             <label className="block text-xs sm:text-sm text-gray-400 mb-2">وضعیت سفارش</label>
-                            <select
+                            <ModernSelect
                                 value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className="w-full max-w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-purple-500 box-border"
-                            >
-                                <option value="">همه</option>
-                                <option value="pending">در انتظار</option>
-                                <option value="confirmed">تایید شده</option>
-                                <option value="processing">در حال پردازش</option>
-                                <option value="shipped">ارسال شده</option>
-                                <option value="delivered">تحویل داده شده</option>
-                                <option value="cancelled">لغو شده</option>
-                            </select>
+                                onChange={(value) => setStatus(value)}
+                                options={[
+                                    { value: '', label: 'همه' },
+                                    { value: 'pending', label: 'در انتظار' },
+                                    { value: 'confirmed', label: 'تایید شده' },
+                                    { value: 'processing', label: 'در حال پردازش' },
+                                    { value: 'shipped', label: 'ارسال شده' },
+                                    { value: 'delivered', label: 'تحویل داده شده' },
+                                    { value: 'cancelled', label: 'لغو شده' }
+                                ]}
+                                placeholder="وضعیت سفارش"
+                            />
                         </div>
                     </div>
                 )}

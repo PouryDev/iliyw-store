@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { apiRequest } from '../../utils/sanctumAuth';
 import { showToast } from '../../utils/toast';
+import ModernSelect from './ModernSelect';
 
 function AdminPaymentGateways() {
     const [gateways, setGateways] = useState([]);
@@ -388,19 +389,17 @@ function AdminPaymentGateways() {
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-300 mb-2 font-medium">نوع (type)</label>
-                                <select
+                                <ModernSelect
                                     value={formData.type}
-                                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
-                                    required
+                                    onChange={(value) => setFormData({ ...formData, type: value })}
+                                    options={[
+                                        { value: 'zarinpal', label: 'زرین‌پال' },
+                                        { value: 'card_to_card', label: 'کارت به کارت' },
+                                        { value: 'zibal', label: 'زیبال' }
+                                    ]}
+                                    placeholder="انتخاب کنید"
                                     disabled={!!editingGateway}
-                                    style={{ colorScheme: 'dark' }}
-                                >
-                                    <option value="">انتخاب کنید</option>
-                                    <option value="zarinpal">زرین‌پال</option>
-                                    <option value="card_to_card">کارت به کارت</option>
-                                    <option value="zibal">زیبال</option>
-                                </select>
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm text-gray-300 mb-2 font-medium">نام نمایشی</label>

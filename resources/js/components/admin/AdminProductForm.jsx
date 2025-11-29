@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import FileUpload from './FileUpload';
 import ModernSelect from './ModernSelect';
 import ModernCheckbox from './ModernCheckbox';
+import AutocompleteSelect from './AutocompleteSelect';
 import { apiRequest, debugTokenStatus } from '../../utils/sanctumAuth';
 import { showToast } from '../../utils/toast';
 import { scrollToTop } from '../../utils/scrollToTop';
@@ -86,7 +87,16 @@ function AdminProductForm() {
                                 preview: img.url
                             }));
                             setImages(existingImages);
-                            setVariants(product.variants || []);
+                            // Normalize variant values: convert to new format with color/size objects
+                            const normalizedVariants = (product.variants || []).map(variant => ({
+                                ...variant,
+                                color: variant.color ? { id: variant.color.id } : (variant.color_id ? { id: variant.color_id } : null),
+                                size: variant.size ? { id: variant.size.id } : (variant.size_id ? { id: variant.size_id } : null),
+                                color_hex_code: variant.color?.hex_code || '',
+                                price: variant.price && variant.price !== 0 ? variant.price : '',
+                                stock: variant.stock && variant.stock !== 0 ? variant.stock : ''
+                            }));
+                            setVariants(normalizedVariants);
                         }
                     }
                 }
@@ -131,10 +141,11 @@ function AdminProductForm() {
 
     const addVariant = () => {
         setVariants(prev => [...prev, {
-            color_id: '',
-            size_id: '',
-            price: form.price,
-            stock: form.stock,
+            color: null,
+            size: null,
+            color_hex_code: '',
+            price: form.price && form.price !== 0 ? form.price : '',
+            stock: form.stock && form.stock !== 0 ? form.stock : '',
             isNew: true
         }]);
     };
@@ -207,8 +218,23 @@ function AdminProductForm() {
 
             // Add variants
             variants.forEach((variant, index) => {
-                formData.append(`variants[${index}][color_id]`, variant.color_id || '');
-                formData.append(`variants[${index}][size_id]`, variant.size_id || '');
+                // Color: send id if exists, otherwise send name and hex_code
+                if (variant.color?.id) {
+                    formData.append(`variants[${index}][color_id]`, variant.color.id);
+                } else if (variant.color?.name) {
+                    formData.append(`variants[${index}][color_name]`, variant.color.name);
+                    if (variant.color_hex_code) {
+                        formData.append(`variants[${index}][color_hex_code]`, variant.color_hex_code);
+                    }
+                }
+                
+                // Size: send id if exists, otherwise send name
+                if (variant.size?.id) {
+                    formData.append(`variants[${index}][size_id]`, variant.size.id);
+                } else if (variant.size?.name) {
+                    formData.append(`variants[${index}][size_name]`, variant.size.name);
+                }
+                
                 formData.append(`variants[${index}][price]`, variant.price || '0');
                 formData.append(`variants[${index}][stock]`, variant.stock || '0');
             });
@@ -257,9 +283,43 @@ function AdminProductForm() {
                             preview: img.url || (img.path ? (img.path.startsWith('http') ? img.path : `/storage/${img.path}`) : '')
                         }));
                         setImages(existingImages);
-                        setVariants(product.variants || []);
+                        // Refresh colors and sizes after successful save
+                        const [colorsRes, sizesRes] = await Promise.all([
+                            apiRequest('/api/admin/colors'),
+                            apiRequest('/api/admin/sizes')
+                        ]);
+                        if (colorsRes.ok) {
+                            const colorsData = await colorsRes.json();
+                            if (colorsData.success) setColors(colorsData.data);
+                        }
+                        if (sizesRes.ok) {
+                            const sizesData = await sizesRes.json();
+                            if (sizesData.success) setSizes(sizesData.data);
+                        }
+                        // Normalize variants to new format
+                        const normalizedVariants = (product.variants || []).map(variant => ({
+                            ...variant,
+                            color: variant.color ? { id: variant.color.id } : (variant.color_id ? { id: variant.color_id } : null),
+                            size: variant.size ? { id: variant.size.id } : (variant.size_id ? { id: variant.size_id } : null),
+                            color_hex_code: variant.color?.hex_code || '',
+                            price: variant.price && variant.price !== 0 ? variant.price : '',
+                            stock: variant.stock && variant.stock !== 0 ? variant.stock : ''
+                        }));
+                        setVariants(normalizedVariants);
                     } else {
-                        // For create, redirect back to list
+                        // For create, refresh colors and sizes then redirect
+                        const [colorsRes, sizesRes] = await Promise.all([
+                            apiRequest('/api/admin/colors'),
+                            apiRequest('/api/admin/sizes')
+                        ]);
+                        if (colorsRes.ok) {
+                            const colorsData = await colorsRes.json();
+                            if (colorsData.success) setColors(colorsData.data);
+                        }
+                        if (sizesRes.ok) {
+                            const sizesData = await sizesRes.json();
+                            if (sizesData.success) setSizes(sizesData.data);
+                        }
                         navigate('/admin/products');
                         scrollToTop();
                     }
@@ -455,33 +515,42 @@ function AdminProductForm() {
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                         <div>
                                             <label className="block text-white font-medium mb-2">رنگ</label>
-                                            <ModernSelect
-                                                name={`variants[${index}][color_id]`}
-                                                options={[
-                                                    { value: '', label: 'انتخاب رنگ' },
-                                                    ...colors.map(color => ({
-                                                        value: color.id,
-                                                        label: color.name
-                                                    }))
-                                                ]}
-                                                value={variant.color_id}
-                                                onChange={(value) => updateVariant(index, 'color_id', value)}
+                                            <AutocompleteSelect
+                                                options={colors.map(color => ({ id: color.id, name: color.name }))}
+                                                value={variant.color}
+                                                onChange={(value) => updateVariant(index, 'color', value)}
+                                                placeholder="نام رنگ را تایپ کنید..."
                                             />
+                                            {variant.color && (
+                                                <div className="mt-2">
+                                                    <label className="block text-white text-sm font-medium mb-1">کد رنگ (Hex)</label>
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="#FF0000"
+                                                            value={variant.color_hex_code || ''}
+                                                            onChange={(e) => updateVariant(index, 'color_hex_code', e.target.value)}
+                                                            pattern="^#[0-9A-Fa-f]{6}$"
+                                                            className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                                                        />
+                                                        {variant.color_hex_code && (
+                                                            <div 
+                                                                className="w-10 h-10 rounded border border-white/20"
+                                                                style={{ backgroundColor: variant.color_hex_code }}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div>
                                             <label className="block text-white font-medium mb-2">سایز</label>
-                                            <ModernSelect
-                                                name={`variants[${index}][size_id]`}
-                                                options={[
-                                                    { value: '', label: 'انتخاب سایز' },
-                                                    ...sizes.map(size => ({
-                                                        value: size.id,
-                                                        label: size.name
-                                                    }))
-                                                ]}
-                                                value={variant.size_id}
-                                                onChange={(value) => updateVariant(index, 'size_id', value)}
+                                            <AutocompleteSelect
+                                                options={sizes.map(size => ({ id: size.id, name: size.name }))}
+                                                value={variant.size}
+                                                onChange={(value) => updateVariant(index, 'size', value)}
+                                                placeholder="نام سایز را تایپ کنید..."
                                             />
                                         </div>
 
