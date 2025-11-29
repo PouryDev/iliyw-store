@@ -41,7 +41,7 @@ function AccountOrders() {
     const getStatusText = (status) => {
         switch (status) {
             case 'pending': return 'در انتظار پردازش';
-            case 'confirmed': return 'تایید شده';
+            case 'confirmed': return 'در حال آماده سازی';
             case 'processing': return 'در حال پردازش';
             case 'shipped': return 'ارسال شده';
             case 'delivered': return 'تحویل داده شده';

@@ -183,7 +183,7 @@ class PaymentService
                         'discount_code' => $orderData['discount_code'],
                         'discount_amount' => $orderData['discount_amount'],
                         'final_amount' => $orderData['final_amount'],
-                        'status' => 'confirmed', // Order is confirmed after payment verification
+                        'status' => 'pending', // Order starts as pending after payment verification
                         'receipt_path' => $orderData['receipt_path'],
                     ]);
 

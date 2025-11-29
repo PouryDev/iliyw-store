@@ -43,7 +43,7 @@ function AccountOrderDetail() {
     const getStatusBadge = (status) => {
         const badges = {
             pending: { text: 'در انتظار پرداخت', class: 'bg-yellow-500/20 text-yellow-300', icon: '⏳' },
-            confirmed: { text: 'تایید شده', class: 'bg-emerald-500/20 text-emerald-300', icon: '✓' },
+            confirmed: { text: 'در حال آماده سازی', class: 'bg-emerald-500/20 text-emerald-300', icon: '✓' },
             paid: { text: 'پرداخت شده', class: 'bg-blue-500/20 text-blue-300', icon: '✓' },
             processing: { text: 'در حال پردازش', class: 'bg-purple-500/20 text-purple-300', icon: '🔄' },
             shipped: { text: 'ارسال شده', class: 'bg-cyan-500/20 text-cyan-300', icon: '📦' },

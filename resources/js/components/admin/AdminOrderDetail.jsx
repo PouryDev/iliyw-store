@@ -66,7 +66,7 @@ function AdminOrderDetail() {
     const getStatusText = (status) => {
         switch (status) {
             case 'pending': return 'در انتظار';
-            case 'confirmed': return 'تایید شده';
+            case 'confirmed': return 'در حال آماده سازی';
             case 'processing': return 'در حال پردازش';
             case 'shipped': return 'ارسال شده';
             case 'delivered': return 'تحویل داده شده';
@@ -330,6 +330,14 @@ function AdminOrderDetail() {
                                 ارسال سفارش
                             </button>
                         )}
+                        {order.status === 'confirmed' && (
+                            <button
+                                onClick={() => updateOrderStatus('shipped')}
+                                className="bg-purple-500 hover:bg-purple-600 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"
+                            >
+                                ارسال سفارش
+                            </button>
+                        )}
                         {order.status === 'shipped' && (
                             <button
                                 onClick={() => updateOrderStatus('delivered')}
@@ -338,7 +346,7 @@ function AdminOrderDetail() {
                                 تحویل داده شده
                             </button>
                         )}
-                        {(order.status === 'pending' || order.status === 'processing') && (
+                        {(order.status === 'pending' || order.status === 'processing' || order.status === 'confirmed') && (
                             <button
                                 onClick={() => updateOrderStatus('cancelled')}
                                 className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition-colors text-sm font-medium"

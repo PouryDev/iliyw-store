@@ -90,7 +90,7 @@
                         @php
                             $statusLabels = [
                                 'pending' => 'در انتظار',
-                                'confirmed' => 'تایید شده',
+                                'confirmed' => 'در حال آماده سازی',
                                 'cancelled' => 'لغو شده',
                                 'shipped' => 'ارسال شده'
                             ];

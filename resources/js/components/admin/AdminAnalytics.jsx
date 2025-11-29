@@ -149,7 +149,7 @@ function AdminAnalytics() {
     const getStatusText = (status) => {
         const texts = {
             pending: 'در انتظار',
-            confirmed: 'تایید شده',
+            confirmed: 'در حال آماده سازی',
             processing: 'در حال پردازش',
             shipped: 'ارسال شده',
             delivered: 'تحویل داده شده',
@@ -283,7 +283,7 @@ function AdminAnalytics() {
                                 options={[
                                     { value: '', label: 'همه' },
                                     { value: 'pending', label: 'در انتظار' },
-                                    { value: 'confirmed', label: 'تایید شده' },
+                                    { value: 'confirmed', label: 'در حال آماده سازی' },
                                     { value: 'processing', label: 'در حال پردازش' },
                                     { value: 'shipped', label: 'ارسال شده' },
                                     { value: 'delivered', label: 'تحویل داده شده' },

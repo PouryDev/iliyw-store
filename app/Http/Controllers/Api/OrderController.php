@@ -426,7 +426,7 @@ class OrderController extends Controller
     {
         return match ($status) {
             'pending' => 'در انتظار',
-            'confirmed' => 'تایید شده',
+            'confirmed' => 'در حال آماده سازی',
             'shipped' => 'ارسال شده',
             'cancelled' => 'لغو شده',
             default => $status,

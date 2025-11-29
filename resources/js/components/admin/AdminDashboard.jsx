@@ -81,7 +81,7 @@ function AdminDashboard() {
     const getStatusText = (status) => {
         const texts = {
             'pending': 'در انتظار',
-            'confirmed': 'تایید شده',
+            'confirmed': 'در حال آماده سازی',
             'processing': 'در حال پردازش',
             'shipped': 'ارسال شده',
             'delivered': 'تحویل داده شده',
