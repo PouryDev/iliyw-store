@@ -29,7 +29,7 @@ function Header() {
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-2 text-white hover:text-cherry-400 transition-colors">
-                        {/* <img src="/images/logo.png" alt="Logo" className="h-8 w-8" /> */}
+                        <img src="/images/logo.png" alt="Logo" className="h-8 w-8" />
                         <span className="font-bold text-xl">ایلی استور</span>
                     </Link>
 

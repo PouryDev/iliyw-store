@@ -9,7 +9,7 @@ function Footer() {
                     {/* Company Info */}
                     <div className="col-span-1 md:col-span-2">
                         <div className="flex items-center space-x-2 mb-4">
-                            {/* <img src="/images/logo.png" alt="Logo" className="h-8 w-8"/> */}
+                            <img src="/images/logo.png" alt="Logo" className="h-8 w-8"/>
                             <span className="font-bold text-xl text-white">ایلی استور</span>
                             {/* E-Namad logo */}
                             <a referrerPolicy="origin" target="_blank"
