@@ -13,6 +13,7 @@ function ProductModal({ product, isOpen, onClose }) {
     const [displayPrice, setDisplayPrice] = useState(null);
     const [fullProduct, setFullProduct] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
 
     useEffect(() => {
         if (isOpen && product) {
@@ -367,6 +368,45 @@ function ProductModal({ product, isOpen, onClose }) {
     const maxQuantity = getMaxQuantity();
     const isOutOfStock = stock <= 0;
 
+    const handleCopyLink = async () => {
+        const productUrl = `${window.location.origin}/product/${product.slug}`;
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(productUrl);
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+                window.dispatchEvent(new CustomEvent('toast:show', { 
+                    detail: { type: 'success', message: 'لینک محصول کپی شد' } 
+                }));
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = productUrl;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+                window.dispatchEvent(new CustomEvent('toast:show', { 
+                    detail: { type: 'success', message: 'لینک محصول کپی شد' } 
+                }));
+            }
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            window.dispatchEvent(new CustomEvent('toast:show', { 
+                detail: { type: 'error', message: 'خطا در کپی لینک' } 
+            }));
+        }
+    };
+
+    const handleViewFullPage = () => {
+        handleClose();
+        navigate(`/product/${product.slug}`);
+    };
+
     return (
         <div 
             className="fixed inset-0 z-[99999] flex items-end md:items-center justify-center"
@@ -388,7 +428,40 @@ function ProductModal({ product, isOpen, onClose }) {
                         </svg>
                     </button>
                     <h2 className="text-lg font-semibold text-white truncate px-2">{product.title}</h2>
-                    <div className="w-9" /> {/* Spacer */}
+                    <div className="flex items-center gap-2">
+                        {/* Copy Link Button */}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleCopyLink();
+                            }}
+                            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                            title="کپی لینک محصول"
+                        >
+                            {linkCopied ? (
+                                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            ) : (
+                                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            )}
+                        </button>
+                        {/* View Full Page Button */}
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleViewFullPage();
+                            }}
+                            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+                            title="مشاهده صفحه محصول"
+                        >
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -490,7 +563,7 @@ function ProductModal({ product, isOpen, onClose }) {
                         )}
 
                         {/* Colors */}
-                        {currentProduct.has_colors && getAvailableColors().length > 0 && (
+                        {currentProduct.has_colors && (
                             <div>
                                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                                     رنگ {selectedColorId && `(${getAvailableColors().find(c => c.id === selectedColorId)?.name})`}
@@ -520,7 +593,7 @@ function ProductModal({ product, isOpen, onClose }) {
                         )}
 
                         {/* Sizes */}
-                        {currentProduct.has_sizes && getAvailableSizes().length > 0 && (
+                        {currentProduct.has_sizes && (
                             <div>
                                 <h3 className="text-sm font-semibold text-gray-300 mb-2">
                                     سایز {selectedSizeId && `(${getAvailableSizes().find(s => s.id === selectedSizeId)?.name})`}
