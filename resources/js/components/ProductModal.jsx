@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../utils/sanctumAuth';
 
@@ -322,6 +323,24 @@ function ProductModal({ product, isOpen, onClose }) {
         onClose();
     };
 
+    const portalElement = useMemo(() => {
+        if (typeof document === 'undefined') return null;
+        const el = document.createElement('div');
+        el.className = 'product-modal-portal';
+        return el;
+    }, []);
+
+    useEffect(() => {
+        if (!portalElement || typeof document === 'undefined') return;
+        const modalRoot = document.getElementById('modal-root') || document.body;
+        modalRoot.appendChild(portalElement);
+        return () => {
+            try {
+                modalRoot.removeChild(portalElement);
+            } catch {}
+        };
+    }, [portalElement]);
+
     useEffect(() => {
         if (isOpen) {
             document.addEventListener('keydown', handleKeyDown);
@@ -361,7 +380,7 @@ function ProductModal({ product, isOpen, onClose }) {
         };
     }, [isOpen, product?.slug, onClose]);
 
-    if (!isOpen || !product) return null;
+    if (!isOpen || !product || !portalElement) return null;
 
     const currentProduct = fullProduct || product;
     const stock = getStockCount();
@@ -407,7 +426,7 @@ function ProductModal({ product, isOpen, onClose }) {
         navigate(`/product/${product.slug}`);
     };
 
-    return (
+    const modalContent = (
         <div 
             className="fixed inset-0 z-[99999] flex items-end md:items-center justify-center"
             onClick={handleBackdropClick}
@@ -691,6 +710,8 @@ function ProductModal({ product, isOpen, onClose }) {
             </div>
         </div>
     );
+
+    return createPortal(modalContent, portalElement);
 }
 
 export default ProductModal;
