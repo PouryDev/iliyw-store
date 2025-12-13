@@ -200,7 +200,7 @@ function SearchDropdown({ onSearch, initialQuery = '' }) {
     };
 
     return (
-        <div className="relative w-full" style={{ zIndex: 99999 }}>
+        <div className="relative w-full">
             <form onSubmit={handleSubmit}>
                 <div className="relative">
                     <input
