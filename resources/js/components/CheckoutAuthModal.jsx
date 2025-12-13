@@ -88,7 +88,7 @@ function CheckoutAuthModal({ open, onClose, onSuccess }) {
     }
 
     return (
-        <div className={`fixed inset-0 z-50 ${open ? '' : 'hidden'}`} aria-hidden={!open}>
+        <div className={`fixed inset-0 z-[100000] ${open ? '' : 'hidden'}`} aria-hidden={!open}>
             <div className="absolute inset-0 bg-black/60 backdrop-blur" onClick={onClose} />
             <div className="absolute inset-x-0 bottom-0 md:inset-0 md:flex md:items-center md:justify-center p-4">
                 <div className="bg-white/5 border border-white/10 rounded-t-2xl md:rounded-2xl max-w-md w-full mx-auto shadow-xl">
