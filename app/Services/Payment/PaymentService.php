@@ -12,6 +12,7 @@ use App\Models\Transaction;
 use App\Services\Payment\PaymentGatewayFactory;
 use App\Services\CampaignService;
 use App\Services\DiscountCodeService;
+use App\Services\Telegram\Client as TelegramClient;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
@@ -158,7 +159,8 @@ class PaymentService
                     ];
                 }
 
-                DB::transaction(function () use ($transaction, $result, $invoice, $orderData) {
+                $createdOrder = null;
+                DB::transaction(function () use ($transaction, $result, $invoice, $orderData, &$createdOrder) {
                     // Mark transaction as verified
                     $transaction->markAsVerified();
 
@@ -193,6 +195,9 @@ class PaymentService
                         'status' => 'paid',
                         'paid_at' => now(),
                     ]);
+
+                    // Store order reference for use after transaction
+                    $createdOrder = $order;
 
                     // Create OrderItems and reduce stock
                     $campaignService = new CampaignService();
@@ -271,7 +276,20 @@ class PaymentService
                 // Clear cart after successful payment verification and order creation
                 Session::forget('cart');
 
-                // Notification will be sent from Thanks page when user visits it
+                // Send Telegram notification directly after order creation
+                if ($createdOrder) {
+                    // Ensure invoice is linked to order if not already linked
+                    $invoice->refresh();
+                    if (!$invoice->order_id) {
+                        $invoice->update(['order_id' => $createdOrder->id]);
+                    }
+                    
+                    // Load order with relationships and send notification
+                    $order = Order::with(['items.product', 'invoice'])->find($createdOrder->id);
+                    if ($order) {
+                        $this->sendOrderTelegramNotification($order);
+                    }
+                }
 
                 return [
                     'success' => true,
@@ -372,6 +390,90 @@ class PaymentService
     public function getActiveGateways()
     {
 return PaymentGateway::active()->ordered()->get();
+    }
+
+    /**
+     * Send Telegram notification when a new order is created
+     *
+     * @param Order $order
+     * @return void
+     */
+    private function sendOrderTelegramNotification(Order $order): void
+    {
+        $adminChatId = config('telegram.admin_chat_id');
+        
+        if (!$adminChatId) {
+            Log::warning('[PaymentService][sendOrderTelegramNotification] Telegram admin chat ID not configured');
+            return;
+        }
+
+        try {
+            // Format message in Persian
+            $itemsCount = $order->items->count();
+            $totalAmount = number_format($order->total_amount) . ' تومان';
+            $invoiceNumber = $order->invoice->invoice_number ?? 'N/A';
+            
+            $message = "🛒 سفارش جدید ثبت شد\n\n";
+            $message .= "📋 شماره سفارش: #{$order->id}\n";
+            $message .= "🧾 شماره فاکتور: {$invoiceNumber}\n";
+            $message .= "👤 نام مشتری: {$order->customer_name}\n";
+            $message .= "📞 تلفن: {$order->customer_phone}\n";
+            $message .= "📍 آدرس: {$order->customer_address}\n";
+            $message .= "📦 تعداد اقلام: {$itemsCount}\n";
+            $message .= "💰 مبلغ کل: {$totalAmount}\n";
+            $message .= "📊 وضعیت: " . $this->getStatusLabel($order->status) . "\n";
+            
+            if ($order->receipt_path) {
+                $message .= "📎 فایل رسید: دارد\n";
+            }
+
+            // Build admin order detail URL
+            $adminOrderUrl = url('/admin/orders/' . $order->id);
+
+            // Create inline keyboard with order detail button
+            $replyMarkup = [
+                'inline_keyboard' => [
+                    [
+                        [
+                            'text' => '🔍 مشاهده جزئیات سفارش',
+                            'url' => $adminOrderUrl,
+                        ],
+                    ],
+                ],
+            ];
+
+            $telegramClient = new TelegramClient();
+            $telegramClient->sendMessage((int) $adminChatId, $message, $replyMarkup);
+
+            Log::info('[PaymentService][sendOrderTelegramNotification] Telegram notification sent successfully', [
+                'order_id' => $order->id,
+            ]);
+        } catch (\Exception $e) {
+            // Log error but don't fail order creation
+            Log::error('[PaymentService][sendOrderTelegramNotification] Failed to send order notification', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+        }
+    }
+
+    /**
+     * Get Persian label for order status
+     *
+     * @param string $status
+     * @return string
+     */
+    private function getStatusLabel(string $status): string
+    {
+        return match ($status) {
+            'pending' => 'در انتظار',
+            'confirmed' => 'در حال آماده سازی',
+            'shipped' => 'ارسال شده',
+            'cancelled' => 'لغو شده',
+            default => $status,
+        };
     }
 }
 

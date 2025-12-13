@@ -64,7 +64,8 @@ class Client
 
             logger()->error($errorMessage, [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTrace(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ]);
             return false;
         }
