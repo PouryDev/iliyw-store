@@ -131,6 +131,20 @@ class PaymentService
                 ];
             }
 
+            // Early return if transaction is already verified
+            if ($transaction->isVerified()) {
+                $invoice = $transaction->invoice;
+                // Return existing order if invoice has one
+                if ($invoice->order_id) {
+                    return [
+                        'success' => true,
+                        'verified' => true,
+                        'message' => 'پرداخت قبلاً تایید شده است',
+                        'invoice_id' => $transaction->invoice_id,
+                    ];
+                }
+            }
+
             $gateway = PaymentGateway::findOrFail($transaction->gateway_id);
             $gatewayInstance = PaymentGatewayFactory::create($gateway);
 
@@ -139,6 +153,20 @@ class PaymentService
 
             if ($result['verified']) {
                 $invoice = $transaction->invoice;
+                
+                // Refresh invoice to get latest state
+                $invoice->refresh();
+                
+                // Check if invoice already has an order (idempotency check)
+                if ($invoice->order_id) {
+                    // Order already exists, return success without creating duplicate
+                    return [
+                        'success' => true,
+                        'verified' => true,
+                        'message' => 'پرداخت با موفقیت تایید شد و سفارش قبلاً ثبت شده است',
+                        'invoice_id' => $transaction->invoice_id,
+                    ];
+                }
                 
                 // Get order data from cache (with fallback to session)
                 $orderData = Cache::get("pending_order_{$invoice->id}");
@@ -161,6 +189,15 @@ class PaymentService
 
                 $createdOrder = null;
                 DB::transaction(function () use ($transaction, $result, $invoice, $orderData, &$createdOrder) {
+                    // Refresh invoice again inside transaction to ensure we have latest state
+                    $invoice->refresh();
+                    
+                    // Double-check if invoice already has an order (race condition protection)
+                    if ($invoice->order_id) {
+                        $createdOrder = $invoice->order;
+                        return;
+                    }
+                    
                     // Mark transaction as verified
                     $transaction->markAsVerified();
 
@@ -286,8 +323,10 @@ class PaymentService
                     
                     // Load order with relationships and send notification
                     $order = Order::with(['items.product', 'invoice'])->find($createdOrder->id);
-                    if ($order) {
+                    if ($order && !$invoice->telegram_notification_sent_at) {
                         $this->sendOrderTelegramNotification($order);
+                        // Mark notification as sent
+                        $invoice->update(['telegram_notification_sent_at' => now()]);
                     }
                 }
 

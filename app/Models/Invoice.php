@@ -24,12 +24,14 @@ class Invoice extends Model
         'status',
         'due_date',
         'paid_at',
+        'telegram_notification_sent_at',
         'notes',
     ];
 
     protected $casts = [
         'due_date' => 'date',
         'paid_at' => 'datetime',
+        'telegram_notification_sent_at' => 'datetime',
     ];
 
     public function order(): BelongsTo

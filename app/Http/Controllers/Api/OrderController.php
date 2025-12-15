@@ -308,9 +308,8 @@ class OrderController extends Controller
             ], 404);
         }
 
-        // Check if notification already sent in this session
-        $notificationKey = "telegram_notification_sent_{$invoice->id}";
-        if ($request->session()->has($notificationKey)) {
+        // Check if notification already sent (database-level check)
+        if ($invoice->telegram_notification_sent_at) {
             return response()->json([
                 'success' => true,
                 'message' => 'Notification already sent',
@@ -336,8 +335,8 @@ class OrderController extends Controller
         try {
             $this->sendOrderNotification($order);
             
-            // Mark as sent in session (expires when session expires)
-            $request->session()->put($notificationKey, true);
+            // Mark as sent in database
+            $invoice->update(['telegram_notification_sent_at' => now()]);
             
             return response()->json([
                 'success' => true,
