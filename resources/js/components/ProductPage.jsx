@@ -436,16 +436,16 @@ function ProductPage() {
                                 <span className="text-cherry-400 mt-0.5">🚚</span>
                                 <div>
                                     <div className="text-white font-semibold">ارسال سریع</div>
-                                    <div className="text-gray-400 text-xs">تحویل 2 تا 4 روز کاری</div>
+                                    <div className="text-gray-400 text-xs">تحویل 5 تا 9 روز کاری</div>
                                 </div>
                             </div>
-                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
+                            {/* <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
                                 <span className="text-cherry-400 mt-0.5">🔄</span>
                                 <div>
                                     <div className="text-white font-semibold">مرجوع آسان</div>
                                     <div className="text-gray-400 text-xs">تا 7 روز پس از دریافت</div>
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
                                 <span className="text-cherry-400 mt-0.5">💳</span>
                                 <div>
@@ -453,13 +453,13 @@ function ProductPage() {
                                     <div className="text-gray-400 text-xs">از طریق درگاه شتاب</div>
                                 </div>
                             </div>
-                            <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
+                            {/* <div className="bg-white/5 border border-white/10 rounded-lg p-3 flex items-start gap-2">
                                 <span className="text-cherry-400 mt-0.5">🎁</span>
                                 <div>
                                     <div className="text-white font-semibold">بسته‌بندی شیک</div>
                                     <div className="text-gray-400 text-xs">مناسب هدیه دادن</div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
