@@ -1,29 +1,64 @@
 # Production PHP-FPM image for Laravel
 FROM php:8.3-fpm-alpine AS base
 
-# Update package index and ensure ca-certificates are installed for SSL
-# Retry logic for network issues
+# Configure Alpine mirrors for better access from Iran
+# Detect Alpine version and configure mirrors dynamically
 RUN set -eux; \
-    (apk update --no-cache || (sleep 10 && apk update --no-cache) || (sleep 20 && apk update --no-cache)) \
+    ALPINE_VERSION=$(cat /etc/alpine-release | cut -d. -f1,2) && \
+    echo "Detected Alpine version: $ALPINE_VERSION" && \
+    { \
+        echo "https://mirror.yandex.ru/mirrors/alpine/v${ALPINE_VERSION}/main"; \
+        echo "https://mirror.yandex.ru/mirrors/alpine/v${ALPINE_VERSION}/community"; \
+        echo "https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/main"; \
+        echo "https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/community"; \
+    } > /etc/apk/repositories
+
+# Update package index and ensure ca-certificates are installed for SSL
+# Retry logic for network issues with longer timeouts
+RUN set -eux; \
+    for i in 1 2 3 4 5; do \
+        if apk update --no-cache; then \
+            break; \
+        else \
+            echo "Attempt $i failed, retrying in 15 seconds..."; \
+            sleep 15; \
+        fi; \
+    done \
     && apk add --no-cache ca-certificates \
     && update-ca-certificates
 
+# Install build dependencies with improved retry logic
 RUN set -eux; \
-    (apk add --no-cache --update bash icu-dev oniguruma-dev libzip-dev libpng-dev freetype-dev libjpeg-turbo-dev curl git || \
-    (sleep 10 && apk add --no-cache --update bash icu-dev oniguruma-dev libzip-dev libpng-dev freetype-dev libjpeg-turbo-dev curl git) || \
-    (sleep 20 && apk add --no-cache --update bash icu-dev oniguruma-dev libzip-dev libpng-dev freetype-dev libjpeg-turbo-dev curl git)) \
+    for i in 1 2 3 4 5; do \
+        if apk add --no-cache --update bash icu-dev oniguruma-dev libzip-dev libpng-dev freetype-dev libjpeg-turbo-dev curl git; then \
+            break; \
+        else \
+            echo "Attempt $i failed, retrying in 15 seconds..."; \
+            sleep 15; \
+        fi; \
+    done \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) pdo pdo_mysql intl mbstring zip gd bcmath \
-    && (apk add --no-cache libpng freetype libjpeg-turbo icu-libs oniguruma libzip || \
-    (sleep 10 && apk add --no-cache libpng freetype libjpeg-turbo icu-libs oniguruma libzip) || \
-    (sleep 20 && apk add --no-cache libpng freetype libjpeg-turbo icu-libs oniguruma libzip)) \
+    && for i in 1 2 3 4 5; do \
+        if apk add --no-cache libpng freetype libjpeg-turbo icu-libs oniguruma libzip; then \
+            break; \
+        else \
+            echo "Attempt $i failed, retrying in 15 seconds..."; \
+            sleep 15; \
+        fi; \
+    done \
     && apk del --no-network freetype-dev libjpeg-turbo-dev libpng-dev icu-dev oniguruma-dev libzip-dev
 
 # Install Node.js and npm for building frontend assets
 RUN set -eux; \
-    ((apk update --no-cache && apk add --no-cache nodejs npm) || \
-    (sleep 10 && apk update --no-cache && apk add --no-cache nodejs npm) || \
-    (sleep 20 && apk update --no-cache && apk add --no-cache nodejs npm))
+    for i in 1 2 3 4 5; do \
+        if apk update --no-cache && apk add --no-cache nodejs npm; then \
+            break; \
+        else \
+            echo "Attempt $i failed, retrying in 15 seconds..."; \
+            sleep 15; \
+        fi; \
+    done
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
