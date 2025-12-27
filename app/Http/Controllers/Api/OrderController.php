@@ -259,7 +259,7 @@ class OrderController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $order->load(['items.product', 'items.variant', 'invoice', 'transactions']);
+        $order->load(['items.product', 'items.variant', 'invoice', 'transactions', 'deliveryMethod']);
 
         return response()->json([
             'success' => true,
@@ -371,12 +371,14 @@ class OrderController extends Controller
 
         try {
             // Load order relationships for message formatting
-            $order->load(['items.product', 'invoice']);
+            $order->load(['items.product', 'invoice', 'deliveryMethod']);
             
             // Format message in Persian
             $itemsCount = $order->items->count();
             $totalAmount = number_format($order->total_amount) . ' تومان';
+            $finalAmount = number_format($order->final_amount) . ' تومان';
             $invoiceNumber = $order->invoice->invoice_number ?? 'N/A';
+            $deliveryMethodTitle = $order->deliveryMethod ? $order->deliveryMethod->title : 'تعیین نشده';
             
             $message = "🛒 سفارش جدید ثبت شد\n\n";
             $message .= "📋 شماره سفارش: #{$order->id}\n";
@@ -386,6 +388,8 @@ class OrderController extends Controller
             $message .= "📍 آدرس: {$order->customer_address}\n";
             $message .= "📦 تعداد اقلام: {$itemsCount}\n";
             $message .= "💰 مبلغ کل: {$totalAmount}\n";
+            $message .= "💳 مبلغ پرداخت شده: {$finalAmount}\n";
+            $message .= "🚚 روش ارسال: {$deliveryMethodTitle}\n";
             $message .= "📊 وضعیت: " . $this->getStatusLabel($order->status) . "\n";
             
             if ($order->receipt_path) {

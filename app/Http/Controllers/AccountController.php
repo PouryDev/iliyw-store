@@ -46,7 +46,7 @@ class AccountController extends Controller
         if ($order->user_id !== $user->id && (!empty($user->phone) && $order->customer_phone !== $user->phone)) {
             abort(403);
         }
-        $order->load(['items.product.images', 'invoice']);
+        $order->load(['items.product.images', 'invoice', 'deliveryMethod']);
         return view('account.order-show', compact('user', 'order'));
     }
 

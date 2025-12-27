@@ -50,6 +50,14 @@
             </div>
 
             <div>
+                <h2 class="font-bold mb-2">اطلاعات ارسال</h2>
+                @if($order->deliveryMethod)
+                    <div class="text-sm">روش ارسال: {{ $order->deliveryMethod->title }}</div>
+                @endif
+                <div class="text-sm">مبلغ پرداختی: {{ number_format($order->final_amount) }} تومان</div>
+            </div>
+
+            <div>
                 <h2 class="font-bold mb-2">رسید</h2>
                 @if($order->receipt_path)
                     <img src="{{ asset('storage/'.$order->receipt_path) }}" class="rounded max-h-72" />

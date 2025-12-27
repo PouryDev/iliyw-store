@@ -50,6 +50,10 @@
                         <span class="text-gray-400">مبلغ سفارش</span>
                         <span class="font-semibold">{{ number_format($order->total_amount) }} <span class="text-xs text-gray-400">تومان</span></span>
                     </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-400">مبلغ پرداختی</span>
+                        <span class="font-semibold">{{ number_format($order->final_amount) }} <span class="text-xs text-gray-400">تومان</span></span>
+                    </div>
                     @if($order->invoice)
                         <div class="flex items-center justify-between">
                             <span class="text-gray-400">شماره فاکتور</span>
@@ -77,6 +81,9 @@
                     <div><span class="text-gray-400">نام گیرنده:</span> <span class="font-medium">{{ $order->customer_name }}</span></div>
                     <div><span class="text-gray-400">تلفن:</span> <span class="font-medium">{{ $order->customer_phone }}</span></div>
                     <div><span class="text-gray-400">آدرس:</span> <span class="font-medium leading-6">{{ $order->customer_address }}</span></div>
+                    @if($order->deliveryMethod)
+                        <div><span class="text-gray-400">روش ارسال:</span> <span class="font-medium">{{ $order->deliveryMethod->title }}</span></div>
+                    @endif
                 </div>
             </div>
         </div>

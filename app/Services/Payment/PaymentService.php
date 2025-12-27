@@ -447,10 +447,15 @@ return PaymentGateway::active()->ordered()->get();
         }
 
         try {
+            // Load delivery method relationship
+            $order->load('deliveryMethod');
+            
             // Format message in Persian
             $itemsCount = $order->items->count();
             $totalAmount = number_format($order->total_amount) . ' تومان';
+            $finalAmount = number_format($order->final_amount) . ' تومان';
             $invoiceNumber = $order->invoice->invoice_number ?? 'N/A';
+            $deliveryMethodTitle = $order->deliveryMethod ? $order->deliveryMethod->title : 'تعیین نشده';
             
             $message = "🛒 سفارش جدید ثبت شد\n\n";
             $message .= "📋 شماره سفارش: #{$order->id}\n";
@@ -460,6 +465,8 @@ return PaymentGateway::active()->ordered()->get();
             $message .= "📍 آدرس: {$order->customer_address}\n";
             $message .= "📦 تعداد اقلام: {$itemsCount}\n";
             $message .= "💰 مبلغ کل: {$totalAmount}\n";
+            $message .= "💳 مبلغ پرداخت شده: {$finalAmount}\n";
+            $message .= "🚚 روش ارسال: {$deliveryMethodTitle}\n";
             $message .= "📊 وضعیت: " . $this->getStatusLabel($order->status) . "\n";
             
             if ($order->receipt_path) {

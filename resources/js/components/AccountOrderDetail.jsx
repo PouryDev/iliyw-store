@@ -194,7 +194,7 @@ function AccountOrderDetail() {
                         </div>
                     )}
                     <div className="border-t border-white/10 pt-2 mt-2 flex justify-between text-white font-bold text-lg">
-                        <span>مبلغ نهایی:</span>
+                        <span>مبلغ پرداختی:</span>
                         <span className="text-cherry-400">{formatPrice(order.final_amount)} تومان</span>
                     </div>
                 </div>
@@ -203,7 +203,7 @@ function AccountOrderDetail() {
             {/* Delivery Address */}
             {order.delivery_address && (
                 <div className="glass-card rounded-2xl p-5 border border-white/10">
-                    <h3 className="text-lg font-bold text-white mb-4">آدرس تحویل</h3>
+                    <h3 className="text-lg font-bold text-white mb-4">اطلاعات ارسال</h3>
                     <div className="flex items-start gap-3">
                         <div className="w-10 h-10 rounded-full bg-cherry-600/20 flex items-center justify-center text-cherry-400 flex-shrink-0">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -212,6 +212,9 @@ function AccountOrderDetail() {
                             <p className="text-white mb-2">{order.delivery_address}</p>
                             <p className="text-sm text-gray-400">گیرنده: {order.customer_name}</p>
                             <p className="text-sm text-gray-400">{order.customer_phone}</p>
+                            {order.delivery_method && (
+                                <p className="text-sm text-gray-400 mt-2">روش ارسال: {order.delivery_method.title}</p>
+                            )}
                         </div>
                     </div>
                 </div>
