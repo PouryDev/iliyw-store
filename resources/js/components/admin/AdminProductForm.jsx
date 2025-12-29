@@ -83,6 +83,7 @@ function AdminProductForm() {
                             const existingImages = (product.images || []).map((img, index) => ({
                                 id: img.id || `existing-${index}`,
                                 url: img.url,
+                                path: img.path,
                                 isNew: false,
                                 preview: img.url
                             }));
@@ -278,9 +279,10 @@ function AdminProductForm() {
                         // Sync images/variants UI
                         const existingImages = (product.images || []).map((img, index) => ({
                             id: img.id || `existing-${index}`,
-                            url: img.url || (img.path ? (img.path.startsWith('http') ? img.path : `/storage/${img.path}`) : ''),
+                            url: img.url,
+                            path: img.path,
                             isNew: false,
-                            preview: img.url || (img.path ? (img.path.startsWith('http') ? img.path : `/storage/${img.path}`) : '')
+                            preview: img.url
                         }));
                         setImages(existingImages);
                         // Refresh colors and sizes after successful save

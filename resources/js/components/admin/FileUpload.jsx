@@ -14,6 +14,24 @@ function FileUpload({
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
 
+    // Helper function to resolve image URL from various formats
+    const resolveImageUrl = (fileObj) => {
+        // First try url field from API
+        if (fileObj.url) return fileObj.url;
+        if (fileObj.image_url) return fileObj.image_url;
+        
+        // Then try preview (for new files)
+        if (fileObj.preview) return fileObj.preview;
+        
+        // Fallback to path resolution
+        if (fileObj.path) {
+            if (/^https?:\/\//i.test(fileObj.path)) return fileObj.path;
+            return `/storage/${fileObj.path.startsWith('/') ? fileObj.path.slice(1) : fileObj.path}`;
+        }
+        
+        return '/images/placeholder.jpg';
+    };
+
     const handleFiles = (newFiles) => {
         const fileArray = Array.from(newFiles);
         const validFiles = fileArray.filter(file => {
@@ -167,7 +185,7 @@ function FileUpload({
                             <div key={fileObj.id} className="relative group">
                                 <div className="aspect-square bg-gray-800 rounded-lg overflow-hidden border border-white/10">
                                     <img
-                                        src={fileObj.preview || fileObj.url || fileObj.image_url}
+                                        src={resolveImageUrl(fileObj)}
                                         alt="Preview"
                                         className="w-full h-full object-cover"
                                         onError={(e) => {
