@@ -130,11 +130,8 @@ return new class extends Migration
         // ===================================================================
         if (Schema::hasTable('campaign_targets')) {
             Schema::table('campaign_targets', function (Blueprint $table) {
-                // Composite index for campaign products lookup
-                $table->index(['campaign_id', 'product_id'], 'idx_campaign_targets_campaign_product');
-                
-                // Index for finding campaigns by product
-                $table->index('product_id', 'idx_campaign_targets_product');
+                // Composite index for campaign targets lookup
+                $table->index(['campaign_id', 'targetable_id', 'targetable_type'], 'idx_campaign_targets_campaign');
             });
         }
 
@@ -274,8 +271,7 @@ return new class extends Migration
 
         if (Schema::hasTable('campaign_targets')) {
             Schema::table('campaign_targets', function (Blueprint $table) {
-                $table->dropIndex('idx_campaign_targets_campaign_product');
-                $table->dropIndex('idx_campaign_targets_product');
+                $table->dropIndex('idx_campaign_targets_campaign');
             });
         }
 
