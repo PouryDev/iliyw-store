@@ -138,12 +138,8 @@ return new class extends Migration
         // ===================================================================
         // CAMPAIGN_SALES TABLE INDEXES
         // ===================================================================
-        if (Schema::hasTable('campaign_sales')) {
-            Schema::table('campaign_sales', function (Blueprint $table) {
-                // Index for campaign analytics
-                $table->index(['campaign_id', 'created_at'], 'idx_campaign_sales_campaign_date');
-            });
-        }
+        // campaign_sales already has index 'campaign_sales_campaign_date' from original migration
+        // No need to add duplicate index
 
         // ===================================================================
         // DISCOUNT_CODE_USAGES TABLE INDEXES
@@ -166,7 +162,8 @@ return new class extends Migration
         });
 
         Schema::table('sizes', function (Blueprint $table) {
-            $table->index(['is_active', 'sort_order'], 'idx_sizes_active_order');
+            // Sizes table doesn't have sort_order column
+            $table->index('is_active', 'idx_sizes_is_active');
         });
 
         // ===================================================================
@@ -191,12 +188,8 @@ return new class extends Migration
         // ===================================================================
         // HERO_SLIDES TABLE INDEXES
         // ===================================================================
-        if (Schema::hasTable('hero_slides')) {
-            Schema::table('hero_slides', function (Blueprint $table) {
-                // Composite index for active slides ordering
-                $table->index(['is_active', 'sort_order'], 'idx_hero_slides_active_order');
-            });
-        }
+        // hero_slides already has index 'hero_slides_active_sort' from original migration
+        // No need to add duplicate index
 
         // ===================================================================
         // PAYMENT_GATEWAYS TABLE INDEXES
@@ -230,11 +223,7 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasTable('hero_slides')) {
-            Schema::table('hero_slides', function (Blueprint $table) {
-                $table->dropIndex('idx_hero_slides_active_order');
-            });
-        }
+        // hero_slides: No index to drop (already exists from original migration)
 
         if (Schema::hasTable('addresses')) {
             Schema::table('addresses', function (Blueprint $table) {
@@ -249,7 +238,7 @@ return new class extends Migration
         }
 
         Schema::table('sizes', function (Blueprint $table) {
-            $table->dropIndex('idx_sizes_active_order');
+            $table->dropIndex('idx_sizes_is_active');
         });
 
         Schema::table('colors', function (Blueprint $table) {
@@ -263,11 +252,7 @@ return new class extends Migration
             });
         }
 
-        if (Schema::hasTable('campaign_sales')) {
-            Schema::table('campaign_sales', function (Blueprint $table) {
-                $table->dropIndex('idx_campaign_sales_campaign_date');
-            });
-        }
+        // campaign_sales: No index to drop (already exists from original migration)
 
         if (Schema::hasTable('campaign_targets')) {
             Schema::table('campaign_targets', function (Blueprint $table) {
