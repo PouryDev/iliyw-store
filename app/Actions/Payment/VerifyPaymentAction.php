@@ -146,6 +146,20 @@ class VerifyPaymentAction extends BaseAction
                 ]);
             }
 
+            // Prepare checkout data with proper casing (DTO expects camelCase)
+            $checkoutDataArray = [
+                'userId' => $orderData['user_id'] ?? null,
+                'customerName' => $orderData['customer_name'] ?? '',
+                'customerPhone' => $orderData['customer_phone'] ?? '',
+                'customerAddress' => $orderData['customer_address'] ?? '',
+                'deliveryMethodId' => $orderData['delivery_method_id'] ?? ($deliveryMethod->id ?? 0),
+                'deliveryAddressId' => $orderData['delivery_address_id'] ?? null,
+                'discountCode' => $orderData['discount_code'] ?? null,
+                'paymentGatewayId' => $orderData['payment_gateway_id'] ?? null,
+                'receiptPath' => $orderData['receipt_path'] ?? null,
+                'cart' => $orderData['cart'] ?? [],
+            ];
+
             // Mark transaction as verified
             $transaction->update([
                 'status' => TransactionStatus::VERIFIED->value,
@@ -155,7 +169,7 @@ class VerifyPaymentAction extends BaseAction
             ]);
 
             // Create order from order data
-            $checkoutData = CheckoutData::fromArray($orderData);
+            $checkoutData = CheckoutData::fromArray($checkoutDataArray);
             $order = $this->createOrderAction->execute($checkoutData);
 
             // Link invoice to order
