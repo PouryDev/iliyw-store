@@ -12,7 +12,7 @@ ALTER TABLE products DROP INDEX IF EXISTS idx_products_price_active;
 ALTER TABLE products DROP INDEX IF EXISTS idx_products_stock_active;
 
 -- Orders indexes
-ALTER TABLE orders DROP INDEX IF EXISTS idx_orders_status;
+ALTER TABLE orders DROP INDEX IF EXISTS ididx_campaign_targets_campaignx_orders_status;
 ALTER TABLE orders DROP INDEX IF EXISTS idx_orders_user_date;
 ALTER TABLE orders DROP INDEX IF EXISTS idx_orders_status_date;
 ALTER TABLE orders DROP INDEX IF EXISTS idx_orders_user_status;
@@ -27,7 +27,7 @@ ALTER TABLE invoices DROP INDEX IF EXISTS idx_invoices_status;
 ALTER TABLE invoices DROP INDEX IF EXISTS idx_invoices_status_date;
 ALTER TABLE invoices DROP INDEX IF EXISTS idx_invoices_paid_at;
 ALTER TABLE invoices DROP INDEX IF EXISTS idx_invoices_due_status;
-
+idx_campaign_targets_campaign
 -- Transactions indexes
 ALTER TABLE transactions DROP INDEX IF EXISTS idx_transactions_invoice_status;
 ALTER TABLE transactions DROP INDEX IF EXISTS idx_transactions_status_date;

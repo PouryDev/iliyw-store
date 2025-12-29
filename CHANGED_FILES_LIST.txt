@@ -1,0 +1,165 @@
+📝 لیست فایل‌های تغییر یافته که باید روی Production آپلود شوند
+================================================================================
+
+🔴 CRITICAL (برای حل خطای 500 الزامی است):
+-------------------------------------------
+app/Actions/Order/ReduceStockAction.php
+app/Actions/Order/RestoreStockAction.php
+app/Repositories/Eloquent/BaseRepository.php
+app/Repositories/Contracts/RepositoryInterface.php
+
+🟡 IMPORTANT (برای عملکرد صحیح controllers):
+-------------------------------------------
+app/Http/Controllers/Api/PaymentController.php
+app/Http/Controllers/Api/OrderController.php
+app/Http/Controllers/Api/CartController.php
+app/Http/Controllers/Api/ProductController.php
+app/Http/Controllers/Api/CategoryController.php
+app/Http/Controllers/Api/ColorController.php
+app/Http/Controllers/Api/SizeController.php
+app/Http/Controllers/Api/Admin/ProductController.php
+app/Http/Controllers/Api/Admin/OrderController.php
+app/Http/Controllers/Api/Admin/CampaignController.php
+app/Http/Controllers/Api/Admin/DiscountCodeController.php
+app/Http/Controllers/Api/Admin/CategoryController.php
+app/Http/Controllers/Api/Admin/ColorController.php
+app/Http/Controllers/Api/Admin/SizeController.php
+app/Http/Controllers/Api/Admin/DeliveryMethodController.php
+
+🟢 NEW FILES (فایل‌های جدید enterprise refactoring):
+---------------------------------------------------
+
+### Base Classes:
+app/Actions/BaseAction.php
+app/DTOs/BaseDTO.php
+
+### Enums:
+app/Enums/OrderStatus.php
+app/Enums/PaymentStatus.php
+app/Enums/TransactionStatus.php
+app/Enums/CampaignType.php
+app/Enums/DiscountType.php
+
+### DTOs:
+app/DTOs/ProductData.php
+app/DTOs/OrderData.php
+app/DTOs/CheckoutData.php
+app/DTOs/PaymentData.php
+app/DTOs/CartItemData.php
+app/DTOs/CampaignData.php
+app/DTOs/DiscountCodeData.php
+
+### Exceptions:
+app/Exceptions/PaymentException.php
+app/Exceptions/OrderException.php
+app/Exceptions/CartException.php
+app/Exceptions/InsufficientStockException.php
+app/Exceptions/InvalidDiscountCodeException.php
+
+### Repository Interfaces:
+app/Repositories/Contracts/RepositoryInterface.php
+app/Repositories/Contracts/ProductRepositoryInterface.php
+app/Repositories/Contracts/OrderRepositoryInterface.php
+app/Repositories/Contracts/UserRepositoryInterface.php
+app/Repositories/Contracts/CategoryRepositoryInterface.php
+app/Repositories/Contracts/CampaignRepositoryInterface.php
+app/Repositories/Contracts/DiscountCodeRepositoryInterface.php
+app/Repositories/Contracts/InvoiceRepositoryInterface.php
+app/Repositories/Contracts/TransactionRepositoryInterface.php
+
+### Repository Implementations:
+app/Repositories/Eloquent/BaseRepository.php
+app/Repositories/Eloquent/ProductRepository.php
+app/Repositories/Eloquent/OrderRepository.php
+app/Repositories/Eloquent/UserRepository.php
+app/Repositories/Eloquent/CategoryRepository.php
+app/Repositories/Eloquent/CampaignRepository.php
+app/Repositories/Eloquent/DiscountCodeRepository.php
+app/Repositories/Eloquent/InvoiceRepository.php
+app/Repositories/Eloquent/TransactionRepository.php
+
+### API Resources:
+app/Http/Resources/ProductResource.php
+app/Http/Resources/ProductImageResource.php
+app/Http/Resources/ProductVariantResource.php
+app/Http/Resources/OrderResource.php
+app/Http/Resources/OrderItemResource.php
+app/Http/Resources/UserResource.php
+app/Http/Resources/CategoryResource.php
+app/Http/Resources/CampaignResource.php
+app/Http/Resources/InvoiceResource.php
+app/Http/Resources/DeliveryMethodResource.php
+
+### Form Requests:
+app/Http/Requests/Api/CheckoutRequest.php
+app/Http/Requests/Api/AddToCartRequest.php
+app/Http/Requests/Admin/StoreProductRequest.php
+app/Http/Requests/Admin/UpdateProductRequest.php
+app/Http/Requests/Admin/StoreCampaignRequest.php
+app/Http/Requests/Admin/StoreDiscountCodeRequest.php
+
+### Events:
+app/Events/OrderCreated.php
+app/Events/OrderStatusChanged.php
+app/Events/OrderCancelled.php
+app/Events/PaymentVerified.php
+app/Events/PaymentFailed.php
+app/Events/CampaignSaleRecorded.php
+
+### Listeners:
+app/Listeners/SendOrderTelegramNotification.php
+app/Listeners/LogPaymentActivity.php
+app/Listeners/ClearCartAfterOrder.php
+
+### Actions (Cart):
+app/Actions/Cart/AddToCartAction.php
+app/Actions/Cart/UpdateCartAction.php
+app/Actions/Cart/CalculateCartTotalsAction.php
+
+### Actions (Campaign):
+app/Actions/Campaign/CalculateCampaignPriceAction.php
+app/Actions/Campaign/RecordCampaignSaleAction.php
+
+### Actions (DiscountCode):
+app/Actions/DiscountCode/ValidateDiscountCodeAction.php
+app/Actions/DiscountCode/ApplyDiscountCodeAction.php
+
+### Actions (Order):
+app/Actions/Order/CalculateOrderTotalsAction.php
+app/Actions/Order/CreateOrderItemsAction.php
+app/Actions/Order/ReduceStockAction.php
+app/Actions/Order/RestoreStockAction.php
+app/Actions/Order/CancelOrderAction.php
+app/Actions/Order/CreateOrderAction.php
+
+### Actions (Payment):
+app/Actions/Payment/CreateInvoiceAction.php
+app/Actions/Payment/InitiatePaymentAction.php
+app/Actions/Payment/VerifyPaymentAction.php
+app/Actions/Payment/HandlePaymentCallbackAction.php
+
+### Service Provider:
+app/Providers/RepositoryServiceProvider.php
+bootstrap/providers.php
+
+### Routes:
+routes/api.php
+
+### Migrations (برای Query Optimization):
+database/migrations/2025_12_29_174558_add_performance_indexes_to_tables.php
+database/migrations/2025_12_29_174848_add_fulltext_search_to_products.php
+
+================================================================================
+📋 دستورات بعد از آپلود:
+================================================================================
+
+1. composer dump-autoload -o
+2. php artisan cache:clear
+3. php artisan config:clear
+4. php artisan route:clear
+5. php artisan view:clear
+6. php artisan migrate (اگر migrations رو آپلود کردید)
+7. sudo systemctl restart php-fpm (یا docker-compose restart app)
+
+================================================================================
+

@@ -14,7 +14,7 @@ class SizeController extends Controller
     public function index(): JsonResponse
     {
         $sizes = Size::where('is_active', true)
-            ->orderBy('sort_order')
+            ->orderBy('name')
             ->get();
 
         return response()->json([

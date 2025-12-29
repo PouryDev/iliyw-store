@@ -14,10 +14,10 @@ class ReduceStockAction extends BaseAction
      *
      * @param array $items Order items data
      * @param array $cart Original cart data
-     * @return void
+     * @return mixed
      * @throws InsufficientStockException
      */
-    public function execute(...$params): void
+    public function execute(...$params): mixed
     {
         [$items, $cart] = $params;
 
@@ -65,6 +65,8 @@ class ReduceStockAction extends BaseAction
                 $product->decrement('stock', $quantity);
             }
         }
+
+        return null;
     }
 }
 
