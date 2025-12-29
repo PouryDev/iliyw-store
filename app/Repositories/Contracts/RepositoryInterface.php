@@ -108,5 +108,29 @@ interface RepositoryInterface
      * @return bool
      */
     public function exists(int $id): bool;
+
+    /**
+     * Get a new query builder instance
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function query();
+
+    /**
+     * Alias for query method
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQuery();
+
+    /**
+     * Get all records paginated with optional relations and search
+     *
+     * @param int $perPage
+     * @param array $relations
+     * @param string|null $search
+     * @return LengthAwarePaginator
+     */
+    public function getAllPaginated(int $perPage = 15, array $relations = [], ?string $search = null): LengthAwarePaginator;
 }
 

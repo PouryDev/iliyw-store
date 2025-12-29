@@ -13,9 +13,9 @@ class RestoreStockAction extends BaseAction
      * Restore stock when order is cancelled
      *
      * @param Order $order
-     * @return void
+     * @return mixed
      */
-    public function execute(...$params): void
+    public function execute(...$params): mixed
     {
         [$order] = $params;
 
@@ -38,6 +38,8 @@ class RestoreStockAction extends BaseAction
                 }
             }
         }
+
+        return null;
     }
 }
 

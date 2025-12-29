@@ -168,5 +168,47 @@ abstract class BaseRepository
     {
         return $this->model->newQuery();
     }
+
+    /**
+     * Alias for query() method
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQuery()
+    {
+        return $this->query();
+    }
+
+    /**
+     * Get all records paginated with optional relations and search
+     *
+     * @param int $perPage
+     * @param array $relations
+     * @param string|null $search
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function getAllPaginated(int $perPage = 15, array $relations = [], ?string $search = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $query = $this->model->query();
+
+        if (!empty($relations)) {
+            $query->with($relations);
+        }
+
+        if ($search) {
+            // Basic search on 'name' or 'title' column if exists
+            $query->where(function ($q) use ($search) {
+                $fillable = $this->model->getFillable();
+                if (in_array('name', $fillable)) {
+                    $q->orWhere('name', 'like', "%{$search}%");
+                }
+                if (in_array('title', $fillable)) {
+                    $q->orWhere('title', 'like', "%{$search}%");
+                }
+            });
+        }
+
+        return $query->latest()->paginate($perPage);
+    }
 }
 
