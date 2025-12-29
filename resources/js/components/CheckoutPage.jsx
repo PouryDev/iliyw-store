@@ -303,7 +303,9 @@ function CheckoutPage() {
             formData.append('customer_name', form.name);
             formData.append('customer_phone', form.phone);
             formData.append('customer_address', form.address);
-            formData.append('receipt', form.receipt);
+            if (form.receipt) {
+                formData.append('receipt', form.receipt);
+            }
             formData.append('delivery_method_id', form.delivery_method_id);
             if (form.discount_code) {
                 formData.append('discount_code', form.discount_code);

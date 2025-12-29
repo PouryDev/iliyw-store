@@ -21,7 +21,7 @@ class CheckoutRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'customer_name' => ['required', 'string', 'max:255'],
             'customer_phone' => ['required', 'string', 'max:20'],
             'customer_address' => ['required', 'string', 'max:500'],
@@ -31,6 +31,16 @@ class CheckoutRequest extends FormRequest
             'payment_gateway_id' => ['nullable', 'exists:payment_gateways,id'],
             'receipt' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'], // 10MB
         ];
+
+        // If payment gateway is card-to-card, receipt is required
+        if ($this->input('payment_gateway_id')) {
+            $gateway = \App\Models\PaymentGateway::find($this->input('payment_gateway_id'));
+            if ($gateway && $gateway->type === 'card_to_card') {
+                $rules['receipt'] = ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'];
+            }
+        }
+
+        return $rules;
     }
 
     /**
@@ -46,6 +56,10 @@ class CheckoutRequest extends FormRequest
             'customer_address.required' => 'آدرس الزامی است',
             'delivery_method_id.required' => 'روش ارسال الزامی است',
             'delivery_method_id.exists' => 'روش ارسال انتخاب شده معتبر نیست',
+            'receipt.required' => 'آپلود فیش واریزی برای پرداخت کارت به کارت الزامی است',
+            'receipt.file' => 'فیش واریزی باید یک فایل معتبر باشد',
+            'receipt.mimes' => 'فیش واریزی باید از نوع jpg، jpeg، png یا pdf باشد',
+            'receipt.max' => 'حجم فیش واریزی نباید بیشتر از 10 مگابایت باشد',
         ];
     }
 }
