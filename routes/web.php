@@ -19,6 +19,20 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Auth;
 
+// Payment callback route (for gateway redirects) - MUST BE FIRST!
+Route::get('/payment/callback/{gateway}', [\App\Http\Controllers\Api\PaymentController::class, 'callback'])
+    ->name('payment.callback');
+
+// Payment error page (React app)
+Route::get('/payment/error', function () {
+    return view('react-app');
+})->name('payment.error');
+
+// Thanks page (React app)
+Route::get('/thanks/{invoice}', function () {
+    return view('react-app');
+})->name('thanks');
+
 // Test session route
 Route::get('/test-session', function () {
     return response()->json([
@@ -61,11 +75,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
 });
 
-// Payment callback route (for gateway redirects)
-Route::get('/payment/callback/{gateway}', [\App\Http\Controllers\Api\PaymentController::class, 'callback'])
-    ->name('payment.callback');
-
 // React SPA route - catch all for frontend routes (must be last)
+// Exclude payment/* and thanks/* routes from catch-all
 Route::get('/{any}', function () {
     return view('react-app');
-})->where('any', '.*')->name('react-app');
+})->where('any', '^(?!(payment|thanks)).*')->name('react-app');
