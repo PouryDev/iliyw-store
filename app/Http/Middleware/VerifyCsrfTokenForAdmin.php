@@ -20,6 +20,11 @@ class VerifyCsrfTokenForAdmin
             return $next($request);
         }
 
+        // Skip CSRF verification for payment callback (from payment gateways)
+        if ($request->is('payment/callback/*')) {
+            return $next($request);
+        }
+
         // For regular web requests, apply CSRF verification
         return app(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class)->handle($request, $next);
     }

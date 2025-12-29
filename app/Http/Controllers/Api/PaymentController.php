@@ -14,6 +14,8 @@ use App\Repositories\Contracts\TransactionRepositoryInterface;
 use App\Exceptions\PaymentException;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -94,9 +96,9 @@ class PaymentController extends Controller
      */
     public function callback(Request $request, string $gateway)
     {
-        try {
-            $callbackData = $request->all();
+        $callbackData = $request->all();
 
+        try {
             $result = $this->handleCallbackAction->execute($gateway, $callbackData);
 
             if ($result['success'] && $result['verified']) {
@@ -112,6 +114,22 @@ class PaymentController extends Controller
 
         } catch (PaymentException $e) {
             return redirect('/payment/error?message=' . urlencode($e->getMessage()));
+        } catch (ModelNotFoundException $e) {
+            Log::error('Payment callback model not found', [
+                'gateway' => $gateway,
+                'callback_data' => $callbackData,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect('/payment/error?message=' . urlencode('اطلاعات پرداخت یافت نشد'));
+        } catch (\Exception $e) {
+            Log::error('Payment callback unexpected error', [
+                'gateway' => $gateway,
+                'callback_data' => $callbackData,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect('/payment/error?message=' . urlencode('خطا در پردازش پرداخت'));
         }
     }
 
