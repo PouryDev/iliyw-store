@@ -7,6 +7,7 @@ use App\Actions\Order\CreateOrderAction;
 use App\Models\Transaction;
 use App\Models\Invoice;
 use App\Models\PaymentGateway;
+use App\Models\DeliveryMethod;
 use App\Services\Payment\PaymentGatewayFactory;
 use App\Events\PaymentVerified;
 use App\Events\PaymentFailed;
@@ -113,6 +114,36 @@ class VerifyPaymentAction extends BaseAction
                 ]);
 
                 throw PaymentException::verificationFailed('داده‌های سفارش یافت نشد');
+            }
+
+            // Fallback for missing/invalid delivery method (prevents ModelNotFound)
+            $deliveryMethodId = $orderData['delivery_method_id'] ?? null;
+            $deliveryMethod = $deliveryMethodId ? DeliveryMethod::find($deliveryMethodId) : null;
+
+            if (!$deliveryMethod) {
+                $deliveryMethod = DeliveryMethod::active()->ordered()->first();
+
+                if (!$deliveryMethod) {
+                    Log::error('No active delivery method found during payment verification', [
+                        'invoice_id' => $invoice->id,
+                        'transaction_id' => $transaction->id,
+                        'delivery_method_id' => $deliveryMethodId,
+                    ]);
+
+                    throw PaymentException::verificationFailed('روش ارسال یافت نشد');
+                }
+
+                // Update order data with fallback method and persist to cache/session
+                $orderData['delivery_method_id'] = $deliveryMethod->id;
+                $orderData['delivery_fee'] = $deliveryMethod->fee;
+                Cache::put("pending_order_{$invoice->id}", $orderData, now()->addHours(24));
+                Session::put("pending_order_{$invoice->id}", $orderData);
+
+                Log::warning('Delivery method fallback applied during payment verification', [
+                    'invoice_id' => $invoice->id,
+                    'transaction_id' => $transaction->id,
+                    'fallback_delivery_method_id' => $deliveryMethod->id,
+                ]);
             }
 
             // Mark transaction as verified
