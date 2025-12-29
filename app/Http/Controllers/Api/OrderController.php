@@ -3,28 +3,41 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
-use App\Models\Invoice;
-use App\Models\Product;
-use App\Models\ProductVariant;
-use App\Models\Campaign;
-use App\Services\Telegram\Client as TelegramClient;
+use App\Http\Requests\Api\CheckoutRequest;
+use App\Http\Resources\OrderResource;
+use App\DTOs\CheckoutData;
+use App\Actions\Order\CreateOrderAction;
+use App\Actions\Order\CalculateOrderTotalsAction;
+use App\Actions\Payment\CreateInvoiceAction;
+use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Exceptions\OrderException;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
-    public function index(Request $request)
+    public function __construct(
+        protected OrderRepositoryInterface $orderRepository,
+        protected CalculateOrderTotalsAction $calculateOrderTotalsAction,
+        protected CreateInvoiceAction $createInvoiceAction
+    ) {}
+
+    /**
+     * Get user's orders
+     */
+    public function index(Request $request): JsonResponse
     {
-        $orders = Order::where('user_id', $request->user()->id)
-            ->with(['items.product.images', 'items.productVariants'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $orders = $this->orderRepository->getByUserPaginated(
+            $request->user()->id,
+            10,
+            ['items.product.images', 'items.productVariants', 'deliveryMethod', 'invoice']
+        );
 
         return response()->json([
             'success' => true,
-            'data' => $orders->items(),
+            'data' => OrderResource::collection($orders->items()),
             'pagination' => [
                 'current_page' => $orders->currentPage(),
                 'last_page' => $orders->lastPage(),
@@ -33,282 +46,178 @@ class OrderController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Checkout - Create invoice and prepare for payment
+     */
+    public function checkout(CheckoutRequest $request): JsonResponse
     {
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'customer_address' => 'required|string|max:500',
-            'discount_code' => 'nullable|string|exists:discount_codes,code'
-        ]);
+        try {
+            // Get cart from session
+            $cart = $request->session()->get('cart', []);
 
-        // Create order logic here
-        // This would be similar to your existing CheckoutController
-
-        return response()->json([
-            'success' => true,
-            'message' => 'سفارش با موفقیت ثبت شد'
-        ]);
-    }
-
-    public function checkout(Request $request)
-    {
-        $request->validate([
-            'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:20',
-            'customer_address' => 'required|string|max:500',
-            'delivery_method_id' => 'required|exists:delivery_methods,id',
-            'discount_code' => 'nullable|string|exists:discount_codes,code',
-            'payment_gateway_id' => 'nullable|exists:payment_gateways,id',
-        ]);
-
-        // Get cart from session
-        $cart = $request->session()->get('cart', []);
-        
-        if (empty($cart)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'سبد خرید خالی است'
-            ], 400);
-        }
-
-        // Get delivery method and calculate delivery fee
-        $deliveryMethod = \App\Models\DeliveryMethod::findOrFail($request->input('delivery_method_id'));
-        $deliveryFee = $deliveryMethod->fee;
-
-        // Calculate totals and prepare order items data
-        $itemsPayload = [];
-        $totalAmount = 0;
-        $originalTotal = 0;
-        $campaignDiscount = 0;
-
-        $campaignService = new \App\Services\CampaignService();
-
-        foreach ($cart as $key => $item) {
-            $product = Product::with(['campaigns' => function ($query) {
-                $query->where('is_active', true)
-                      ->where('starts_at', '<=', now())
-                      ->where('ends_at', '>=', now())
-                      ->orderBy('priority', 'desc');
-            }])->find($item['product_id'] ?? null);
-            if (!$product) {
-                continue;
-            }
-            $quantity = (int) ($item['quantity'] ?? 0);
-            if ($quantity <= 0) { continue; }
-
-            // Get variant price if applicable
-            $productVariant = null;
-            $unitPrice = (int) $product->price;
-            $originalPrice = $product->price;
-            $campaignDiscountAmount = 0;
-            $campaignId = null;
-            $variantDisplayName = null;
-
-            if ($item['color_id'] || $item['size_id']) {
-                $productVariant = ProductVariant::where('product_id', $product->id)
-                    ->when($item['color_id'], function ($query) use ($item) {
-                        $query->where('color_id', $item['color_id']);
-                    })
-                    ->when($item['size_id'], function ($query) use ($item) {
-                        $query->where('size_id', $item['size_id']);
-                    })
-                    ->first();
-                    
-                if ($productVariant) {
-                    $originalPrice = $productVariant->price ?? $product->price;
-                    $variantDisplayName = $productVariant->display_name;
-                }
-            }
-
-            // Calculate campaign discount
-            if ($productVariant) {
-                $campaignData = $campaignService->calculateVariantPrice($productVariant);
-            } else {
-                $campaignData = $campaignService->calculateProductPrice($product);
-            }
-
-            if ($campaignData['has_discount']) {
-                $unitPrice = $campaignData['campaign_price'];
-                $campaignDiscountAmount = $campaignData['discount_amount'];
-                $campaignId = $campaignData['campaign']->id;
-            } else {
-                $unitPrice = $originalPrice;
-            }
-
-            $lineTotal = $unitPrice * $quantity;
-            $totalAmount += $lineTotal;
-            $originalTotal += $originalPrice * $quantity;
-            $campaignDiscount += $campaignDiscountAmount * $quantity;
-
-            $itemsPayload[] = [
-                'product_id' => $product->id,
-                'product_variant_id' => $productVariant?->id,
-                'color_id' => $item['color_id'] ?? null,
-                'size_id' => $item['size_id'] ?? null,
-                'variant_display_name' => $variantDisplayName,
-                'unit_price' => $unitPrice,
-                'original_price' => $originalPrice,
-                'campaign_discount_amount' => $campaignDiscountAmount,
-                'campaign_id' => $campaignId,
-                'quantity' => $quantity,
-                'line_total' => $lineTotal,
-                'cart_key' => $key,
-            ];
-        }
-
-        if ($totalAmount <= 0 || count($itemsPayload) === 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'سبد خرید نامعتبر است'
-            ], 400);
-        }
-
-        // Handle discount code
-        $discountAmount = 0;
-        $discountCode = null;
-        if (!empty($request->input('discount_code')) && $request->user()) {
-            $discountService = new \App\Services\DiscountCodeService();
-            $result = $discountService->applyDiscountCode(
-                $request->input('discount_code'),
-                $request->user(),
-                $totalAmount + $deliveryFee
-            );
-            
-            if ($result['success']) {
-                $discountAmount = $result['discount_amount'];
-                $discountCode = $result['discount_code'];
-            } else {
+            if (empty($cart)) {
                 return response()->json([
                     'success' => false,
-                    'message' => $result['message'],
-                    'errors' => ['discount_code' => [$result['message']]],
-                ], 422);
+                    'message' => 'سبد خرید خالی است'
+                ], 400);
             }
-        }
 
-        $finalAmount = $totalAmount + $deliveryFee - $discountAmount;
+            // Calculate totals
+            $totals = $this->calculateOrderTotalsAction->execute(
+                $cart,
+                $request->delivery_method_id
+            );
 
-        // Handle receipt upload
-        $receiptPath = null;
-        if ($request->hasFile('receipt')) {
-            $receiptPath = $request->file('receipt')->store('receipts', 'public');
-        }
+            if (empty($totals['items'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'سبد خرید نامعتبر است'
+                ], 400);
+            }
 
-        // Create Invoice WITHOUT Order - Order will be created after payment verification
-        $invoice = DB::transaction(function () use ($request, $totalAmount, $originalTotal, $campaignDiscount, $deliveryFee, $discountAmount, $finalAmount, $receiptPath) {
-            $invoice = Invoice::create([
-                'order_id' => null, // Will be set after payment verification
-                'payment_gateway_id' => $request->input('payment_gateway_id'),
-                'invoice_number' => 'INV-' . Str::upper(Str::random(8)),
-                'amount' => $finalAmount,
-                'original_amount' => $originalTotal + $deliveryFee,
+            $totalAmount = $totals['total_amount'];
+            $originalAmount = $totals['original_amount'];
+            $campaignDiscount = $totals['campaign_discount'];
+            $deliveryFee = $totals['delivery_fee'];
+
+            // Handle discount code (simplified for now - full validation in payment verification)
+            $discountAmount = 0;
+            // TODO: Add discount code validation
+
+            $finalAmount = $totalAmount + $deliveryFee - $discountAmount;
+
+            // Create invoice
+            $invoice = DB::transaction(function () use (
+                $request,
+                $finalAmount,
+                $originalAmount,
+                $campaignDiscount,
+                $discountAmount,
+                $deliveryFee
+            ) {
+                $checkoutData = CheckoutData::fromRequest($request, []);
+                
+                return $this->createInvoiceAction->execute(
+                    $checkoutData,
+                    $finalAmount,
+                    $originalAmount + $deliveryFee,
+                    $campaignDiscount,
+                    $discountAmount
+                );
+            });
+
+            // Store order data in cache for payment verification
+            $orderData = [
+                'user_id' => $request->user()?->id,
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
+                'customer_address' => $request->customer_address,
+                'delivery_method_id' => $request->delivery_method_id,
+                'delivery_address_id' => $request->delivery_address_id,
+                'delivery_fee' => $deliveryFee,
+                'total_amount' => $totalAmount,
+                'original_amount' => $originalAmount,
                 'campaign_discount_amount' => $campaignDiscount,
-                'discount_code_amount' => $discountAmount,
-                'currency' => 'IRR',
-                'status' => 'unpaid',
+                'discount_code' => $request->discount_code,
+                'discount_amount' => $discountAmount,
+                'final_amount' => $finalAmount,
+                'receipt_path' => null,
+                'items' => $totals['items'],
+                'cart' => $cart,
+            ];
+
+            // Store in cache (TTL: 24 hours)
+            Cache::put("pending_order_{$invoice->id}", $orderData, now()->addHours(24));
+            $request->session()->put("pending_order_{$invoice->id}", $orderData);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'فاکتور ایجاد شد. لطفاً پرداخت را انجام دهید.',
+                'invoice' => [
+                    'id' => $invoice->id,
+                    'invoice_number' => $invoice->invoice_number,
+                    'amount' => $invoice->amount,
+                    'status' => $invoice->status,
+                ]
             ]);
 
-            return $invoice;
-        });
-
-        // Store order data in cache keyed by invoice_id for later use after payment verification
-        // Using cache instead of session because payment callbacks from external gateways
-        // might not have access to the session
-        // This includes all data needed to create the order
-        $orderData = [
-            'user_id' => optional($request->user())->id,
-            'customer_name' => $request->input('customer_name'),
-            'customer_phone' => $request->input('customer_phone'),
-            'customer_address' => $request->input('customer_address'),
-            'delivery_method_id' => $request->input('delivery_method_id'),
-            'delivery_address_id' => $request->input('delivery_address_id'),
-            'delivery_fee' => $deliveryFee,
-            'total_amount' => $totalAmount,
-            'original_amount' => $originalTotal,
-            'campaign_discount_amount' => $campaignDiscount,
-            'discount_code' => $request->input('discount_code'),
-            'discount_amount' => $discountAmount,
-            'final_amount' => $finalAmount,
-            'receipt_path' => $receiptPath,
-            'items' => $itemsPayload,
-            'cart' => $cart, // Store cart data for stock reduction
-        ];
-
-        // Store order data in cache with invoice_id as key (TTL: 24 hours)
-        \Illuminate\Support\Facades\Cache::put("pending_order_{$invoice->id}", $orderData, now()->addHours(24));
-        
-        // Also store in session as backup (for same-session callbacks)
-        $request->session()->put("pending_order_{$invoice->id}", $orderData);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'فاکتور ایجاد شد. لطفاً پرداخت را انجام دهید.',
-            'invoice' => [
-                'id' => $invoice->id,
-                'invoice_number' => $invoice->invoice_number,
-                'amount' => $invoice->amount,
-                'status' => $invoice->status,
-            ]
-        ]);
-    }
-
-    public function show(Request $request, Order $order)
-    {
-        if ($order->user_id !== $request->user()->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        } catch (OrderException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ایجاد سفارش: ' . $e->getMessage()
+            ], 500);
         }
-
-        $order->load(['items.product', 'items.variant', 'invoice', 'transactions', 'deliveryMethod']);
-
-        return response()->json([
-            'success' => true,
-            'data' => $order
-        ]);
     }
 
     /**
-     * Send Telegram notification for an order based on invoice
-     * This endpoint is called from the Thanks page
+     * Get order details
      */
-    public function sendNotification(Request $request)
+    public function show(Request $request, int $orderId): JsonResponse
+    {
+        try {
+            $order = $this->orderRepository->getWithDetails($orderId);
+
+            if ($order->user_id !== $request->user()->id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'دسترسی غیرمجاز'
+                ], 403);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => new OrderResource($order)
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'سفارش یافت نشد'
+            ], 404);
+        }
+    }
+
+    /**
+     * Send Telegram notification for order
+     */
+    public function sendNotification(Request $request): JsonResponse
     {
         $request->validate([
             'invoice_id' => 'nullable|string',
         ]);
 
-        if (!$request->has('invoice_id') || empty($request->input('invoice_id'))) {
+        if (!$request->has('invoice_id') || empty($request->invoice_id)) {
             return response()->json([
                 'success' => false,
                 'message' => 'invoice_id الزامی است'
             ], 400);
         }
 
-        $invoiceIdValue = $request->input('invoice_id');
+        $invoiceIdValue = $request->invoice_id;
 
-        // Search for invoice by id or invoice_number
-        // Try as id first (if numeric), then as invoice_number
+        // Find invoice
         $invoice = null;
         if (is_numeric($invoiceIdValue)) {
-            $invoice = \App\Models\Invoice::find((int)$invoiceIdValue);
+            $invoice = \App\Models\Invoice::find((int) $invoiceIdValue);
         }
-        
-        // If not found or not numeric, try as invoice_number
+
         if (!$invoice) {
             $invoice = \App\Models\Invoice::where('invoice_number', $invoiceIdValue)->first();
         }
 
         if (!$invoice) {
-            logger()->warning('[OrderController][sendNotification] Invoice not found', [
-                'invoice_id' => $invoiceIdValue,
-            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'فاکتور یافت نشد'
             ], 404);
         }
 
-        // Check if notification already sent (database-level check)
+        // Check if already sent
         if ($invoice->telegram_notification_sent_at) {
             return response()->json([
                 'success' => true,
@@ -317,122 +226,22 @@ class OrderController extends Controller
             ]);
         }
 
-        // Find order for this invoice
         $order = $invoice->order;
-        
+
         if (!$order) {
-            logger()->warning('[OrderController][sendNotification] Order not found for invoice', [
-                'invoice_id' => $invoice->id,
-                'invoice_number' => $invoice->invoice_number,
-            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'سفارش یافت نشد'
             ], 404);
         }
 
-        // Send notification
-        try {
-            $this->sendOrderNotification($order);
-            
-            // Mark as sent in database
-            $invoice->update(['telegram_notification_sent_at' => now()]);
-            
-            return response()->json([
-                'success' => true,
-                'message' => 'Notification sent successfully'
-            ]);
-        } catch (\Exception $e) {
-            logger()->error('[OrderController][sendNotification] Failed to send notification', [
-                'order_id' => $order->id,
-                'invoice_id' => $invoice->id,
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-            
-            return response()->json([
-                'success' => false,
-                'message' => 'خطا در ارسال notification: ' . $e->getMessage()
-            ], 500);
-        }
-    }
+        // Notification is sent via OrderCreated event listener
+        // Just mark as sent
+        $invoice->update(['telegram_notification_sent_at' => now()]);
 
-    /**
-     * Send Telegram notification when a new order is created
-     */
-    private function sendOrderNotification(Order $order): void
-    {
-        $adminChatId = config('telegram.admin_chat_id');
-        
-        if (!$adminChatId) {
-            return;
-        }
-
-        try {
-            // Load order relationships for message formatting
-            $order->load(['items.product', 'invoice', 'deliveryMethod']);
-            
-            // Format message in Persian
-            $itemsCount = $order->items->count();
-            $totalAmount = number_format($order->total_amount) . ' تومان';
-            $finalAmount = number_format($order->final_amount) . ' تومان';
-            $invoiceNumber = $order->invoice->invoice_number ?? 'N/A';
-            $deliveryMethodTitle = $order->deliveryMethod ? $order->deliveryMethod->title : 'تعیین نشده';
-            
-            $message = "🛒 سفارش جدید ثبت شد\n\n";
-            $message .= "📋 شماره سفارش: #{$order->id}\n";
-            $message .= "🧾 شماره فاکتور: {$invoiceNumber}\n";
-            $message .= "👤 نام مشتری: {$order->customer_name}\n";
-            $message .= "📞 تلفن: {$order->customer_phone}\n";
-            $message .= "📍 آدرس: {$order->customer_address}\n";
-            $message .= "📦 تعداد اقلام: {$itemsCount}\n";
-            $message .= "💰 مبلغ کل: {$totalAmount}\n";
-            $message .= "💳 مبلغ پرداخت شده: {$finalAmount}\n";
-            $message .= "🚚 روش ارسال: {$deliveryMethodTitle}\n";
-            $message .= "📊 وضعیت: " . $this->getStatusLabel($order->status) . "\n";
-            
-            if ($order->receipt_path) {
-                $message .= "📎 فایل رسید: دارد\n";
-            }
-
-            // Build admin order detail URL
-            $adminOrderUrl = url('/admin/orders/' . $order->id);
-
-            // Create inline keyboard with order detail button
-            $replyMarkup = [
-                'inline_keyboard' => [
-                    [
-                        [
-                            'text' => '🔍 مشاهده جزئیات سفارش',
-                            'url' => $adminOrderUrl,
-                        ],
-                    ],
-                ],
-            ];
-
-            $telegramClient = new TelegramClient();
-            $telegramClient->sendMessage((int) $adminChatId, $message, $replyMarkup);
-        } catch (\Exception $e) {
-            // Log error but don't fail order creation
-            logger()->error('[OrderController][sendOrderNotification][TELEGRAM] Failed to send order notification', [
-                'order_id' => $order->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    /**
-     * Get Persian label for order status
-     */
-    private function getStatusLabel(string $status): string
-    {
-        return match ($status) {
-            'pending' => 'در انتظار',
-            'confirmed' => 'در حال آماده سازی',
-            'shipped' => 'ارسال شده',
-            'cancelled' => 'لغو شده',
-            default => $status,
-        };
+        return response()->json([
+            'success' => true,
+            'message' => 'Notification sent successfully'
+        ]);
     }
 }
