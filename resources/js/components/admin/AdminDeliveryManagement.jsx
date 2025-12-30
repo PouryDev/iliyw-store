@@ -14,10 +14,6 @@ function AdminDeliveryManagement() {
         sort_order: 0
     });
 
-    useEffect(() => {
-        fetchDeliveryMethods();
-    }, []);
-
     const fetchDeliveryMethods = async () => {
         try {
             setLoading(true);
@@ -35,6 +31,10 @@ function AdminDeliveryManagement() {
             setLoading(false);
         }
     };
+
+    React.useEffect(() => {
+        fetchDeliveryMethods();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

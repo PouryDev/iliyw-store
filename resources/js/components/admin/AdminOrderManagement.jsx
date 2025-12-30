@@ -1,35 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ModernSelect from './ModernSelect';
 import { adminApiRequest } from '../../utils/adminApi';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 
 function AdminOrderManagement() {
     const navigate = useNavigate();
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('all');
 
-    useEffect(() => {
-        const loadOrders = async () => {
-            try {
-                setLoading(true);
-                const res = await adminApiRequest('/orders');
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success) {
-                        setOrders(data.data);
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to load orders:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    // Fetch function for infinite scroll
+    const fetchOrders = async (page, perPage, search, filters) => {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: perPage.toString(),
+        });
 
-        loadOrders();
-    }, []);
+        if (filters.status && filters.status !== 'all') {
+            params.append('status', filters.status);
+        }
+
+        const res = await adminApiRequest(`/orders?${params.toString()}`);
+        
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+                return {
+                    data: data.data,
+                    pagination: data.pagination
+                };
+            }
+        }
+        
+        throw new Error('Failed to load orders');
+    };
+
+    const { items: orders, loading, hasMore, error, total, observerTarget, refresh } = useInfiniteScroll(
+        fetchOrders,
+        {
+            perPage: 20,
+            filters: { status: filterStatus }
+        }
+    );
 
     const formatPrice = (value) => {
         try { 
@@ -72,11 +83,7 @@ function AdminOrderManagement() {
             });
 
             if (res.ok) {
-                setOrders(orders.map(order => 
-                    order.id === orderId 
-                        ? { ...order, status: newStatus }
-                        : order
-                ));
+                refresh();
                 window.dispatchEvent(new CustomEvent('toast:show', { 
                     detail: { type: 'success', message: 'وضعیت سفارش به‌روزرسانی شد' } 
                 }));
@@ -89,11 +96,7 @@ function AdminOrderManagement() {
         }
     };
 
-    const filteredOrders = orders.filter(order => 
-        filterStatus === 'all' || order.status === filterStatus
-    );
-
-    if (loading) {
+    if (loading && orders.length === 0) {
         return (
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-center min-h-96">
@@ -113,7 +116,10 @@ function AdminOrderManagement() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">مدیریت سفارش‌ها</h1>
-                        <p className="text-gray-400">مشاهده و مدیریت سفارش‌های مشتریان</p>
+                        <p className="text-gray-400">
+                            مشاهده و مدیریت سفارش‌های مشتریان
+                            {total > 0 && <span className="mr-2">({total.toLocaleString('fa-IR')} سفارش)</span>}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -139,9 +145,16 @@ function AdminOrderManagement() {
                 </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+                    <p className="text-red-400">{error}</p>
+                </div>
+            )}
+
             {/* Orders List */}
             <div className="space-y-6">
-                {filteredOrders.map((order) => (
+                {orders.map((order) => (
                     <div key={order.id} className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl p-6">
                         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
                             {/* Order Info */}
@@ -296,8 +309,27 @@ function AdminOrderManagement() {
                 ))}
             </div>
 
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+                <div ref={observerTarget} className="flex justify-center py-8">
+                    {loading && (
+                        <div className="text-center">
+                            <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-2"></div>
+                            <p className="text-gray-400 text-sm">در حال بارگذاری بیشتر...</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* End of List Message */}
+            {!hasMore && orders.length > 0 && (
+                <div className="text-center py-8">
+                    <p className="text-gray-400 text-sm">همه سفارش‌ها نمایش داده شد</p>
+                </div>
+            )}
+
             {/* Empty State */}
-            {filteredOrders.length === 0 && !loading && (
+            {orders.length === 0 && !loading && (
                 <div className="text-center py-12">
                     <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -8,10 +8,6 @@ function AdminHeroSlideManagement() {
     const [loading, setLoading] = useState(true);
     const [draggedIndex, setDraggedIndex] = useState(null);
 
-    useEffect(() => {
-        loadSlides();
-    }, []);
-
     const loadSlides = async () => {
         try {
             setLoading(true);
@@ -29,6 +25,10 @@ function AdminHeroSlideManagement() {
             setLoading(false);
         }
     };
+
+    React.useEffect(() => {
+        loadSlides();
+    }, []);
 
     const handleDelete = async (slideId) => {
         if (!confirm('آیا مطمئن هستید که می‌خواهید این اسلاید را حذف کنید؟')) {

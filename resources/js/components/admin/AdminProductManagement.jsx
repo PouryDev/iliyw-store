@@ -1,36 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ModernSelect from './ModernSelect';
 import { apiRequest } from '../../utils/sanctumAuth';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 
 function AdminProductManagement() {
     const navigate = useNavigate();
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
 
-    useEffect(() => {
-        const loadProducts = async () => {
-            try {
-                setLoading(true);
-                const res = await apiRequest('/api/admin/products');
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success) {
-                        setProducts(data.data);
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to load products:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    // Debounce search term
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
-        loadProducts();
-    }, []);
+    // Fetch function for infinite scroll
+    const fetchProducts = async (page, perPage, search, filters) => {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: perPage.toString(),
+        });
+
+        if (search) {
+            params.append('search', search);
+        }
+
+        // Note: is_active filter is done client-side since API doesn't support it
+
+        const res = await apiRequest(`/api/admin/products?${params.toString()}`);
+        
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+                // Client-side status filtering
+                let filteredData = data.data;
+                if (filters.status && filters.status !== 'all') {
+                    filteredData = filteredData.filter(p => 
+                        filters.status === 'active' ? p.is_active : !p.is_active
+                    );
+                }
+                
+                return {
+                    data: filteredData,
+                    pagination: data.pagination
+                };
+            }
+        }
+        
+        throw new Error('Failed to load products');
+    };
+
+    const { items: products, loading, hasMore, error, total, observerTarget, refresh } = useInfiniteScroll(
+        fetchProducts,
+        {
+            perPage: 20,
+            search: debouncedSearch,
+            filters: { status: filterStatus }
+        }
+    );
 
     const formatPrice = (value) => {
         try { 
@@ -67,9 +98,8 @@ function AdminProductManagement() {
             });
 
             if (res.ok) {
-                setProducts(products.map(p => 
-                    p.id === productId ? { ...p, is_active: newStatus } : p
-                ));
+                // Refresh the list to get updated data
+                refresh();
                 window.dispatchEvent(new CustomEvent('toast:show', { 
                     detail: { type: 'success', message: `محصول با موفقیت ${actionText} شد` } 
                 }));
@@ -82,18 +112,7 @@ function AdminProductManagement() {
         }
     };
 
-    const filteredProducts = products.filter(product => {
-        const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            product.description?.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const matchesStatus = filterStatus === 'all' || 
-                            (filterStatus === 'active' && product.is_active) ||
-                            (filterStatus === 'inactive' && !product.is_active);
-        
-        return matchesSearch && matchesStatus;
-    });
-
-    if (loading) {
+    if (loading && products.length === 0) {
         return (
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-center min-h-96">
@@ -113,7 +132,10 @@ function AdminProductManagement() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">مدیریت محصولات</h1>
-                        <p className="text-gray-400">مدیریت و ویرایش محصولات فروشگاه</p>
+                        <p className="text-gray-400">
+                            مدیریت و ویرایش محصولات فروشگاه
+                            {total > 0 && <span className="mr-2">({total.toLocaleString('fa-IR')} محصول)</span>}
+                        </p>
                     </div>
                     <button
                         onClick={() => navigate('/admin/products/create')}
@@ -154,9 +176,16 @@ function AdminProductManagement() {
                 </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+                    <p className="text-red-400">{error}</p>
+                </div>
+            )}
+
             {/* Products Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredProducts.map((product) => (
+                {products.map((product) => (
                     <div key={product.id} className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl overflow-hidden hover:shadow-purple-500/20 transition-all duration-200">
                         {/* Product Image */}
                         <div className="aspect-square bg-gray-800 relative overflow-hidden">
@@ -223,8 +252,27 @@ function AdminProductManagement() {
                 ))}
             </div>
 
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+                <div ref={observerTarget} className="flex justify-center py-8">
+                    {loading && (
+                        <div className="text-center">
+                            <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-2"></div>
+                            <p className="text-gray-400 text-sm">در حال بارگذاری بیشتر...</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* End of List Message */}
+            {!hasMore && products.length > 0 && (
+                <div className="text-center py-8">
+                    <p className="text-gray-400 text-sm">همه محصولات نمایش داده شد</p>
+                </div>
+            )}
+
             {/* Empty State */}
-            {filteredProducts.length === 0 && !loading && (
+            {products.length === 0 && !loading && (
                 <div className="text-center py-12">
                     <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,12 +281,12 @@ function AdminProductManagement() {
                     </div>
                     <h3 className="text-white text-xl font-semibold mb-2">محصولی یافت نشد</h3>
                     <p className="text-gray-400 mb-6">
-                        {searchTerm || filterStatus !== 'all' 
+                        {debouncedSearch || filterStatus !== 'all' 
                             ? 'هیچ محصولی با فیلترهای انتخابی یافت نشد' 
                             : 'هنوز محصولی اضافه نکرده‌اید'
                         }
                     </p>
-                    {!searchTerm && filterStatus === 'all' && (
+                    {!debouncedSearch && filterStatus === 'all' && (
                         <button
                             onClick={() => navigate('/admin/products/create')}
                             className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg"

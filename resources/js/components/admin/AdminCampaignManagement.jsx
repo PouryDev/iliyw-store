@@ -1,33 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminApiRequest } from '../../utils/adminApi';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 
 function AdminCampaignManagement() {
     const navigate = useNavigate();
-    const [campaigns, setCampaigns] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const loadCampaigns = async () => {
-            try {
-                setLoading(true);
-                const res = await adminApiRequest('/campaigns');
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success) {
-                        setCampaigns(data.data);
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to load campaigns:', error);
-            } finally {
-                setLoading(false);
+    // Fetch function for infinite scroll
+    const fetchCampaigns = async (page, perPage, search, filters) => {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: perPage.toString(),
+        });
+
+        if (filters.is_active !== undefined) {
+            params.append('is_active', filters.is_active ? '1' : '0');
+        }
+
+        const res = await adminApiRequest(`/campaigns?${params.toString()}`);
+        
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+                return {
+                    data: data.data,
+                    pagination: data.pagination
+                };
             }
-        };
+        }
+        
+        throw new Error('Failed to load campaigns');
+    };
 
-        loadCampaigns();
-    }, []);
+    const { items: campaigns, loading, hasMore, error, total, observerTarget, refresh } = useInfiniteScroll(
+        fetchCampaigns,
+        {
+            perPage: 20
+        }
+    );
 
     const formatPrice = (value) => {
         try { 
@@ -46,7 +56,7 @@ function AdminCampaignManagement() {
             const res = await adminApiRequest(`/campaigns/${campaignId}`, { method: 'DELETE' });
 
             if (res.ok) {
-                setCampaigns(campaigns.filter(c => c.id !== campaignId));
+                refresh();
                 window.dispatchEvent(new CustomEvent('toast:show', { 
                     detail: { type: 'success', message: 'کمپین با موفقیت حذف شد' } 
                 }));
@@ -64,11 +74,7 @@ function AdminCampaignManagement() {
             const res = await adminApiRequest(`/campaigns/${campaignId}/toggle`, { method: 'PATCH' });
 
             if (res.ok) {
-                setCampaigns(campaigns.map(c => 
-                    c.id === campaignId 
-                        ? { ...c, is_active: !currentStatus }
-                        : c
-                ));
+                refresh();
                 window.dispatchEvent(new CustomEvent('toast:show', { 
                     detail: { type: 'success', message: 'وضعیت کمپین تغییر کرد' } 
                 }));
@@ -81,7 +87,7 @@ function AdminCampaignManagement() {
         }
     };
 
-    if (loading) {
+    if (loading && campaigns.length === 0) {
         return (
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-center min-h-96">
@@ -101,7 +107,10 @@ function AdminCampaignManagement() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">مدیریت کمپین‌ها</h1>
-                        <p className="text-gray-400">مدیریت و ویرایش کمپین‌های فروشگاه</p>
+                        <p className="text-gray-400">
+                            مدیریت و ویرایش کمپین‌های فروشگاه
+                            {total > 0 && <span className="mr-2">({total.toLocaleString('fa-IR')} کمپین)</span>}
+                        </p>
                     </div>
                     <button
                         onClick={() => navigate('/admin/campaigns/create')}
@@ -114,6 +123,13 @@ function AdminCampaignManagement() {
                     </button>
                 </div>
             </div>
+
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+                    <p className="text-red-400">{error}</p>
+                </div>
+            )}
 
             {/* Campaigns List */}
             <div className="space-y-6">
@@ -228,6 +244,25 @@ function AdminCampaignManagement() {
                     </div>
                 ))}
             </div>
+
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+                <div ref={observerTarget} className="flex justify-center py-8">
+                    {loading && (
+                        <div className="text-center">
+                            <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-2"></div>
+                            <p className="text-gray-400 text-sm">در حال بارگذاری بیشتر...</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* End of List Message */}
+            {!hasMore && campaigns.length > 0 && (
+                <div className="text-center py-8">
+                    <p className="text-gray-400 text-sm">همه کمپین‌ها نمایش داده شد</p>
+                </div>
+            )}
 
             {/* Empty State */}
             {campaigns.length === 0 && !loading && (

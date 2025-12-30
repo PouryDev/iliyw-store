@@ -46,7 +46,7 @@ function AdminCategoryManagement() {
             if (res.ok) {
                 const data = await res.json();
                 if (data.success) {
-                    setCategories(categories.filter(c => c.id !== categoryId));
+                    refresh();
                     window.dispatchEvent(new CustomEvent('toast:show', { 
                         detail: { type: 'success', message: 'دسته‌بندی با موفقیت حذف شد' } 
                     }));
@@ -76,11 +76,7 @@ function AdminCategoryManagement() {
             if (res.ok) {
                 const data = await res.json();
                 if (data.success) {
-                    setCategories(categories.map(c => 
-                        c.id === categoryId 
-                            ? { ...c, is_active: !currentStatus }
-                            : c
-                    ));
+                    refresh();
                     window.dispatchEvent(new CustomEvent('toast:show', { 
                         detail: { type: 'success', message: 'وضعیت دسته‌بندی تغییر کرد' } 
                     }));
@@ -94,19 +90,7 @@ function AdminCategoryManagement() {
         }
     };
 
-    const filteredCategories = categories.filter(category => {
-        const matchesSearch = category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            category.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            category.slug?.toLowerCase().includes(searchTerm.toLowerCase());
-        
-        const matchesStatus = filterStatus === 'all' || 
-                            (filterStatus === 'active' && category.is_active) ||
-                            (filterStatus === 'inactive' && !category.is_active);
-        
-        return matchesSearch && matchesStatus;
-    });
-
-    if (loading) {
+    if (loading && categories.length === 0) {
         return (
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-center min-h-96">
@@ -126,7 +110,10 @@ function AdminCategoryManagement() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">مدیریت دسته‌بندی‌ها</h1>
-                        <p className="text-gray-400">مدیریت و ویرایش دسته‌بندی‌های فروشگاه</p>
+                        <p className="text-gray-400">
+                            مدیریت و ویرایش دسته‌بندی‌های فروشگاه
+                            {total > 0 && <span className="mr-2">({total.toLocaleString('fa-IR')} دسته‌بندی)</span>}
+                        </p>
                     </div>
                     <button
                         onClick={() => navigate('/admin/categories/create')}
@@ -167,9 +154,16 @@ function AdminCategoryManagement() {
                 </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+                    <p className="text-red-400">{error}</p>
+                </div>
+            )}
+
             {/* Categories List */}
             <div className="space-y-4 sm:space-y-6">
-                {filteredCategories.map((category) => (
+                {categories.map((category) => (
                     <div key={category.id} className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-xl border border-white/10 shadow-2xl p-4 sm:p-6">
                         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 sm:gap-6">
                             {/* Category Info */}
@@ -236,8 +230,27 @@ function AdminCategoryManagement() {
                 ))}
             </div>
 
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+                <div ref={observerTarget} className="flex justify-center py-8">
+                    {loading && (
+                        <div className="text-center">
+                            <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-2"></div>
+                            <p className="text-gray-400 text-sm">در حال بارگذاری بیشتر...</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* End of List Message */}
+            {!hasMore && categories.length > 0 && (
+                <div className="text-center py-8">
+                    <p className="text-gray-400 text-sm">همه دسته‌بندی‌ها نمایش داده شد</p>
+                </div>
+            )}
+
             {/* Empty State */}
-            {filteredCategories.length === 0 && !loading && (
+            {categories.length === 0 && !loading && (
                 <div className="text-center py-12">
                     <div className="w-24 h-24 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -246,12 +259,12 @@ function AdminCategoryManagement() {
                     </div>
                     <h3 className="text-white text-xl font-semibold mb-2">دسته‌بندی‌ای یافت نشد</h3>
                     <p className="text-gray-400 mb-6">
-                        {searchTerm || filterStatus !== 'all' 
+                        {debouncedSearch || filterStatus !== 'all' 
                             ? 'هیچ دسته‌بندی‌ای با فیلترهای انتخابی یافت نشد' 
                             : 'هنوز دسته‌بندی‌ای اضافه نکرده‌اید'
                         }
                     </p>
-                    {!searchTerm && filterStatus === 'all' && (
+                    {!debouncedSearch && filterStatus === 'all' && (
                         <button
                             onClick={() => navigate('/admin/categories/create')}
                             className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 hover:scale-105 shadow-lg min-h-[44px]"

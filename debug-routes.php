@@ -95,3 +95,4 @@ echo "\nIf using Docker:\n";
 echo "docker-compose exec app php artisan route:clear && docker-compose exec app php artisan route:cache\n";
 echo "\n";
 
+

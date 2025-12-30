@@ -1,33 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminApiRequest } from '../../utils/adminApi';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 
 function AdminDiscountManagement() {
     const navigate = useNavigate();
-    const [discounts, setDiscounts] = useState([]);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const loadDiscounts = async () => {
-            try {
-                setLoading(true);
-                const res = await adminApiRequest('/discount-codes');
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success) {
-                        setDiscounts(data.data);
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to load discounts:', error);
-            } finally {
-                setLoading(false);
+    // Fetch function for infinite scroll
+    const fetchDiscounts = async (page, perPage, search, filters) => {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: perPage.toString(),
+        });
+
+        if (filters.is_active !== undefined) {
+            params.append('is_active', filters.is_active ? '1' : '0');
+        }
+
+        const res = await adminApiRequest(`/discount-codes?${params.toString()}`);
+        
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+                return {
+                    data: data.data,
+                    pagination: data.pagination
+                };
             }
-        };
+        }
+        
+        throw new Error('Failed to load discount codes');
+    };
 
-        loadDiscounts();
-    }, []);
+    const { items: discounts, loading, hasMore, error, total, observerTarget, refresh } = useInfiniteScroll(
+        fetchDiscounts,
+        {
+            perPage: 20
+        }
+    );
 
     const formatPrice = (value) => {
         try { 
@@ -46,7 +56,7 @@ function AdminDiscountManagement() {
             const res = await adminApiRequest(`/discount-codes/${discountId}`, { method: 'DELETE' });
 
             if (res.ok) {
-                setDiscounts(discounts.filter(d => d.id !== discountId));
+                refresh();
                 window.dispatchEvent(new CustomEvent('toast:show', { 
                     detail: { type: 'success', message: 'کد تخفیف با موفقیت حذف شد' } 
                 }));
@@ -64,11 +74,7 @@ function AdminDiscountManagement() {
             const res = await adminApiRequest(`/discount-codes/${discountId}/toggle`, { method: 'PATCH' });
 
             if (res.ok) {
-                setDiscounts(discounts.map(d => 
-                    d.id === discountId 
-                        ? { ...d, is_active: !currentStatus }
-                        : d
-                ));
+                refresh();
                 window.dispatchEvent(new CustomEvent('toast:show', { 
                     detail: { type: 'success', message: 'وضعیت کد تخفیف تغییر کرد' } 
                 }));
@@ -81,7 +87,7 @@ function AdminDiscountManagement() {
         }
     };
 
-    if (loading) {
+    if (loading && discounts.length === 0) {
         return (
             <div className="max-w-6xl mx-auto">
                 <div className="flex items-center justify-center min-h-96">
@@ -101,7 +107,10 @@ function AdminDiscountManagement() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold text-white mb-2">مدیریت کدهای تخفیف</h1>
-                        <p className="text-gray-400">مدیریت و ویرایش کدهای تخفیف فروشگاه</p>
+                        <p className="text-gray-400">
+                            مدیریت و ویرایش کدهای تخفیف فروشگاه
+                            {total > 0 && <span className="mr-2">({total.toLocaleString('fa-IR')} کد)</span>}
+                        </p>
                     </div>
                     <button
                         onClick={() => navigate('/admin/discounts/create')}
@@ -114,6 +123,13 @@ function AdminDiscountManagement() {
                     </button>
                 </div>
             </div>
+
+            {/* Error Message */}
+            {error && (
+                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-6">
+                    <p className="text-red-400">{error}</p>
+                </div>
+            )}
 
             {/* Discounts List */}
             <div className="space-y-6">
@@ -216,6 +232,25 @@ function AdminDiscountManagement() {
                     </div>
                 ))}
             </div>
+
+            {/* Infinite Scroll Trigger */}
+            {hasMore && (
+                <div ref={observerTarget} className="flex justify-center py-8">
+                    {loading && (
+                        <div className="text-center">
+                            <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-2"></div>
+                            <p className="text-gray-400 text-sm">در حال بارگذاری بیشتر...</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* End of List Message */}
+            {!hasMore && discounts.length > 0 && (
+                <div className="text-center py-8">
+                    <p className="text-gray-400 text-sm">همه کدهای تخفیف نمایش داده شد</p>
+                </div>
+            )}
 
             {/* Empty State */}
             {discounts.length === 0 && !loading && (
