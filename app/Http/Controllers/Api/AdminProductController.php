@@ -190,7 +190,22 @@ class AdminProductController extends Controller
         if ($request->has('variants')) {
             $variantIdsToKeep = [];
             
-            foreach ($request->input('variants') as $variantData) {
+            // Debug: Check how variants are received
+            $variantsInput = $request->input('variants');
+            \Log::info('Variants input received:', [
+                'raw' => $variantsInput,
+                'type' => gettype($variantsInput),
+                'is_array' => is_array($variantsInput),
+                'count' => is_array($variantsInput) ? count($variantsInput) : 0
+            ]);
+            
+            foreach ($variantsInput as $index => $variantData) {
+                \Log::info("Processing variant index {$index}:", [
+                    'variant_data' => $variantData,
+                    'stock' => $variantData['stock'] ?? 'NOT SET',
+                    'id' => $variantData['id'] ?? 'NOT SET'
+                ]);
+                
                 $variantDataToSave = [];
                 
                 // Process color - only set if provided in request
