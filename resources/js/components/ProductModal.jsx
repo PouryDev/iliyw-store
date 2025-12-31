@@ -118,8 +118,21 @@ function ProductModal({ product, isOpen, onClose }) {
         // For products with variants, require exact match
         if (currentProduct.has_variants || currentProduct.has_colors || currentProduct.has_sizes) {
             const variant = currentProduct.active_variants.find(v => {
-                const colorMatch = !currentProduct.has_colors || (selectedColorId && String(v.color_id) === String(selectedColorId));
-                const sizeMatch = !currentProduct.has_sizes || (selectedSizeId && String(v.size_id) === String(selectedSizeId));
+                // Color matching: if has_colors is false, variant should have no color_id
+                // If has_colors is true, both selectedColorId and v.color_id must match
+                const colorMatch = !currentProduct.has_colors 
+                    ? (v.color_id === null || v.color_id === undefined)
+                    : (selectedColorId !== null && selectedColorId !== undefined && 
+                       v.color_id !== null && v.color_id !== undefined && 
+                       String(v.color_id) === String(selectedColorId));
+                
+                // Size matching: if has_sizes is false, variant should have no size_id
+                // If has_sizes is true, both selectedSizeId and v.size_id must match
+                const sizeMatch = !currentProduct.has_sizes 
+                    ? (v.size_id === null || v.size_id === undefined)
+                    : (selectedSizeId !== null && selectedSizeId !== undefined && 
+                       v.size_id !== null && v.size_id !== undefined && 
+                       String(v.size_id) === String(selectedSizeId));
                 
                 return colorMatch && sizeMatch;
             });

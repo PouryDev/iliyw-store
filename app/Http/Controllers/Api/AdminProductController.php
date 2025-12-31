@@ -149,6 +149,7 @@ class AdminProductController extends Controller
             'is_active' => 'sometimes|boolean',
             'images.*' => 'sometimes|image|max:4096',
             'existing_images.*' => 'sometimes|integer|exists:product_images,id',
+            'variants.*.id' => 'nullable|integer|exists:product_variants,id',
             'variants.*.color_id' => 'nullable|exists:colors,id',
             'variants.*.color_name' => 'nullable|string|max:255',
             'variants.*.color_hex_code' => 'nullable|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
@@ -156,6 +157,7 @@ class AdminProductController extends Controller
             'variants.*.size_name' => 'nullable|string|max:255',
             'variants.*.price' => 'nullable|numeric|min:0',
             'variants.*.stock' => 'nullable|integer|min:0',
+            'variants.*.is_active' => 'nullable|boolean',
         ]);
 
         // Convert string values to proper types for FormData
@@ -186,7 +188,8 @@ class AdminProductController extends Controller
 
         // Handle variants
         if ($request->has('variants')) {
-            $product->variants()->delete();
+            $variantIdsToKeep = [];
+            
             foreach ($request->input('variants') as $variantData) {
                 $variantDataToSave = [];
                 
@@ -228,8 +231,46 @@ class AdminProductController extends Controller
                 $variantDataToSave['price'] = $variantData['price'] ?? null;
                 $variantDataToSave['stock'] = $variantData['stock'] ?? 0;
                 
-                $product->variants()->create($variantDataToSave);
+                // Check if variant ID is provided (existing variant)
+                if (!empty($variantData['id'])) {
+                    $variant = $product->variants()->find($variantData['id']);
+                    
+                    if ($variant) {
+                        // Update existing variant
+                        // Preserve is_active if not explicitly provided
+                        if (isset($variantData['is_active'])) {
+                            // Convert to boolean properly
+                            $variantDataToSave['is_active'] = filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN);
+                        } else {
+                            // Keep existing is_active value
+                            $variantDataToSave['is_active'] = $variant->is_active;
+                        }
+                        
+                        $variant->update($variantDataToSave);
+                        $variantIdsToKeep[] = $variant->id;
+                    } else {
+                        // Variant ID provided but not found, create new one
+                        $variantDataToSave['is_active'] = isset($variantData['is_active']) 
+                            ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
+                            : true;
+                        $newVariant = $product->variants()->create($variantDataToSave);
+                        $variantIdsToKeep[] = $newVariant->id;
+                    }
+                } else {
+                    // New variant, create it
+                    $variantDataToSave['is_active'] = isset($variantData['is_active']) 
+                        ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
+                        : true;
+                    $newVariant = $product->variants()->create($variantDataToSave);
+                    $variantIdsToKeep[] = $newVariant->id;
+                }
             }
+            
+            // Delete variants that are not in the request
+            $product->variants()->whereNotIn('id', $variantIdsToKeep)->delete();
+        } else {
+            // If no variants provided, delete all variants
+            $product->variants()->delete();
         }
 
         return response()->json([

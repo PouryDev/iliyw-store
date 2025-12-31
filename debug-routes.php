@@ -96,3 +96,4 @@ echo "docker-compose exec app php artisan route:clear && docker-compose exec app
 echo "\n";
 
 
+

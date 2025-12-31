@@ -219,6 +219,11 @@ function AdminProductForm() {
 
             // Add variants
             variants.forEach((variant, index) => {
+                // Send variant ID if it exists (for updating existing variants)
+                if (variant.id) {
+                    formData.append(`variants[${index}][id]`, variant.id);
+                }
+                
                 // Color: send id if exists, otherwise send name and hex_code
                 if (variant.color?.id) {
                     formData.append(`variants[${index}][color_id]`, variant.color.id);
@@ -238,6 +243,11 @@ function AdminProductForm() {
                 
                 formData.append(`variants[${index}][price]`, variant.price || '0');
                 formData.append(`variants[${index}][stock]`, variant.stock || '0');
+                
+                // Send is_active if it exists
+                if (variant.hasOwnProperty('is_active')) {
+                    formData.append(`variants[${index}][is_active]`, variant.is_active ? '1' : '0');
+                }
             });
 
             // Debug: Log FormData contents
