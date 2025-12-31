@@ -221,13 +221,22 @@ function ProductModal({ product, isOpen, onClose }) {
         if (currentProduct.has_variants || currentProduct.has_colors || currentProduct.has_sizes) {
             const variant = getSelectedVariant();
             if (!variant) {
-                return 0; // No stock if no variant selected
+                // If no variant selected, try to find first available variant
+                if (currentProduct?.active_variants && currentProduct.active_variants.length > 0) {
+                    const firstAvailable = currentProduct.active_variants.find(v => (v?.stock || 0) > 0);
+                    if (firstAvailable) {
+                        return firstAvailable.stock;
+                    }
+                    // If no variant has stock, return 0
+                    return 0;
+                }
+                return 0; // No stock if no variant selected and no variants available
             }
-            return variant.stock;
+            return variant.stock || 0;
         }
         
         // For products without variants, use main product stock
-        return currentProduct.stock;
+        return currentProduct.stock || 0;
     }
 
     function getMaxQuantity() {
