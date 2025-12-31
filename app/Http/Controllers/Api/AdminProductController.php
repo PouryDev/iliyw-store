@@ -193,7 +193,7 @@ class AdminProductController extends Controller
             foreach ($request->input('variants') as $variantData) {
                 $variantDataToSave = [];
                 
-                // Process color
+                // Process color - only set if provided in request
                 if (isset($variantData['color_id']) && $variantData['color_id'] !== '') {
                     $variantDataToSave['color_id'] = (int) $variantData['color_id'];
                 } elseif (!empty($variantData['color_name'])) {
@@ -213,12 +213,10 @@ class AdminProductController extends Controller
                     }
                     
                     $variantDataToSave['color_id'] = $color->id;
-                } else {
-                    // Explicitly set to null if not provided
-                    $variantDataToSave['color_id'] = null;
                 }
+                // If color_id not provided, it will be preserved from existing variant (handled below)
                 
-                // Process size
+                // Process size - only set if provided in request
                 if (isset($variantData['size_id']) && $variantData['size_id'] !== '') {
                     $variantDataToSave['size_id'] = (int) $variantData['size_id'];
                 } elseif (!empty($variantData['size_name'])) {
@@ -228,10 +226,8 @@ class AdminProductController extends Controller
                         ['is_active' => true]
                     );
                     $variantDataToSave['size_id'] = $size->id;
-                } else {
-                    // Explicitly set to null if not provided
-                    $variantDataToSave['size_id'] = null;
                 }
+                // If size_id not provided, it will be preserved from existing variant (handled below)
                 
                 // Add other fields - convert to proper types
                 $variantDataToSave['price'] = isset($variantData['price']) && $variantData['price'] !== '' 
@@ -247,6 +243,16 @@ class AdminProductController extends Controller
                     
                     if ($variant) {
                         // Update existing variant
+                        // Preserve color_id if not explicitly provided
+                        if (!isset($variantDataToSave['color_id'])) {
+                            $variantDataToSave['color_id'] = $variant->color_id;
+                        }
+                        
+                        // Preserve size_id if not explicitly provided
+                        if (!isset($variantDataToSave['size_id'])) {
+                            $variantDataToSave['size_id'] = $variant->size_id;
+                        }
+                        
                         // Preserve is_active if not explicitly provided
                         if (isset($variantData['is_active'])) {
                             // Convert to boolean properly
@@ -260,6 +266,13 @@ class AdminProductController extends Controller
                         $variantIdsToKeep[] = $variant->id;
                     } else {
                         // Variant ID provided but not found, create new one
+                        // For new variants, set color_id and size_id to null if not provided
+                        if (!isset($variantDataToSave['color_id'])) {
+                            $variantDataToSave['color_id'] = null;
+                        }
+                        if (!isset($variantDataToSave['size_id'])) {
+                            $variantDataToSave['size_id'] = null;
+                        }
                         $variantDataToSave['is_active'] = isset($variantData['is_active']) 
                             ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
                             : true;
@@ -268,6 +281,13 @@ class AdminProductController extends Controller
                     }
                 } else {
                     // New variant, create it
+                    // For new variants, set color_id and size_id to null if not provided
+                    if (!isset($variantDataToSave['color_id'])) {
+                        $variantDataToSave['color_id'] = null;
+                    }
+                    if (!isset($variantDataToSave['size_id'])) {
+                        $variantDataToSave['size_id'] = null;
+                    }
                     $variantDataToSave['is_active'] = isset($variantData['is_active']) 
                         ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
                         : true;
