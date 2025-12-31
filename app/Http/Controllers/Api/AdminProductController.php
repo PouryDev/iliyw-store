@@ -194,8 +194,8 @@ class AdminProductController extends Controller
                 $variantDataToSave = [];
                 
                 // Process color
-                if (!empty($variantData['color_id'])) {
-                    $variantDataToSave['color_id'] = $variantData['color_id'];
+                if (isset($variantData['color_id']) && $variantData['color_id'] !== '') {
+                    $variantDataToSave['color_id'] = (int) $variantData['color_id'];
                 } elseif (!empty($variantData['color_name'])) {
                     $colorName = trim($variantData['color_name']);
                     $color = Color::firstOrCreate(
@@ -213,11 +213,14 @@ class AdminProductController extends Controller
                     }
                     
                     $variantDataToSave['color_id'] = $color->id;
+                } else {
+                    // Explicitly set to null if not provided
+                    $variantDataToSave['color_id'] = null;
                 }
                 
                 // Process size
-                if (!empty($variantData['size_id'])) {
-                    $variantDataToSave['size_id'] = $variantData['size_id'];
+                if (isset($variantData['size_id']) && $variantData['size_id'] !== '') {
+                    $variantDataToSave['size_id'] = (int) $variantData['size_id'];
                 } elseif (!empty($variantData['size_name'])) {
                     $sizeName = trim($variantData['size_name']);
                     $size = Size::firstOrCreate(
@@ -225,11 +228,18 @@ class AdminProductController extends Controller
                         ['is_active' => true]
                     );
                     $variantDataToSave['size_id'] = $size->id;
+                } else {
+                    // Explicitly set to null if not provided
+                    $variantDataToSave['size_id'] = null;
                 }
                 
-                // Add other fields
-                $variantDataToSave['price'] = $variantData['price'] ?? null;
-                $variantDataToSave['stock'] = $variantData['stock'] ?? 0;
+                // Add other fields - convert to proper types
+                $variantDataToSave['price'] = isset($variantData['price']) && $variantData['price'] !== '' 
+                    ? (int) $variantData['price'] 
+                    : null;
+                $variantDataToSave['stock'] = isset($variantData['stock']) && $variantData['stock'] !== '' 
+                    ? (int) $variantData['stock'] 
+                    : 0;
                 
                 // Check if variant ID is provided (existing variant)
                 if (!empty($variantData['id'])) {
