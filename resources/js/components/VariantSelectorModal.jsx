@@ -56,13 +56,19 @@ function VariantSelectorModal({
         }
     }
 
+    function getVariantsArray(productData) {
+        // Support both 'variants' and 'active_variants' field names
+        return productData?.variants || productData?.active_variants || productData?.activeVariants || [];
+    }
+
     function getSelectedVariant() {
         const currentProduct = fullProduct || product;
-        if (!currentProduct?.active_variants) return null;
+        const variants = getVariantsArray(currentProduct);
+        if (!variants || variants.length === 0) return null;
         
         // For products with variants, require exact match
         if (currentProduct.has_variants || currentProduct.has_colors || currentProduct.has_sizes) {
-            const variant = currentProduct.active_variants.find(v => {
+            const variant = variants.find(v => {
                 // Color matching: if has_colors is false, variant should have no color_id
                 // If has_colors is true, both selectedColorId and v.color_id must match
                 const colorMatch = !currentProduct.has_colors 
@@ -96,8 +102,9 @@ function VariantSelectorModal({
             const variant = getSelectedVariant();
             if (!variant) {
                 // If no variant selected, try to find first available variant
-                if (currentProduct?.active_variants && currentProduct.active_variants.length > 0) {
-                    const firstAvailable = currentProduct.active_variants.find(v => (v?.stock || 0) > 0);
+                const variants = getVariantsArray(currentProduct);
+                if (variants && variants.length > 0) {
+                    const firstAvailable = variants.find(v => (v?.stock || 0) > 0);
                     if (firstAvailable) {
                         return firstAvailable.stock;
                     }
@@ -127,11 +134,12 @@ function VariantSelectorModal({
             return currentProduct.available_colors;
         }
         
-        // Fallback to extracting from active_variants
-        if (!currentProduct?.active_variants) return [];
+        // Fallback to extracting from variants
+        const variants = getVariantsArray(currentProduct);
+        if (!variants || variants.length === 0) return [];
         const colors = new Map();
         
-        currentProduct.active_variants.forEach(variant => {
+        variants.forEach(variant => {
             if (variant.color && !colors.has(variant.color.id)) {
                 colors.set(variant.color.id, variant.color);
             }
@@ -148,11 +156,12 @@ function VariantSelectorModal({
             return currentProduct.available_sizes;
         }
         
-        // Fallback to extracting from active_variants
-        if (!currentProduct?.active_variants) return [];
+        // Fallback to extracting from variants
+        const variants = getVariantsArray(currentProduct);
+        if (!variants || variants.length === 0) return [];
         const sizes = new Map();
         
-        currentProduct.active_variants.forEach(variant => {
+        variants.forEach(variant => {
             if (variant.size && !sizes.has(variant.size.id)) {
                 sizes.set(variant.size.id, variant.size);
             }
