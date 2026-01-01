@@ -163,6 +163,35 @@ function ProductPage() {
         return variant?.price ?? p?.price ?? 0;
     }
 
+    function getStockCount() {
+        // For products with variants, require variant selection
+        if (product?.has_variants || product?.has_colors || product?.has_sizes) {
+            const variant = getSelectedVariant(product, selectedColorId, selectedSizeId);
+            if (!variant) {
+                // If no variant selected, try to find first available variant
+                const variants = getVariantsArray(product);
+                if (variants && variants.length > 0) {
+                    const firstAvailable = variants.find(v => (v?.stock || 0) > 0);
+                    if (firstAvailable) {
+                        return firstAvailable.stock;
+                    }
+                    // If no variant has stock, return 0
+                    return 0;
+                }
+                return 0; // No stock if no variant selected and no variants available
+            }
+            return variant.stock || 0;
+        }
+        
+        // For products without variants, use main product stock
+        return product?.stock || 0;
+    }
+
+    function getMaxQuantity() {
+        const stock = getStockCount();
+        return Math.min(stock, 10);
+    }
+
     function getActiveCampaign(p) {
         return Array.isArray(p?.campaigns) && p.campaigns.length > 0 ? p.campaigns[0] : null;
     }
@@ -210,6 +239,14 @@ function ProductPage() {
 
     async function handleAddToCart() {
         if (!product) return;
+        
+        // Check if variant is out of stock
+        const stock = getStockCount();
+        if (stock <= 0) {
+            setAddStatus('این محصول موجود نیست');
+            return;
+        }
+        
         setAdding(true);
         setAddStatus(null);
         try {
@@ -263,6 +300,8 @@ function ProductPage() {
 
     const colors = getAvailableColors();
     const sizes = getAvailableSizes();
+    const stock = getStockCount();
+    const isOutOfStock = stock <= 0;
 
     return (
         <div className="min-h-screen pb-28 md:pb-8 pt-6 md:pt-8">
@@ -432,19 +471,33 @@ function ProductPage() {
                                 <input
                                     type="number"
                                     min={1}
+                                    max={getMaxQuantity()}
                                     value={quantity}
-                                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                                    onChange={(e) => setQuantity(Math.max(1, Math.min(getMaxQuantity(), Number(e.target.value))))}
                                     className="bg-black/40 border border-white/10 rounded px-3 py-2 w-28 text-white"
                                 />
+                            </div>
+
+                            {/* Stock Info */}
+                            <div className="text-sm text-gray-400">
+                                {isOutOfStock ? (
+                                    <span className="text-red-400">ناموجود</span>
+                                ) : (
+                                    <span>{stock} عدد موجود</span>
+                                )}
                             </div>
 
                             <div className="pt-2">
                                 <button
                                     onClick={handleAddToCart}
-                                    disabled={adding}
-                                    className="bg-cherry-600 hover:bg-cherry-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors text-white px-6 py-3 rounded-lg"
+                                    disabled={adding || isOutOfStock}
+                                    className={`transition-colors text-white px-6 py-3 rounded-lg ${
+                                        isOutOfStock
+                                            ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                            : 'bg-cherry-600 hover:bg-cherry-500 disabled:opacity-60 disabled:cursor-not-allowed'
+                                    }`}
                                 >
-                                    {adding ? 'در حال افزودن...' : 'افزودن به سبد خرید'}
+                                    {adding ? 'در حال افزودن...' : isOutOfStock ? 'ناموجود' : 'افزودن به سبد خرید'}
                                 </button>
                                 {addStatus && (
                                     <span className="ml-4 text-sm text-gray-300">{addStatus}</span>
@@ -498,8 +551,16 @@ function ProductPage() {
                                 return <div className="text-white font-extrabold">{formatPrice(finalPrice)} تومان</div>;
                             })()}
                         </div>
-                        <button onClick={handleAddToCart} disabled={adding} className="flex-1 text-center bg-cherry-600 hover:bg-cherry-500 text-white rounded-lg py-2">
-                            {adding ? 'در حال افزودن...' : 'افزودن به سبد'}
+                        <button 
+                            onClick={handleAddToCart} 
+                            disabled={adding || isOutOfStock} 
+                            className={`flex-1 text-center rounded-lg py-2 ${
+                                isOutOfStock
+                                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                    : 'bg-cherry-600 hover:bg-cherry-500 text-white disabled:opacity-60 disabled:cursor-not-allowed'
+                            }`}
+                        >
+                            {adding ? 'در حال افزودن...' : isOutOfStock ? 'ناموجود' : 'افزودن به سبد'}
                         </button>
                     </div>
                 </div>
