@@ -244,6 +244,7 @@ function ProductPage() {
         const stock = getStockCount();
         if (stock <= 0) {
             setAddStatus('این محصول موجود نیست');
+            setTimeout(() => setAddStatus(null), 3000);
             return;
         }
         
@@ -261,17 +262,46 @@ function ProductPage() {
                     size_id: selectedSizeId || null,
                 }),
             });
-            if (!res.ok) throw new Error('failed');
-            const payload = await res.json();
-            if (!payload?.ok) throw new Error('failed');
-            setAddStatus('محصول به سبد اضافه شد');
+            
+            let payload;
             try {
-                localStorage.setItem('cart', JSON.stringify(payload.items || []));
-            } catch {}
-            window.dispatchEvent(new Event('cart:update'));
-            window.dispatchEvent(new CustomEvent('toast:show', { detail: { type: 'success', message: 'به سبد اضافه شد' } }));
-        } catch (e) {
-            setAddStatus('خطا در افزودن به سبد');
+                payload = await res.json();
+            } catch (parseError) {
+                // If JSON parsing fails, use default error message
+                const errorMessage = 'خطا در افزودن به سبد خرید';
+                setAddStatus(errorMessage);
+                window.dispatchEvent(new CustomEvent('toast:show', { 
+                    detail: { type: 'error', message: errorMessage } 
+                }));
+                setTimeout(() => setAddStatus(null), 4000);
+                return;
+            }
+            
+            if (res.ok && (payload?.success || payload?.ok)) {
+                setAddStatus('محصول به سبد اضافه شد');
+                try {
+                    localStorage.setItem('cart', JSON.stringify(payload.items || []));
+                } catch {}
+                window.dispatchEvent(new Event('cart:update'));
+                window.dispatchEvent(new CustomEvent('toast:show', { detail: { type: 'success', message: 'به سبد اضافه شد' } }));
+                setTimeout(() => setAddStatus(null), 2000);
+            } else {
+                // Extract error message from response - backend sends clear error messages
+                const errorMessage = payload?.message || 'خطا در افزودن به سبد خرید';
+                setAddStatus(errorMessage);
+                window.dispatchEvent(new CustomEvent('toast:show', { 
+                    detail: { type: 'error', message: errorMessage } 
+                }));
+                setTimeout(() => setAddStatus(null), 4000);
+            }
+        } catch (error) {
+            console.error('Add to cart error:', error);
+            const errorMessage = 'خطا در افزودن به سبد خرید';
+            setAddStatus(errorMessage);
+            window.dispatchEvent(new CustomEvent('toast:show', { 
+                detail: { type: 'error', message: errorMessage } 
+            }));
+            setTimeout(() => setAddStatus(null), 4000);
         } finally {
             setAdding(false);
         }
