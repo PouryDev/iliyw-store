@@ -71,8 +71,45 @@ function ProductPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slug]);
 
+    function getVariantsArray(productData) {
+        // Support both 'variants' and 'active_variants' field names
+        return productData?.variants || productData?.active_variants || productData?.activeVariants || [];
+    }
+
+    function getSelectedVariant(p, colorId, sizeId) {
+        const variants = getVariantsArray(p);
+        if (!variants || variants.length === 0) return null;
+        
+        // For products with variants, require exact match
+        if (p.has_variants || p.has_colors || p.has_sizes) {
+            const variant = variants.find(v => {
+                // Color matching: if has_colors is false, variant should have no color_id
+                // If has_colors is true, both colorId and v.color_id must match
+                const colorMatch = !p.has_colors 
+                    ? (v.color_id === null || v.color_id === undefined)
+                    : (colorId !== null && colorId !== undefined && 
+                       v.color_id !== null && v.color_id !== undefined && 
+                       String(v.color_id) === String(colorId));
+                
+                // Size matching: if has_sizes is false, variant should have no size_id
+                // If has_sizes is true, both sizeId and v.size_id must match
+                const sizeMatch = !p.has_sizes 
+                    ? (v.size_id === null || v.size_id === undefined)
+                    : (sizeId !== null && sizeId !== undefined && 
+                       v.size_id !== null && v.size_id !== undefined && 
+                       String(v.size_id) === String(sizeId));
+                
+                return colorMatch && sizeMatch;
+            });
+            
+            return variant;
+        }
+        
+        return null;
+    }
+
     function uniqueColors(p) {
-        const variants = p?.active_variants || p?.activeVariants || [];
+        const variants = getVariantsArray(p);
         const colors = variants.map((v) => v.color).filter(Boolean);
         const map = new Map();
         colors.forEach((c) => {
@@ -82,7 +119,7 @@ function ProductPage() {
     }
 
     function uniqueSizes(p) {
-        const variants = p?.active_variants || p?.activeVariants || [];
+        const variants = getVariantsArray(p);
         const sizes = variants.map((v) => v.size).filter(Boolean);
         const map = new Map();
         sizes.forEach((s) => {
@@ -94,7 +131,7 @@ function ProductPage() {
     function filteredSizes() {
         if (!product?.has_sizes) return [];
         if (!selectedColorId) return uniqueSizes(product);
-        const variants = product?.active_variants || product?.activeVariants || [];
+        const variants = getVariantsArray(product);
         const sizes = variants
             .filter((v) => v.color && v.color.id === Number(selectedColorId) && v.size)
             .map((v) => v.size);
@@ -105,12 +142,10 @@ function ProductPage() {
         return Array.from(map.values());
     }
 
-    
-
     function filteredColors() {
         if (!product?.has_colors) return [];
         if (!selectedSizeId) return uniqueColors(product);
-        const variants = product?.active_variants || product?.activeVariants || [];
+        const variants = getVariantsArray(product);
         const colors = variants
             .filter((v) => v.size && v.size.id === Number(selectedSizeId) && v.color)
             .map((v) => v.color);
@@ -129,16 +164,8 @@ function ProductPage() {
         }
     }
 
-    function findVariant(p, colorId, sizeId) {
-        const variants = p?.active_variants || p?.activeVariants || [];
-        return variants.find((v) => (
-            (colorId ? v.color_id === Number(colorId) : !v.color_id) &&
-            (sizeId ? v.size_id === Number(sizeId) : !v.size_id)
-        ));
-    }
-
     function calculateBasePrice(p, colorId, sizeId) {
-        const variant = findVariant(p, colorId, sizeId);
+        const variant = getSelectedVariant(p, colorId, sizeId);
         return variant?.price ?? p?.price ?? 0;
     }
 
