@@ -128,32 +128,26 @@ function ProductPage() {
         return Array.from(map.values());
     }
 
-    function filteredSizes() {
+    function getAvailableSizes() {
         if (!product?.has_sizes) return [];
-        if (!selectedColorId) return uniqueSizes(product);
-        const variants = getVariantsArray(product);
-        const sizes = variants
-            .filter((v) => v.color && v.color.id === Number(selectedColorId) && v.size)
-            .map((v) => v.size);
-        const map = new Map();
-        sizes.forEach((s) => {
-            if (!map.has(s.id)) map.set(s.id, s);
-        });
-        return Array.from(map.values());
+        // Use available_sizes attribute if available (like in product details page)
+        if (product?.available_sizes) {
+            return product.available_sizes;
+        }
+        
+        // Fallback to extracting from variants (show all available sizes)
+        return uniqueSizes(product);
     }
 
-    function filteredColors() {
+    function getAvailableColors() {
         if (!product?.has_colors) return [];
-        if (!selectedSizeId) return uniqueColors(product);
-        const variants = getVariantsArray(product);
-        const colors = variants
-            .filter((v) => v.size && v.size.id === Number(selectedSizeId) && v.color)
-            .map((v) => v.color);
-        const map = new Map();
-        colors.forEach((c) => {
-            if (!map.has(c.id)) map.set(c.id, c);
-        });
-        return Array.from(map.values());
+        // Use available_colors attribute if available (like in product details page)
+        if (product?.available_colors) {
+            return product.available_colors;
+        }
+        
+        // Fallback to extracting from variants (show all available colors)
+        return uniqueColors(product);
     }
 
     function formatPrice(value) {
@@ -267,8 +261,8 @@ function ProductPage() {
         );
     }
 
-    const colors = product.has_colors ? filteredColors() : [];
-    const sizes = product.has_sizes ? filteredSizes() : [];
+    const colors = getAvailableColors();
+    const sizes = getAvailableSizes();
 
     return (
         <div className="min-h-screen pb-28 md:pb-8 pt-6 md:pt-8">
