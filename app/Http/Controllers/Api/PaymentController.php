@@ -113,6 +113,7 @@ class PaymentController extends Controller
             return redirect('/payment/error?message=' . urlencode($errorMessage));
 
         } catch (PaymentException $e) {
+            report($e);
             return redirect('/payment/error?message=' . urlencode($e->getMessage()));
         } catch (ModelNotFoundException $e) {
             Log::error('Payment callback model not found', [

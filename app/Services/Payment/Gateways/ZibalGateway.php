@@ -34,7 +34,8 @@ class ZibalGateway implements PaymentGatewayInterface
     public function initiate(Invoice $invoice, array $additionalData = []): array
     {
         try {
-            if (empty($this->merchantId)) {
+            // In sandbox mode, merchant_id is not required (we use test merchant)
+            if (!$this->sandbox && empty($this->merchantId)) {
                 return [
                     'success' => false,
                     'redirect_url' => null,
@@ -123,7 +124,8 @@ class ZibalGateway implements PaymentGatewayInterface
     public function verify(Transaction $transaction, array $callbackData = []): array
     {
         try {
-            if (empty($this->merchantId)) {
+            // In sandbox mode, merchant_id is not required (we use test merchant)
+            if (!$this->sandbox && empty($this->merchantId)) {
                 return [
                     'success' => false,
                     'verified' => false,
@@ -316,7 +318,17 @@ class ZibalGateway implements PaymentGatewayInterface
      */
     public function isAvailable(): bool
     {
-        return $this->gateway->is_active && !empty($this->merchantId);
+        if (!$this->gateway->is_active) {
+            return false;
+        }
+
+        // In sandbox mode, merchant is always "zibal", so we don't need to check merchant_id
+        if ($this->sandbox) {
+            return true;
+        }
+
+        // In production mode, merchant_id must be set
+        return !empty($this->merchantId);
     }
 
     /**
