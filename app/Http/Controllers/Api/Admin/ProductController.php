@@ -31,7 +31,7 @@ class ProductController extends Controller
 
         $products = $this->productRepository->getAllPaginated(
             $perPage,
-            ['images', 'category', 'activeVariants'],
+            ['images', 'category', 'variants'],
             $search
         );
 
@@ -77,55 +77,63 @@ class ProductController extends Controller
 
             // Handle variants if provided
             if ($request->has('variants')) {
-                foreach ($request->input('variants') as $variantData) {
-                    $variantDataToSave = [];
-                    
-                    // Process color
-                    if (!empty($variantData['color_id'])) {
-                        $variantDataToSave['color_id'] = (int) $variantData['color_id'];
-                    } elseif (!empty($variantData['color_name'])) {
-                        $colorName = trim($variantData['color_name']);
-                        $color = Color::firstOrCreate(
-                            ['name' => $colorName],
-                            [
-                                'hex_code' => $variantData['color_hex_code'] ?? null,
-                                'is_active' => true
-                            ]
-                        );
+                $variantsInput = $request->input('variants', []);
+                
+                // Only process if variants array is not empty
+                if (is_array($variantsInput) && count($variantsInput) > 0) {
+                    foreach ($variantsInput as $variantData) {
+                        $variantDataToSave = [];
                         
-                        // Update hex_code if provided and different
-                        if (!empty($variantData['color_hex_code']) && $color->hex_code !== $variantData['color_hex_code']) {
-                            $color->hex_code = $variantData['color_hex_code'];
-                            $color->save();
+                        // Process color
+                        if (!empty($variantData['color_id'])) {
+                            $variantDataToSave['color_id'] = (int) $variantData['color_id'];
+                        } elseif (!empty($variantData['color_name'])) {
+                            $colorName = trim($variantData['color_name']);
+                            $color = Color::firstOrCreate(
+                                ['name' => $colorName],
+                                [
+                                    'hex_code' => $variantData['color_hex_code'] ?? null,
+                                    'is_active' => true
+                                ]
+                            );
+                            
+                            // Update hex_code if provided and different
+                            if (!empty($variantData['color_hex_code']) && $color->hex_code !== $variantData['color_hex_code']) {
+                                $color->hex_code = $variantData['color_hex_code'];
+                                $color->save();
+                            }
+                            
+                            $variantDataToSave['color_id'] = $color->id;
                         }
                         
-                        $variantDataToSave['color_id'] = $color->id;
+                        // Process size
+                        if (!empty($variantData['size_id'])) {
+                            $variantDataToSave['size_id'] = (int) $variantData['size_id'];
+                        } elseif (!empty($variantData['size_name'])) {
+                            $sizeName = trim($variantData['size_name']);
+                            $size = Size::firstOrCreate(
+                                ['name' => $sizeName],
+                                ['is_active' => true]
+                            );
+                            $variantDataToSave['size_id'] = $size->id;
+                        }
+                        
+                        // Add other fields
+                        $variantDataToSave['price'] = isset($variantData['price']) && $variantData['price'] !== '' 
+                            ? (int) $variantData['price'] 
+                            : null;
+                        $variantDataToSave['stock'] = isset($variantData['stock']) && $variantData['stock'] !== '' 
+                            ? (int) $variantData['stock'] 
+                            : 0;
+                        $variantDataToSave['is_active'] = isset($variantData['is_active']) 
+                            ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
+                            : true;
+                        
+                        // Ensure product_id is set
+                        $variantDataToSave['product_id'] = $product->id;
+                        
+                        $product->variants()->create($variantDataToSave);
                     }
-                    
-                    // Process size
-                    if (!empty($variantData['size_id'])) {
-                        $variantDataToSave['size_id'] = (int) $variantData['size_id'];
-                    } elseif (!empty($variantData['size_name'])) {
-                        $sizeName = trim($variantData['size_name']);
-                        $size = Size::firstOrCreate(
-                            ['name' => $sizeName],
-                            ['is_active' => true]
-                        );
-                        $variantDataToSave['size_id'] = $size->id;
-                    }
-                    
-                    // Add other fields
-                    $variantDataToSave['price'] = isset($variantData['price']) && $variantData['price'] !== '' 
-                        ? (int) $variantData['price'] 
-                        : null;
-                    $variantDataToSave['stock'] = isset($variantData['stock']) && $variantData['stock'] !== '' 
-                        ? (int) $variantData['stock'] 
-                        : 0;
-                    $variantDataToSave['is_active'] = isset($variantData['is_active']) 
-                        ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
-                        : true;
-                    
-                    $product->variants()->create($variantDataToSave);
                 }
             }
 
@@ -211,84 +219,105 @@ class ProductController extends Controller
             }
 
             // Handle variants if provided
+            // Only process variants if they are explicitly sent and not empty
+            // If variants is not sent at all, preserve existing variants
             if ($request->has('variants')) {
-                $variantIdsToKeep = [];
-                $variantsInput = $request->input('variants');
+                $variantsInput = $request->input('variants', []);
                 
-                foreach ($variantsInput as $variantData) {
-                    $variantDataToSave = [];
+                // Only process variants if array is not empty
+                // If empty array is sent, it means user wants to remove all variants
+                if (is_array($variantsInput) && count($variantsInput) > 0) {
+                    $variantIdsToKeep = [];
                     
-                    // Process color - only set if provided in request
-                    if (isset($variantData['color_id']) && $variantData['color_id'] !== '') {
-                        $variantDataToSave['color_id'] = (int) $variantData['color_id'];
-                    } elseif (!empty($variantData['color_name'])) {
-                        $colorName = trim($variantData['color_name']);
-                        $color = Color::firstOrCreate(
-                            ['name' => $colorName],
-                            [
-                                'hex_code' => $variantData['color_hex_code'] ?? null,
-                                'is_active' => true
-                            ]
-                        );
+                    foreach ($variantsInput as $variantData) {
+                        $variantDataToSave = [];
                         
-                        // Update hex_code if provided and different
-                        if (!empty($variantData['color_hex_code']) && $color->hex_code !== $variantData['color_hex_code']) {
-                            $color->hex_code = $variantData['color_hex_code'];
-                            $color->save();
+                        // Process color - only set if provided in request
+                        if (isset($variantData['color_id']) && $variantData['color_id'] !== '') {
+                            $variantDataToSave['color_id'] = (int) $variantData['color_id'];
+                        } elseif (!empty($variantData['color_name'])) {
+                            $colorName = trim($variantData['color_name']);
+                            $color = Color::firstOrCreate(
+                                ['name' => $colorName],
+                                [
+                                    'hex_code' => $variantData['color_hex_code'] ?? null,
+                                    'is_active' => true
+                                ]
+                            );
+                            
+                            // Update hex_code if provided and different
+                            if (!empty($variantData['color_hex_code']) && $color->hex_code !== $variantData['color_hex_code']) {
+                                $color->hex_code = $variantData['color_hex_code'];
+                                $color->save();
+                            }
+                            
+                            $variantDataToSave['color_id'] = $color->id;
                         }
                         
-                        $variantDataToSave['color_id'] = $color->id;
-                    }
-                    
-                    // Process size - only set if provided in request
-                    if (isset($variantData['size_id']) && $variantData['size_id'] !== '') {
-                        $variantDataToSave['size_id'] = (int) $variantData['size_id'];
-                    } elseif (!empty($variantData['size_name'])) {
-                        $sizeName = trim($variantData['size_name']);
-                        $size = Size::firstOrCreate(
-                            ['name' => $sizeName],
-                            ['is_active' => true]
-                        );
-                        $variantDataToSave['size_id'] = $size->id;
-                    }
-                    
-                    // Add other fields - convert to proper types
-                    $variantDataToSave['price'] = isset($variantData['price']) && $variantData['price'] !== '' 
-                        ? (int) $variantData['price'] 
-                        : null;
-                    $variantDataToSave['stock'] = isset($variantData['stock']) && $variantData['stock'] !== '' 
-                        ? (int) $variantData['stock'] 
-                        : 0;
-                    
-                    // Check if variant ID is provided (existing variant)
-                    if (!empty($variantData['id'])) {
-                        $variant = $product->variants()->find($variantData['id']);
+                        // Process size - only set if provided in request
+                        if (isset($variantData['size_id']) && $variantData['size_id'] !== '') {
+                            $variantDataToSave['size_id'] = (int) $variantData['size_id'];
+                        } elseif (!empty($variantData['size_name'])) {
+                            $sizeName = trim($variantData['size_name']);
+                            $size = Size::firstOrCreate(
+                                ['name' => $sizeName],
+                                ['is_active' => true]
+                            );
+                            $variantDataToSave['size_id'] = $size->id;
+                        }
                         
-                        if ($variant) {
-                            // Update existing variant
-                            // Preserve color_id if not explicitly provided
-                            if (!isset($variantDataToSave['color_id'])) {
-                                $variantDataToSave['color_id'] = $variant->color_id;
-                            }
+                        // Add other fields - convert to proper types
+                        $variantDataToSave['price'] = isset($variantData['price']) && $variantData['price'] !== '' 
+                            ? (int) $variantData['price'] 
+                            : null;
+                        $variantDataToSave['stock'] = isset($variantData['stock']) && $variantData['stock'] !== '' 
+                            ? (int) $variantData['stock'] 
+                            : 0;
+                        
+                        // Check if variant ID is provided (existing variant)
+                        if (!empty($variantData['id'])) {
+                            $variant = $product->variants()->find($variantData['id']);
                             
-                            // Preserve size_id if not explicitly provided
-                            if (!isset($variantDataToSave['size_id'])) {
-                                $variantDataToSave['size_id'] = $variant->size_id;
-                            }
-                            
-                            // Preserve is_active if not explicitly provided
-                            if (isset($variantData['is_active'])) {
-                                // Convert to boolean properly
-                                $variantDataToSave['is_active'] = filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN);
+                            if ($variant) {
+                                // Update existing variant
+                                // Preserve color_id if not explicitly provided
+                                if (!isset($variantDataToSave['color_id'])) {
+                                    $variantDataToSave['color_id'] = $variant->color_id;
+                                }
+                                
+                                // Preserve size_id if not explicitly provided
+                                if (!isset($variantDataToSave['size_id'])) {
+                                    $variantDataToSave['size_id'] = $variant->size_id;
+                                }
+                                
+                                // Preserve is_active if not explicitly provided
+                                if (isset($variantData['is_active'])) {
+                                    // Convert to boolean properly
+                                    $variantDataToSave['is_active'] = filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN);
+                                } else {
+                                    // Keep existing is_active value
+                                    $variantDataToSave['is_active'] = $variant->is_active;
+                                }
+                                
+                                $variant->update($variantDataToSave);
+                                $variantIdsToKeep[] = $variant->id;
                             } else {
-                                // Keep existing is_active value
-                                $variantDataToSave['is_active'] = $variant->is_active;
+                                // Variant ID provided but not found, create new one
+                                // For new variants, set color_id and size_id to null if not provided
+                                if (!isset($variantDataToSave['color_id'])) {
+                                    $variantDataToSave['color_id'] = null;
+                                }
+                                if (!isset($variantDataToSave['size_id'])) {
+                                    $variantDataToSave['size_id'] = null;
+                                }
+                                $variantDataToSave['is_active'] = isset($variantData['is_active']) 
+                                    ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
+                                    : true;
+                                $newVariant = $product->variants()->create($variantDataToSave);
+                                $variantIdsToKeep[] = $newVariant->id;
                             }
-                            
-                            $variant->update($variantDataToSave);
-                            $variantIdsToKeep[] = $variant->id;
                         } else {
-                            // Variant ID provided but not found, create new one
+                            // New variant, create it
                             // For new variants, set color_id and size_id to null if not provided
                             if (!isset($variantDataToSave['color_id'])) {
                                 $variantDataToSave['color_id'] = null;
@@ -302,26 +331,16 @@ class ProductController extends Controller
                             $newVariant = $product->variants()->create($variantDataToSave);
                             $variantIdsToKeep[] = $newVariant->id;
                         }
-                    } else {
-                        // New variant, create it
-                        // For new variants, set color_id and size_id to null if not provided
-                        if (!isset($variantDataToSave['color_id'])) {
-                            $variantDataToSave['color_id'] = null;
-                        }
-                        if (!isset($variantDataToSave['size_id'])) {
-                            $variantDataToSave['size_id'] = null;
-                        }
-                        $variantDataToSave['is_active'] = isset($variantData['is_active']) 
-                            ? filter_var($variantData['is_active'], FILTER_VALIDATE_BOOLEAN)
-                            : true;
-                        $newVariant = $product->variants()->create($variantDataToSave);
-                        $variantIdsToKeep[] = $newVariant->id;
                     }
+                    
+                    // Delete variants that are not in the request
+                    $product->variants()->whereNotIn('id', $variantIdsToKeep)->delete();
+                } else {
+                    // Empty array sent - user explicitly wants to remove all variants
+                    $product->variants()->delete();
                 }
-                
-                // Delete variants that are not in the request
-                $product->variants()->whereNotIn('id', $variantIdsToKeep)->delete();
             }
+            // If variants is not sent at all, do nothing - preserve existing variants
 
             DB::commit();
 

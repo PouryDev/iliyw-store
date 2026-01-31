@@ -28,7 +28,15 @@ class ProductResource extends JsonResource
             'has_sizes' => (bool) $this->has_sizes,
             'is_active' => (bool) $this->is_active,
             'images' => ProductImageResource::collection($this->whenLoaded('images')),
-            'variants' => $this->whenLoaded('activeVariants', fn() => ProductVariantResource::collection($this->activeVariants)),
+            'variants' => $this->when(
+                $this->relationLoaded('variants') || $this->relationLoaded('activeVariants'),
+                function () {
+                    if ($this->relationLoaded('variants')) {
+                        return ProductVariantResource::collection($this->variants);
+                    }
+                    return ProductVariantResource::collection($this->activeVariants);
+                }
+            ),
             'available_colors' => $this->when($this->has_colors, fn() => $this->available_colors),
             'available_sizes' => $this->when($this->has_sizes, fn() => $this->available_sizes),
             'total_stock' => $this->when(isset($this->has_variants), fn() => $this->total_stock),
