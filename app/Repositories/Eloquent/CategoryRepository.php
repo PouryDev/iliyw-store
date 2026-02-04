@@ -5,6 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Category;
 use App\Repositories\Contracts\CategoryRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CategoryRepository extends BaseRepository implements CategoryRepositoryInterface
 {
@@ -33,6 +34,30 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         }])
         ->orderBy('name')
         ->get();
+    }
+
+    /**
+     * Get categories paginated with products count.
+     */
+    public function getAllPaginated(
+        int $perPage = 15,
+        array $relations = [],
+        ?string $search = null
+    ): LengthAwarePaginator {
+        $query = $this->model->query()->withCount('products');
+
+        if (!empty($relations)) {
+            $query->with($relations);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->orWhere('name', 'like', "%{$search}%")
+                    ->orWhere('slug', 'like', "%{$search}%");
+            });
+        }
+
+        return $query->latest()->paginate($perPage);
     }
 
     /**

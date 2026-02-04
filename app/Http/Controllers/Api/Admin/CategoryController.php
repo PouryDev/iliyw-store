@@ -20,12 +20,9 @@ class CategoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         $perPage = $request->input('per_page', 50);
+        $search = $request->input('search');
 
-        $categories = $this->categoryRepository
-            ->query()
-            ->withCount('products')
-            ->latest()
-            ->paginate($perPage);
+        $categories = $this->categoryRepository->getAllPaginated($perPage, [], $search);
 
         return response()->json([
             'success' => true,
