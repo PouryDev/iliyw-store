@@ -1,39 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ModernSelect from './ModernSelect';
 import { adminApiRequest } from '../../utils/adminApi';
+import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
 
 function AdminCategoryManagement() {
     const navigate = useNavigate();
-    const [categories, setCategories] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterStatus, setFilterStatus] = useState('all');
 
-    useEffect(() => {
-        const loadCategories = async () => {
-            try {
-                setLoading(true);
-                const res = await adminApiRequest('/categories');
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.success) {
-                        setCategories(data.data);
-                    }
-                }
-            } catch (error) {
-                console.error('Failed to load categories:', error);
-                window.dispatchEvent(new CustomEvent('toast:show', { 
-                    detail: { type: 'error', message: 'خطا در بارگذاری دسته‌بندی‌ها' } 
-                }));
-            } finally {
-                setLoading(false);
-            }
-        };
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
-        loadCategories();
-    }, []);
+    const fetchCategories = async (page, perPage, search, filters) => {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            per_page: perPage.toString(),
+        });
+
+        const res = await adminApiRequest(`/categories?${params.toString()}`);
+        
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success) {
+                let filteredData = data.data || [];
+                const normalizedSearch = (search || '').trim().toLowerCase();
+
+                if (normalizedSearch) {
+                    filteredData = filteredData.filter((category) => {
+                        const name = (category.name || '').toLowerCase();
+                        const slug = (category.slug || '').toLowerCase();
+                        const description = (category.description || '').toLowerCase();
+                        return (
+                            name.includes(normalizedSearch) ||
+                            slug.includes(normalizedSearch) ||
+                            description.includes(normalizedSearch)
+                        );
+                    });
+                }
+
+                if (filters.status && filters.status !== 'all') {
+                    filteredData = filteredData.filter((category) =>
+                        filters.status === 'active' ? category.is_active : !category.is_active
+                    );
+                }
+
+                return {
+                    data: filteredData,
+                    pagination: data.pagination
+                };
+            }
+        }
+        
+        throw new Error('Failed to load categories');
+    };
+
+    const { items: categories, loading, hasMore, error, total, observerTarget, refresh } = useInfiniteScroll(
+        fetchCategories,
+        {
+            perPage: 20,
+            search: debouncedSearch,
+            filters: { status: filterStatus }
+        }
+    );
 
     const handleDeleteCategory = async (categoryId) => {
         if (!confirm('آیا مطمئن هستید که می‌خواهید این دسته‌بندی را حذف کنید؟')) {
@@ -69,7 +103,7 @@ function AdminCategoryManagement() {
         }
     };
 
-    const toggleCategoryStatus = async (categoryId, currentStatus) => {
+    const toggleCategoryStatus = async (categoryId) => {
         try {
             const res = await adminApiRequest(`/categories/${categoryId}/toggle`, { method: 'PATCH' });
 
@@ -209,7 +243,7 @@ function AdminCategoryManagement() {
                                     ویرایش
                                 </button>
                                 <button
-                                    onClick={() => toggleCategoryStatus(category.id, category.is_active)}
+                                    onClick={() => toggleCategoryStatus(category.id)}
                                     className={`font-semibold py-3 px-4 rounded-lg transition-all duration-200 hover:scale-105 text-sm min-h-[44px] ${
                                         category.is_active
                                             ? 'bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white'
