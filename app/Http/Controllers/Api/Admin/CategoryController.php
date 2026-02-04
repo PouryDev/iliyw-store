@@ -21,7 +21,11 @@ class CategoryController extends Controller
     {
         $perPage = $request->input('per_page', 50);
 
-        $categories = $this->categoryRepository->getAllPaginated($perPage, ['products']);
+        $categories = $this->categoryRepository
+            ->query()
+            ->withCount('products')
+            ->latest()
+            ->paginate($perPage);
 
         return response()->json([
             'success' => true,
