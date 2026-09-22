@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\OrderResource;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -38,13 +39,13 @@ class UserController extends Controller
     public function orders(Request $request)
     {
         $orders = $request->user()->orders()
-            ->with(['items.product', 'items.variant'])
+            ->with(['items.product.images', 'items.color', 'items.size', 'items.productVariant'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return response()->json([
             'success' => true,
-            'data' => $orders->items(),
+            'data' => OrderResource::collection($orders->items()),
             'pagination' => [
                 'current_page' => $orders->currentPage(),
                 'last_page' => $orders->lastPage(),

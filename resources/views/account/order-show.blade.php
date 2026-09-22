@@ -31,6 +31,15 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="font-medium truncate">{{ $item->product->title }}</div>
+                            @if($item->variant_display_name)
+                                <div class="text-xs text-gray-400">{{ $item->variant_display_name }}</div>
+                            @elseif($item->color || $item->size)
+                                <div class="text-xs text-gray-400">
+                                    @if($item->color) رنگ: {{ $item->color->name }} @endif
+                                    @if($item->color && $item->size) • @endif
+                                    @if($item->size) سایز: {{ $item->size->name }} @endif
+                                </div>
+                            @endif
                             <div class="text-xs text-gray-400">تعداد: {{ $item->quantity }}</div>
                         </div>
                         <div class="text-left">

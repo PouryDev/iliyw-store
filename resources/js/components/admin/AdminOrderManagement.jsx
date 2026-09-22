@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import ModernSelect from './ModernSelect';
 import { adminApiRequest } from '../../utils/adminApi';
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll';
+import {
+    formatMoney,
+    getOrderItemImage,
+    getOrderItemTitle,
+    getOrderItemUnitPrice,
+    getOrderItemVariantLabel,
+} from '../../utils/orderItemDisplay';
 
 function AdminOrderManagement() {
     const navigate = useNavigate();
@@ -42,13 +49,7 @@ function AdminOrderManagement() {
         }
     );
 
-    const formatPrice = (value) => {
-        try { 
-            return Number(value || 0).toLocaleString('fa-IR'); 
-        } catch { 
-            return value || '0'; 
-        }
-    };
+    const formatPrice = (value) => formatMoney(value);
 
     const getStatusColor = (status) => {
         switch (status) {
@@ -185,32 +186,35 @@ function AdminOrderManagement() {
                                 <div className="mb-4">
                                     <p className="text-gray-400 text-sm mb-2">محصولات سفارش:</p>
                                     <div className="space-y-2">
-                                        {order.items?.map((item, index) => (
-                                            <div key={index} className="bg-white/5 rounded-lg p-3 flex items-center justify-between">
+                                        {order.items?.map((item, index) => {
+                                            const imageUrl = getOrderItemImage(item);
+                                            const variantLabel = getOrderItemVariantLabel(item);
+                                            return (
+                                            <div key={item.id || index} className="bg-white/5 rounded-lg p-3 flex items-center justify-between">
                                                 <div className="flex items-center space-x-3 space-x-reverse">
-                                                    {item.product?.images && item.product.images.length > 0 ? (
+                                                    {imageUrl ? (
                                                         <img 
-                                                            src={item.product.images[0].url} 
-                                                            alt={item.product.title}
+                                                            src={imageUrl} 
+                                                            alt={getOrderItemTitle(item)}
                                                             className="w-12 h-12 object-cover rounded"
                                                         />
                                                     ) : (
                                                         <div className="w-12 h-12 bg-gray-600 rounded flex items-center justify-center text-sm">📦</div>
                                                     )}
                                                     <div>
-                                                        <p className="text-white font-medium">{item.product?.title}</p>
+                                                        <p className="text-white font-medium">{getOrderItemTitle(item)}</p>
                                                         <p className="text-gray-400 text-sm">
-                                                            تعداد: {item.quantity} • 
-                                                            {item.color && ` رنگ: ${item.color.name}`} • 
-                                                            {item.size && ` سایز: ${item.size.name}`}
+                                                            تعداد: {item.quantity}
+                                                            {variantLabel ? ` • ${variantLabel}` : ''}
                                                         </p>
                                                     </div>
                                                 </div>
                                                 <p className="text-purple-400 font-medium">
-                                                    {formatPrice(item.price)} تومان
+                                                    {formatPrice(getOrderItemUnitPrice(item))} تومان
                                                 </p>
                                             </div>
-                                        ))}
+                                            );
+                                        })}
                                     </div>
                                 </div>
 
@@ -218,7 +222,7 @@ function AdminOrderManagement() {
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <div>
                                         <p className="text-gray-400 text-sm">مبلغ کل</p>
-                                        <p className="text-white font-bold text-lg">{formatPrice(order.total_amount)} تومان</p>
+                                        <p className="text-white font-bold text-lg">{formatPrice(order.final_amount ?? order.total_amount)} تومان</p>
                                     </div>
                                     <div>
                                         <p className="text-gray-400 text-sm">هزینه ارسال</p>
@@ -231,14 +235,20 @@ function AdminOrderManagement() {
                                 </div>
 
                                 {/* Delivery Address */}
-                                {order.delivery_address && (
+                                {order.customer_address && (
                                     <div className="mb-4">
                                         <p className="text-gray-400 text-sm mb-2">آدرس تحویل:</p>
                                         <div className="bg-white/5 rounded-lg p-3">
-                                            <p className="text-white">{order.delivery_address.address}</p>
-                                            <p className="text-gray-400 text-sm">
-                                                {order.delivery_address.city}، {order.delivery_address.province}
-                                            </p>
+                                            {order.deliveryAddress || (typeof order.delivery_address === 'object' && order.delivery_address?.address) ? (
+                                                <>
+                                                    <p className="text-white">{(order.deliveryAddress || order.delivery_address).address}</p>
+                                                    <p className="text-gray-400 text-sm">
+                                                        {(order.deliveryAddress || order.delivery_address).city}، {(order.deliveryAddress || order.delivery_address).province}
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <p className="text-white">{order.customer_address}</p>
+                                            )}
                                         </div>
                                     </div>
                                 )}

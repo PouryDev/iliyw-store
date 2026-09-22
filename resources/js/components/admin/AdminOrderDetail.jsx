@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../utils/sanctumAuth';
+import {
+    formatMoney,
+    getOrderItemImage,
+    getOrderItemLineTotal,
+    getOrderItemTitle,
+    getOrderItemUnitPrice,
+    getOrderItemVariantLabel,
+} from '../../utils/orderItemDisplay';
 
 function AdminOrderDetail() {
     const { id } = useParams();
@@ -232,23 +240,23 @@ function AdminOrderDetail() {
                     <div className="space-y-2">
                         <div className="flex justify-between">
                             <span className="text-gray-400 text-sm">مبلغ اصلی:</span>
-                            <span className="text-white text-sm">{order.original_amount?.toLocaleString('fa-IR')} تومان</span>
+                            <span className="text-white text-sm">{formatMoney(order.original_amount ?? order.total_amount)} تومان</span>
                         </div>
                         {order.campaign_discount_amount > 0 && (
                             <div className="flex justify-between">
                                 <span className="text-gray-400 text-sm">تخفیف کمپین:</span>
-                                <span className="text-green-400 text-sm">-{order.campaign_discount_amount.toLocaleString('fa-IR')} تومان</span>
+                                <span className="text-green-400 text-sm">-{formatMoney(order.campaign_discount_amount)} تومان</span>
                             </div>
                         )}
                         {order.discount_amount > 0 && (
                             <div className="flex justify-between">
                                 <span className="text-gray-400 text-sm">تخفیف کد:</span>
-                                <span className="text-green-400 text-sm">-{order.discount_amount.toLocaleString('fa-IR')} تومان</span>
+                                <span className="text-green-400 text-sm">-{formatMoney(order.discount_amount)} تومان</span>
                             </div>
                         )}
                         <div className="flex justify-between">
                             <span className="text-gray-400 text-sm">هزینه ارسال:</span>
-                            <span className="text-white text-sm">{order.delivery_fee?.toLocaleString('fa-IR')} تومان</span>
+                            <span className="text-white text-sm">{formatMoney(order.delivery_fee)} تومان</span>
                         </div>
                         {order.delivery_method && (
                             <div className="flex justify-between">
@@ -259,7 +267,7 @@ function AdminOrderDetail() {
                         <div className="border-t border-white/10 pt-2 mt-2">
                             <div className="flex justify-between text-base font-semibold">
                                 <span className="text-white">مبلغ پرداختی:</span>
-                                <span className="text-white">{order.final_amount?.toLocaleString('fa-IR')} تومان</span>
+                                <span className="text-white">{formatMoney(order.final_amount ?? order.total_amount)} تومان</span>
                             </div>
                         </div>
                     </div>
@@ -269,36 +277,41 @@ function AdminOrderDetail() {
                 <div className="bg-white/5 border border-white/10 rounded-xl p-4">
                     <h2 className="text-base font-semibold text-white mb-3">محصولات سفارش</h2>
                     <div className="space-y-3">
-                        {order.items?.map((item) => (
+                        {order.items?.map((item) => {
+                            const imageUrl = getOrderItemImage(item);
+                            const variantLabel = getOrderItemVariantLabel(item);
+                            return (
                             <div key={item.id} className="bg-white/5 rounded-lg p-3">
                                 <div className="flex gap-3">
-                                    {item.product?.images?.[0] && (
+                                    {imageUrl && (
                                         <img
-                                            src={item.product.images[0].url}
-                                            alt={item.product.name}
+                                            src={imageUrl}
+                                            alt={getOrderItemTitle(item)}
                                             className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                                         />
                                     )}
                                     <div className="flex-1 min-w-0">
                                         <h3 className="text-white font-medium text-sm leading-tight mb-1">
-                                            {item.product?.name}
+                                            {getOrderItemTitle(item)}
                                         </h3>
-                                        <div className="text-xs text-gray-400 mb-2">
-                                            {item.color && <span>رنگ: {item.color.name}</span>}
-                                            {item.size && <span className="mr-2">سایز: {item.size.name}</span>}
-                                        </div>
+                                        {variantLabel && (
+                                            <div className="text-xs text-gray-400 mb-2">
+                                                {variantLabel}
+                                            </div>
+                                        )}
                                         <div className="flex justify-between items-center">
                                             <span className="text-xs text-gray-400">
-                                                {item.quantity} × {item.price?.toLocaleString('fa-IR')} تومان
+                                                {item.quantity} × {formatMoney(getOrderItemUnitPrice(item))} تومان
                                             </span>
                                             <span className="text-sm font-semibold text-white">
-                                                {(item.quantity * item.price)?.toLocaleString('fa-IR')} تومان
+                                                {formatMoney(getOrderItemLineTotal(item))} تومان
                                             </span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 

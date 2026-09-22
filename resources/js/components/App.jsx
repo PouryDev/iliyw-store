@@ -28,6 +28,7 @@ import AdminCategoryForm from './admin/AdminCategoryForm';
 import AccountLayout from './account/AccountLayout';
 import AccountProfile from './account/AccountProfile';
 import AccountOrders from './account/AccountOrders';
+import AccountOrderDetail from './AccountOrderDetail';
 import AccountAddresses from './account/AccountAddresses';
 import LoginPage from './auth/LoginPage';
 import RegisterPage from './auth/RegisterPage';
@@ -77,6 +78,7 @@ function App() {
                             <Route index element={<AccountProfile />} />
                             <Route path="profile" element={<AccountProfile />} />
                             <Route path="orders" element={<AccountOrders />} />
+                            <Route path="orders/:id" element={<AccountOrderDetail />} />
                             <Route path="addresses" element={<AccountAddresses />} />
                         </Route>
                         
