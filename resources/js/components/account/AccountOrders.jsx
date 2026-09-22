@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { apiRequest } from '../../utils/sanctumAuth';
+import {
+    formatMoney,
+    getOrderItemImage,
+    getOrderItemLineTotal,
+    getOrderItemTitle,
+    getOrderItemUnitPrice,
+    getOrderItemVariantLabel,
+    getOrderPayableTotal,
+} from '../../utils/orderItemDisplay';
 
 function AccountOrders() {
-    const { user } = useAuth();
+    const navigate = useNavigate();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [selectedOrder, setSelectedOrder] = useState(null);
 
     useEffect(() => {
         fetchOrders();
@@ -50,12 +58,7 @@ function AccountOrders() {
         }
     };
 
-    const getProductImageUrl = (product) => {
-        const path = product?.images?.[0]?.url || product?.images?.[0]?.path;
-        if (!path) return null;
-        if (/^https?:\/\//i.test(path)) return path;
-        return path.startsWith('/storage/') ? path : `/storage/${path}`;
-    };
+    const getProductImageUrl = (item) => getOrderItemImage(item);
 
     if (loading) {
         return (
@@ -122,7 +125,7 @@ function AccountOrders() {
                                         {getStatusText(order.status)}
                                     </div>
                                     <p className="text-white font-bold text-lg mt-2">
-                                        {order.total_amount?.toLocaleString('fa-IR')} تومان
+                                        {formatMoney(getOrderPayableTotal(order))} تومان
                                     </p>
                                 </div>
                             </div>
@@ -130,12 +133,13 @@ function AccountOrders() {
                             {/* Order Items */}
                             <div className="space-y-3 mb-4">
                                 {order.items?.map((item, index) => {
-                                    const imgUrl = getProductImageUrl(item.product);
+                                    const imgUrl = getProductImageUrl(item);
+                                    const variantLabel = getOrderItemVariantLabel(item);
                                     return (
-                                        <div key={index} className="flex items-center space-x-4 space-x-reverse bg-white/5 rounded-xl p-3">
+                                        <div key={item.id || index} className="flex items-center space-x-4 space-x-reverse bg-white/5 rounded-xl p-3">
                                             <div className="w-12 h-12 bg-gray-500/20 rounded-lg flex items-center justify-center overflow-hidden">
                                                 {imgUrl ? (
-                                                    <img src={imgUrl} alt={item.product?.title || 'Product'} className="w-12 h-12 object-cover" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
+                                                    <img src={imgUrl} alt={getOrderItemTitle(item)} className="w-12 h-12 object-cover" onError={(e)=>{ e.currentTarget.style.display='none'; }} />
                                                 ) : (
                                                     <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -143,10 +147,16 @@ function AccountOrders() {
                                                 )}
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="text-white font-medium">{item.product?.title || 'محصول'}</h4>
+                                                <h4 className="text-white font-medium">{getOrderItemTitle(item)}</h4>
+                                                {variantLabel && (
+                                                    <p className="text-gray-400 text-xs mt-0.5">{variantLabel}</p>
+                                                )}
                                                 <p className="text-gray-400 text-sm">
-                                                    {item.quantity} عدد • {Number(item.unit_price || item.price || 0).toLocaleString('fa-IR')} تومان
+                                                    {item.quantity} عدد • {formatMoney(getOrderItemUnitPrice(item))} تومان
                                                 </p>
+                                            </div>
+                                            <div className="text-cherry-400 text-sm font-semibold whitespace-nowrap">
+                                                {formatMoney(getOrderItemLineTotal(item))} تومان
                                             </div>
                                         </div>
                                     );
@@ -159,7 +169,7 @@ function AccountOrders() {
                                     <p>تعداد آیتم: {order.items?.length || 0}</p>
                                 </div>
                                 <button
-                                    onClick={() => setSelectedOrder(order)}
+                                    onClick={() => navigate(`/account/orders/${order.id}`)}
                                     className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors duration-200"
                                 >
                                     جزئیات بیشتر
@@ -167,59 +177,6 @@ function AccountOrders() {
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
-
-            {/* Order Detail Modal */}
-            {selectedOrder && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="fixed inset-0 bg-black/50" onClick={() => setSelectedOrder(null)}></div>
-                    <div className="relative bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl border border-white/10 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                        <div className="p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl font-bold text-white">جزئیات سفارش</h2>
-                                <button
-                                    onClick={() => setSelectedOrder(null)}
-                                    className="text-gray-400 hover:text-white transition-colors"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            {/* Order Info */}
-                            <div className="space-y-4 mb-6">
-                                <div className="bg-white/5 rounded-xl p-4">
-                                    <h3 className="text-white font-semibold mb-2">اطلاعات سفارش</h3>
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <div>
-                                            <span className="text-gray-400">شماره سفارش:</span>
-                                            <span className="text-white mr-2">#{selectedOrder.order_number || selectedOrder.id}</span>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">تاریخ:</span>
-                                            <span className="text-white mr-2">
-                                                {new Date(selectedOrder.created_at).toLocaleDateString('fa-IR')}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">وضعیت:</span>
-                                            <span className={`mr-2 px-2 py-1 rounded text-xs ${getStatusColor(selectedOrder.status)}`}>
-                                                {getStatusText(selectedOrder.status)}
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <span className="text-gray-400">مبلغ کل:</span>
-                                            <span className="text-white mr-2">
-                                                {Number(selectedOrder.total_amount || 0).toLocaleString('fa-IR')} تومان
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

@@ -27,7 +27,7 @@ class OrderController extends Controller
         $status = $request->input('status');
 
         $query = $this->orderRepository->newQuery()
-            ->with(['user', 'items.product', 'deliveryMethod', 'invoice'])
+            ->with(['user', 'items.product.images', 'items.color', 'items.size', 'items.productVariant', 'deliveryMethod', 'invoice'])
             ->when($status, function ($q) use ($status) {
                 $q->where('status', $status);
             })
@@ -49,10 +49,10 @@ class OrderController extends Controller
     /**
      * Show order details
      */
-    public function show(int $id): JsonResponse
+    public function show(int $order): JsonResponse
     {
         try {
-            $order = $this->orderRepository->getWithDetails($id);
+            $order = $this->orderRepository->getWithDetails($order);
 
             return response()->json([
                 'success' => true,

@@ -76,6 +76,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
             'items.product.images',
             'items.color',
             'items.size',
+            'items.productVariant',
             'deliveryAddress',
             'deliveryMethod',
             'invoice',

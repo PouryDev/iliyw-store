@@ -32,7 +32,7 @@ class OrderController extends Controller
         $orders = $this->orderRepository->getByUserPaginated(
             $request->user()->id,
             10,
-            ['items.product.images', 'items.productVariants', 'deliveryMethod', 'invoice']
+            ['items.product.images', 'items.color', 'items.size', 'items.productVariant', 'deliveryMethod', 'invoice']
         );
 
         return response()->json([
@@ -157,10 +157,10 @@ class OrderController extends Controller
     /**
      * Get order details
      */
-    public function show(Request $request, int $orderId): JsonResponse
+    public function show(Request $request, int $order): JsonResponse
     {
         try {
-            $order = $this->orderRepository->getWithDetails($orderId);
+            $order = $this->orderRepository->getWithDetails($order);
 
             if ($order->user_id !== $request->user()->id) {
                 return response()->json([

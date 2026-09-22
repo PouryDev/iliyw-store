@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSeo } from '../hooks/useSeo';
 import LoadingSpinner from './LoadingSpinner';
+import { apiRequest } from '../utils/sanctumAuth';
+import {
+    formatMoney,
+    getOrderItemImage,
+    getOrderItemLineTotal,
+    getOrderItemTitle,
+    getOrderItemUnitPrice,
+    getOrderItemVariantLabel,
+    getOrderPayableTotal,
+    getOrderProductsTotal,
+} from '../utils/orderItemDisplay';
 
 function AccountOrderDetail() {
     const { id } = useParams();
@@ -22,13 +33,10 @@ function AccountOrderDetail() {
     const fetchOrder = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/account/orders/${id}`, {
-                headers: { 'Accept': 'application/json' },
-                credentials: 'same-origin'
-            });
+            const res = await apiRequest(`/api/orders/${id}`);
             if (!res.ok) throw new Error('failed');
             const data = await res.json();
-            setOrder(data.order);
+            setOrder(data.data || data.order || null);
         } catch (e) {
             console.error(e);
         } finally {
@@ -36,9 +44,7 @@ function AccountOrderDetail() {
         }
     };
 
-    const formatPrice = (v) => {
-        try { return Number(v || 0).toLocaleString('fa-IR'); } catch { return v; }
-    };
+    const formatPrice = (v) => formatMoney(v);
 
     const getStatusBadge = (status) => {
         const badges = {
@@ -134,11 +140,14 @@ function AccountOrderDetail() {
             <div className="glass-card rounded-2xl p-5 border border-white/10">
                 <h3 className="text-lg font-bold text-white mb-4">محصولات سفارش</h3>
                 <div className="space-y-3">
-                    {order.items?.map((item) => (
+                    {order.items?.map((item) => {
+                        const imageUrl = getOrderItemImage(item);
+                        const variantLabel = getOrderItemVariantLabel(item);
+                        return (
                         <div key={item.id} className="flex items-center gap-4 p-3 rounded-lg bg-white/5">
                             <img 
-                                src={item.product_image || '/images/placeholder.jpg'} 
-                                alt={item.product_title}
+                                src={imageUrl || '/images/placeholder.jpg'} 
+                                alt={getOrderItemTitle(item)}
                                 className="w-20 h-20 rounded-lg object-cover"
                                 onError={(e) => {
                                     const img = e.currentTarget;
@@ -151,25 +160,23 @@ function AccountOrderDetail() {
                                 }}
                             />
                             <div className="flex-1 min-w-0">
-                                <h4 className="text-white font-semibold mb-1">{item.product_title}</h4>
-                                {item.color_name && (
-                                    <p className="text-xs text-gray-400">رنگ: {item.color_name}</p>
-                                )}
-                                {item.size_name && (
-                                    <p className="text-xs text-gray-400">سایز: {item.size_name}</p>
+                                <h4 className="text-white font-semibold mb-1">{getOrderItemTitle(item)}</h4>
+                                {variantLabel && (
+                                    <p className="text-xs text-gray-400">{variantLabel}</p>
                                 )}
                                 <p className="text-xs text-gray-400 mt-1">تعداد: {formatPrice(item.quantity)}</p>
                             </div>
                             <div className="text-left">
                                 <div className="text-cherry-400 font-bold">
-                                    {formatPrice(item.unit_price)} تومان
+                                    {formatPrice(getOrderItemUnitPrice(item))} تومان
                                 </div>
                                 <div className="text-xs text-gray-400 mt-1">
-                                    جمع: {formatPrice(item.unit_price * item.quantity)} تومان
+                                    جمع: {formatPrice(getOrderItemLineTotal(item))} تومان
                                 </div>
                             </div>
                         </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
 
@@ -179,8 +186,14 @@ function AccountOrderDetail() {
                 <div className="space-y-2">
                     <div className="flex justify-between text-gray-300">
                         <span>جمع محصولات:</span>
-                        <span>{formatPrice(order.amount)} تومان</span>
+                        <span>{formatPrice(getOrderProductsTotal(order))} تومان</span>
                     </div>
+                    {order.campaign_discount_amount > 0 && (
+                        <div className="flex justify-between text-green-400">
+                            <span>تخفیف کمپین:</span>
+                            <span>- {formatPrice(order.campaign_discount_amount)} تومان</span>
+                        </div>
+                    )}
                     {order.discount_amount > 0 && (
                         <div className="flex justify-between text-green-400">
                             <span>تخفیف:</span>
@@ -195,13 +208,13 @@ function AccountOrderDetail() {
                     )}
                     <div className="border-t border-white/10 pt-2 mt-2 flex justify-between text-white font-bold text-lg">
                         <span>مبلغ پرداختی:</span>
-                        <span className="text-cherry-400">{formatPrice(order.final_amount)} تومان</span>
+                        <span className="text-cherry-400">{formatPrice(getOrderPayableTotal(order))} تومان</span>
                     </div>
                 </div>
             </div>
 
             {/* Delivery Address */}
-            {order.delivery_address && (
+            {(order.delivery_address || order.customer_address) && (
                 <div className="glass-card rounded-2xl p-5 border border-white/10">
                     <h3 className="text-lg font-bold text-white mb-4">اطلاعات ارسال</h3>
                     <div className="flex items-start gap-3">
@@ -209,7 +222,7 @@ function AccountOrderDetail() {
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </div>
                         <div className="flex-1">
-                            <p className="text-white mb-2">{order.delivery_address}</p>
+                            <p className="text-white mb-2">{typeof order.delivery_address === 'string' ? order.delivery_address : (order.customer_address || '')}</p>
                             <p className="text-sm text-gray-400">گیرنده: {order.customer_name}</p>
                             <p className="text-sm text-gray-400">{order.customer_phone}</p>
                             {order.delivery_method && (
