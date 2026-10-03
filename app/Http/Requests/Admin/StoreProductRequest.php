@@ -43,6 +43,9 @@ class StoreProductRequest extends FormRequest
             'variants.*.price' => ['nullable', 'numeric', 'min:0'],
             'variants.*.stock' => ['nullable', 'integer', 'min:0'],
             'variants.*.is_active' => ['nullable', 'boolean'],
+            'has_discount' => ['sometimes', 'boolean'],
+            'discount_type' => ['nullable', 'in:percentage,fixed'],
+            'discount_value' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

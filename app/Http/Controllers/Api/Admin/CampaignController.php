@@ -24,7 +24,7 @@ class CampaignController extends Controller
         $isActive = $request->input('is_active');
 
         $query = $this->campaignRepository->newQuery()
-            ->with('products')
+            ->with(['products.images'])
             ->when($isActive !== null, function ($q) use ($isActive) {
                 $q->where('is_active', (bool) $isActive);
             })
@@ -49,7 +49,7 @@ class CampaignController extends Controller
     public function store(StoreCampaignRequest $request): JsonResponse
     {
         try {
-            $campaign = $this->campaignRepository->create($request->validated());
+            $campaign = $this->campaignRepository->create($request->campaignAttributes());
 
             // Attach products if provided
             if ($request->has('product_ids') && is_array($request->product_ids)) {
@@ -97,8 +97,15 @@ class CampaignController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
+        $request->merge([
+            'name' => $request->input('name') ?? $request->input('title'),
+            'type' => $request->input('type') ?? $request->input('discount_type'),
+            'ends_at' => $request->input('ends_at') ?? $request->input('expires_at'),
+        ]);
+
         $request->validate([
             'name' => 'sometimes|string|max:255',
+            'description' => 'sometimes|nullable|string',
             'type' => 'sometimes|in:percentage,fixed',
             'discount_value' => 'sometimes|numeric|min:0',
             'starts_at' => 'sometimes|date',
@@ -110,9 +117,11 @@ class CampaignController extends Controller
         ]);
 
         try {
-            $updated = $this->campaignRepository->update($id, $request->only([
-                'name', 'type', 'discount_value', 'starts_at', 'ends_at', 'is_active', 'priority'
-            ]));
+            $payload = collect($request->only([
+                'name', 'description', 'type', 'discount_value', 'starts_at', 'ends_at', 'is_active', 'priority'
+            ]))->filter(fn ($value) => $value !== null)->all();
+
+            $updated = $this->campaignRepository->update($id, $payload);
 
             if (!$updated) {
                 return response()->json([

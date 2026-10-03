@@ -22,7 +22,10 @@ function AdminProductForm() {
         is_active: true,
         has_variants: false,
         has_colors: false,
-        has_sizes: false
+        has_sizes: false,
+        has_discount: false,
+        discount_type: 'percentage',
+        discount_value: ''
     });
     
     const [variants, setVariants] = useState([]);
@@ -68,6 +71,11 @@ function AdminProductForm() {
                         const data = await productRes.json();
                         if (data.success) {
                             const product = data.data;
+                            const productCampaign = (product.campaigns || []).find((campaign) => {
+                                // Prefer high-priority product-level discounts created from this form
+                                return campaign.priority >= 100 && campaign.discount_value > 0;
+                            }) || null;
+
                             setForm({
                                 title: product.title || '',
                                 description: product.description || '',
@@ -77,7 +85,10 @@ function AdminProductForm() {
                                 is_active: product.is_active ?? true,
                                 has_variants: product.has_variants ?? false,
                                 has_colors: product.has_colors ?? false,
-                                has_sizes: product.has_sizes ?? false
+                                has_sizes: product.has_sizes ?? false,
+                                has_discount: !!(productCampaign && productCampaign.discount_value > 0),
+                                discount_type: productCampaign?.discount_type || productCampaign?.type || 'percentage',
+                                discount_value: productCampaign?.discount_value || ''
                             });
                             // Convert existing images to FileUpload format
                             const existingImages = (product.images || []).map((img, index) => ({
@@ -204,6 +215,9 @@ function AdminProductForm() {
             formData.append('has_variants', form.has_variants ? '1' : '0');
             formData.append('has_colors', form.has_colors ? '1' : '0');
             formData.append('has_sizes', form.has_sizes ? '1' : '0');
+            formData.append('has_discount', form.has_discount ? '1' : '0');
+            formData.append('discount_type', form.discount_type || 'percentage');
+            formData.append('discount_value', form.has_discount && form.discount_value ? String(form.discount_value) : '0');
 
             // Add images
             const newImages = images.filter(img => img.isNew && img.file);
@@ -274,18 +288,27 @@ function AdminProductForm() {
                     // Stay on page for update (SPA UX) and refresh local state from server
                     if (isEdit) {
                         const product = data.data;
-                        setForm(prev => ({
-                            ...prev,
-                            title: product.title || prev.title,
-                            description: product.description || prev.description,
-                            price: product.price ?? prev.price,
-                            stock: product.stock ?? prev.stock,
-                            category_id: product.category_id ?? prev.category_id,
-                            is_active: product.is_active ?? prev.is_active,
-                            has_variants: product.has_variants ?? prev.has_variants,
-                            has_colors: product.has_colors ?? prev.has_colors,
-                            has_sizes: product.has_sizes ?? prev.has_sizes
-                        }));
+                        setForm(prev => {
+                            const productCampaign = (product.campaigns || []).find((campaign) => {
+                                return campaign.priority >= 100 && campaign.discount_value > 0;
+                            }) || null;
+
+                            return {
+                                ...prev,
+                                title: product.title || prev.title,
+                                description: product.description || prev.description,
+                                price: product.price ?? prev.price,
+                                stock: product.stock ?? prev.stock,
+                                category_id: product.category_id ?? prev.category_id,
+                                is_active: product.is_active ?? prev.is_active,
+                                has_variants: product.has_variants ?? prev.has_variants,
+                                has_colors: product.has_colors ?? prev.has_colors,
+                                has_sizes: product.has_sizes ?? prev.has_sizes,
+                                has_discount: !!(productCampaign && productCampaign.discount_value > 0),
+                                discount_type: productCampaign?.discount_type || productCampaign?.type || prev.discount_type,
+                                discount_value: productCampaign?.discount_value || ''
+                            };
+                        });
                         // Sync images/variants UI
                         const existingImages = (product.images || []).map((img, index) => ({
                             id: img.id || `existing-${index}`,
@@ -491,6 +514,56 @@ function AdminProductForm() {
                             label="دارای سایز"
                         />
                     </div>
+                </div>
+
+                {/* Product Discount */}
+                <div className="bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-xl font-bold text-white mb-1">تخفیف محصول</h2>
+                            <p className="text-gray-400 text-sm">اعمال تخفیف درصدی یا مبلغ ثابت روی این محصول</p>
+                        </div>
+                        <ModernCheckbox
+                            checked={form.has_discount}
+                            onChange={(e) => setForm(prev => ({ ...prev, has_discount: e.target.checked }))}
+                            label="فعال‌سازی تخفیف"
+                        />
+                    </div>
+
+                    {form.has_discount && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-white font-medium mb-2">نوع تخفیف</label>
+                                <ModernSelect
+                                    name="discount_type"
+                                    value={form.discount_type}
+                                    onChange={(value) => setForm(prev => ({ ...prev, discount_type: value }))}
+                                    options={[
+                                        { value: 'percentage', label: 'درصدی' },
+                                        { value: 'fixed', label: 'مبلغ ثابت' }
+                                    ]}
+                                    placeholder="نوع تخفیف را انتخاب کنید"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-white font-medium mb-2">
+                                    مقدار تخفیف {form.discount_type === 'percentage' ? '(درصد)' : '(تومان)'}
+                                </label>
+                                <input
+                                    type="number"
+                                    name="discount_value"
+                                    value={form.discount_value}
+                                    onChange={handleInputChange}
+                                    required={form.has_discount}
+                                    min="0"
+                                    max={form.discount_type === 'percentage' ? 100 : undefined}
+                                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                                    placeholder={form.discount_type === 'percentage' ? '20' : '50000'}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Images */}

@@ -52,12 +52,14 @@ function AdminCampaignForm() {
                         if (data.success) {
                             const campaign = data.data;
                             setForm({
-                                title: campaign.title || '',
+                                title: campaign.title || campaign.name || '',
                                 description: campaign.description || '',
-                                discount_type: campaign.discount_type || 'percentage',
+                                discount_type: campaign.discount_type || campaign.type || 'percentage',
                                 discount_value: campaign.discount_value || '',
                                 starts_at: campaign.starts_at ? campaign.starts_at.split('T')[0] : '',
-                                expires_at: campaign.expires_at ? campaign.expires_at.split('T')[0] : '',
+                                expires_at: (campaign.expires_at || campaign.ends_at)
+                                    ? (campaign.expires_at || campaign.ends_at).split('T')[0]
+                                    : '',
                                 is_active: campaign.is_active ?? true
                             });
                             setSelectedProducts(campaign.products || []);
@@ -105,7 +107,16 @@ function AdminCampaignForm() {
             const method = isEdit ? 'PUT' : 'POST';
 
             const requestData = {
-                ...form,
+                name: form.title,
+                title: form.title,
+                description: form.description,
+                type: form.discount_type,
+                discount_type: form.discount_type,
+                discount_value: Number(form.discount_value),
+                starts_at: form.starts_at || null,
+                ends_at: form.expires_at || null,
+                expires_at: form.expires_at || null,
+                is_active: form.is_active,
                 product_ids: selectedProducts.map(p => p.id)
             };
 

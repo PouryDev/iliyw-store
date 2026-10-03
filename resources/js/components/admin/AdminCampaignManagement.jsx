@@ -139,7 +139,7 @@ function AdminCampaignManagement() {
                             {/* Campaign Info */}
                             <div className="flex-1">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <h3 className="text-white font-bold text-xl">{campaign.title}</h3>
+                                    <h3 className="text-white font-bold text-xl">{campaign.title || campaign.name}</h3>
                                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                                         campaign.is_active 
                                             ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
@@ -153,13 +153,13 @@ function AdminCampaignManagement() {
                                     <div>
                                         <p className="text-gray-400 text-sm">نوع تخفیف</p>
                                         <p className="text-white font-medium">
-                                            {campaign.discount_type === 'percentage' ? 'درصدی' : 'مبلغی'}
+                                            {(campaign.discount_type || campaign.type) === 'percentage' ? 'درصدی' : 'مبلغی'}
                                         </p>
                                     </div>
                                     <div>
                                         <p className="text-gray-400 text-sm">مقدار تخفیف</p>
                                         <p className="text-white font-medium">
-                                            {campaign.discount_type === 'percentage' 
+                                            {(campaign.discount_type || campaign.type) === 'percentage' 
                                                 ? `${campaign.discount_value}%` 
                                                 : `${formatPrice(campaign.discount_value)} تومان`
                                             }

@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Models\Campaign;
 use App\Models\Color;
+use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Size;
 use App\Repositories\Contracts\ProductRepositoryInterface;
@@ -52,7 +54,9 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request): JsonResponse
     {
         try {
-            $productData = $request->validated();
+            $productData = collect($request->validated())
+                ->except(['has_discount', 'discount_type', 'discount_value', 'images', 'variants', 'existing_images'])
+                ->all();
 
             // Generate slug if not provided
             if (empty($productData['slug'])) {
@@ -139,10 +143,19 @@ class ProductController extends Controller
 
             DB::commit();
 
+            if ($request->exists('has_discount') || $request->exists('discount_value') || $request->exists('discount_type')) {
+                $this->syncProductDiscount(
+                    $product->fresh(),
+                    $request->input('discount_type'),
+                    $request->input('discount_value'),
+                    $request->boolean('has_discount')
+                );
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'محصول با موفقیت ایجاد شد',
-                'data' => new ProductResource($product->fresh(['images', 'variants.color', 'variants.size', 'category']))
+                'data' => new ProductResource($product->fresh(['images', 'variants.color', 'variants.size', 'category', 'campaigns']))
             ], 201);
 
         } catch (\Exception $e) {
@@ -185,7 +198,11 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $updated = $this->productRepository->update($id, $request->validated());
+            $productData = collect($request->validated())
+                ->except(['has_discount', 'discount_type', 'discount_value', 'images', 'variants', 'existing_images'])
+                ->all();
+
+            $updated = $this->productRepository->update($id, $productData);
 
             if (!$updated) {
                 DB::rollBack();
@@ -344,10 +361,19 @@ class ProductController extends Controller
 
             DB::commit();
 
+            if ($request->exists('has_discount') || $request->exists('discount_value') || $request->exists('discount_type')) {
+                $this->syncProductDiscount(
+                    $product->fresh(),
+                    $request->input('discount_type'),
+                    $request->input('discount_value'),
+                    $request->boolean('has_discount')
+                );
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'محصول با موفقیت به‌روزرسانی شد',
-                'data' => new ProductResource($product->fresh(['images', 'variants.color', 'variants.size', 'category']))
+                'data' => new ProductResource($product->fresh(['images', 'variants.color', 'variants.size', 'category', 'campaigns']))
             ]);
 
         } catch (\Exception $e) {
@@ -386,6 +412,56 @@ class ProductController extends Controller
                 'message' => 'خطا در حذف محصول: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Create/update/remove an exclusive product-level campaign discount.
+     * Only touches campaigns that target this single product.
+     */
+    protected function syncProductDiscount(
+        Product $product,
+        ?string $discountType,
+        mixed $discountValue,
+        bool $hasDiscount
+    ): void {
+        // Product-level discounts use priority 100 so they outrank regular campaigns
+        $exclusiveCampaign = $product->campaigns()
+            ->where('priority', '>=', 100)
+            ->withCount('targets')
+            ->get()
+            ->first(fn (Campaign $campaign) => (int) $campaign->targets_count === 1);
+
+        $value = is_numeric($discountValue) ? (int) $discountValue : 0;
+        $type = in_array($discountType, ['percentage', 'fixed'], true) ? $discountType : 'percentage';
+
+        if (!$hasDiscount || $value <= 0) {
+            if ($exclusiveCampaign) {
+                $exclusiveCampaign->delete();
+            }
+            return;
+        }
+
+        if ($type === 'percentage' && $value > 100) {
+            $value = 100;
+        }
+
+        $payload = [
+            'name' => 'تخفیف ' . $product->title,
+            'type' => $type,
+            'discount_value' => $value,
+            'starts_at' => now(),
+            'ends_at' => now()->addYears(10),
+            'is_active' => true,
+            'priority' => 100,
+        ];
+
+        if ($exclusiveCampaign) {
+            $exclusiveCampaign->update($payload);
+            return;
+        }
+
+        $campaign = Campaign::create($payload);
+        $campaign->products()->attach($product->id);
     }
 }
 
